@@ -15,7 +15,6 @@ from simtext.utils.distance import cos_dist
 jieba.setLogLevel('ERROR')
 USER_DIR = Path.expanduser(Path('~')).joinpath('.simtext')
 if not USER_DIR.exists():
-    print('make dir:%s' % USER_DIR)
     USER_DIR.mkdir()
 USER_DATA_DIR = USER_DIR.joinpath('datasets')
 if not USER_DATA_DIR.exists():
