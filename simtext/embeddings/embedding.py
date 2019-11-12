@@ -3,7 +3,9 @@
 @author:XuMing（xuming624@qq.com)
 @description: 
 """
+import os
 
+os.environ['TF_KERAS'] = '1'
 import json
 import pydoc
 from typing import Union, List, Optional, Dict
@@ -11,12 +13,14 @@ from typing import Union, List, Optional, Dict
 import numpy as np
 from tensorflow import keras
 
-from simtext import custom_objects
 from simtext.processors.base_processor import BaseProcessor
 from simtext.processors.default_processor import DefaultProcessor
 from simtext.utils.logger import get_logger
+import keras_bert
 
+custom_objects = keras_bert.get_custom_objects()
 logger = get_logger(__name__)
+
 L = keras.layers
 
 

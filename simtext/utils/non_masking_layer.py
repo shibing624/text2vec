@@ -6,7 +6,12 @@
 
 # file: non_masking_layer.py
 # time: 2019-05-23 14:05
-from simtext import custom_objects
+import os
+
+os.environ['TF_KERAS'] = '1'
+import keras_bert
+
+custom_objects = keras_bert.get_custom_objects()
 from tensorflow.python.keras.layers import Layer
 
 

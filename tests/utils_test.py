@@ -53,7 +53,7 @@ def get_zip_file():
     file_path = utils.get_file(
         'aa', _url, extract=True,
         cache_dir=simtext.USER_DATA_DIR,
-        cache_subdir='bert_test',
+        cache_subdir='dir_test1',
         verbose=1
     )
     print("file_path:", file_path)

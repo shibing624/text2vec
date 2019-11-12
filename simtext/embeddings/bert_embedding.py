@@ -114,18 +114,18 @@ class BERTEmbedding(Embedding):
         self._build_model()
 
     def _build_token2idx_from_bert(self):
-
         dict_path = os.path.join(self.model_folder, 'vocab.txt')
         if not os.path.exists(dict_path):
-            model_name = self.model_key_map.get(self.model_folder, 'bert-base-chinese')
+            model_name = self.model_key_map.get(self.model_folder, 'chinese_L-12_H-768_A-12')
             url = self.pre_trained_models.get(model_name)
             file_path = get_file(
                 model_name + ".zip", url, extract=True,
-                cache_dir=simtext.USER_DATA_DIR,
-                cache_subdir=simtext.USER_BERT_MODEL_DIR,
+                cache_dir=simtext.USER_DIR,
+                cache_subdir=simtext.USER_DATA_DIR,
                 verbose=1
             )
-            dict_path = os.path.join(file_path, 'vocab.txt')
+            self.model_folder = os.path.join(simtext.USER_DATA_DIR, model_name )
+            dict_path = os.path.join(self.model_folder , 'vocab.txt')
         logger.debug(f'load vocab.txt from {dict_path}')
         token2idx = {}
         with codecs.open(dict_path, 'r', encoding='utf-8') as f:
