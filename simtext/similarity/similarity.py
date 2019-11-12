@@ -25,6 +25,7 @@ class Similarity(object):
             return ret
 
         if self.embedding_type == EmbType.BERT:
+            a = 'https://storage.googleapis.com/bert_models/2018_11_03/chinese_L-12_H-768_A-12.zip'
             b = BERTEmbedding(model_folder='/Users/xuming06/Codes/bert/data/chinese_L-12_H-768_A-12',
                               sequence_length=128)
             tokens_1 = b.tokenizer.tokenize(text1)

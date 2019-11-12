@@ -10,12 +10,12 @@ from typing import Union, Optional, Any, List, Tuple
 
 import numpy as np
 import tensorflow as tf
-
+import simtext
 from simtext.embeddings.embedding import Embedding
 from simtext.processors.base_processor import BaseProcessor
 from simtext.utils.logger import get_logger
 from simtext.utils.non_masking_layer import NonMaskingLayer
-
+from simtext.utils import get_file
 os.environ['TF_KERAS'] = '1'
 import keras_bert
 
@@ -24,6 +24,44 @@ logger = get_logger(__name__)
 
 class BERTEmbedding(Embedding):
     """Pre-trained BERT embedding"""
+    model_key_map = {
+        'bert-base-uncased': 'uncased_L-12_H-768_A-12',
+        'bert-large-uncased': 'uncased_L-24_H-1024_A-16',
+        'bert-base-cased': 'cased_L-12_H-768_A-12',
+        'bert-large-cased': 'cased_L-24_H-1024_A-16',
+        'bert-base-multilingual-cased': 'multi_cased_L-12_H-768_A-12',
+        'bert-base-chinese': 'chinese_L-12_H-768_A-12'
+    }
+
+    pre_trained_models = {
+        # BERT-Base, Uncased: 12-layer, 768-hidden, 12-heads, 110M parameters
+        'uncased_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_10_18/'
+                                   'uncased_L-12_H-768_A-12.zip',
+        # BERT-Large, Uncased
+        # 24-layer, 1024-hidden, 16-heads, 340M parameters
+        'uncased_L-24_H-1024_A-16': 'https://storage.googleapis.com/bert_models/2018_10_18/'
+                                    'uncased_L-24_H-1024_A-16.zip',
+        # BERT-Base, Cased
+        # 12-layer, 768-hidden, 12-heads , 110M parameters
+        'cased_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_10_18/'
+                                 'cased_L-12_H-768_A-12.zip',
+        # BERT-Large, Cased
+        # 24-layer, 1024-hidden, 16-heads, 340M parameters
+        'cased_L-24_H-1024_A-16': 'https://storage.googleapis.com/bert_models/2018_10_18/'
+                                  'cased_L-24_H-1024_A-16.zip',
+        # BERT-Base, Multilingual Cased (New, recommended)
+        # 104 languages, 12-layer, 768-hidden, 12-heads, 110M parameters
+        'multi_cased_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_11_23/'
+                                       'multi_cased_L-12_H-768_A-12.zip',
+        # BERT-Base, Multilingual Uncased (Orig, not recommended)
+        # 12-layer, 768-hidden, 12-heads, 110M parameters
+        'multilingual_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_11_03/'
+                                        'multilingual_L-12_H-768_A-12.zip',
+        # BERT-Base, Chinese
+        # Chinese Simplified and Traditional, 12-layer, 768-hidden, 12-heads, 110M
+        'chinese_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_11_03/'
+                                   'chinese_L-12_H-768_A-12.zip',
+    }
 
     def info(self):
         info = super(BERTEmbedding, self).info()
@@ -34,7 +72,7 @@ class BERTEmbedding(Embedding):
         return info
 
     def __init__(self,
-                 model_folder: str,
+                 model_folder: str = '',
                  layer_nums: int = 4,
                  trainable: bool = False,
                  sequence_length: Union[str, int] = 'auto',
@@ -76,8 +114,18 @@ class BERTEmbedding(Embedding):
         self._build_model()
 
     def _build_token2idx_from_bert(self):
+
         dict_path = os.path.join(self.model_folder, 'vocab.txt')
-        logger.debug('load vocab.txt from %s' % self.model_folder)
+        if not os.path.exists(dict_path):
+            url = self.pre_trained_models.get(self.model_key_map.get(self.model_folder, 'bert-base-chinese'))
+            file_path = get_file(
+                'bert', url, extract=True,
+                cache_dir=simtext.USER_DATA_DIR,
+                cache_subdir=simtext.USER_BERT_MODEL_DIR,
+                verbose=1
+            )
+            dict_path = os.path.join(file_path, 'vocab.txt')
+        logger.debug(f'load vocab.txt from {dict_path}')
         token2idx = {}
         with codecs.open(dict_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -187,5 +235,3 @@ class BERTEmbedding(Embedding):
         if x1 is None:
             x1 = np.zeros(x0.shape, dtype=np.int32)
         return x0, x1
-
-

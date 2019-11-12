@@ -46,3 +46,14 @@ def test_get_file():
     file_dir = simtext.USER_DATA_DIR.joinpath('LICENSE')
     if os.path.exists(file_dir):
         shutil.rmtree(file_dir)
+
+
+def test_get_zip_file():
+    _url = "https://raw.githubusercontent.com/shibing624/simtext/master/tests/data.zip"
+    file_path = utils.get_file(
+        'bert11', _url, extract=True,
+        cache_dir=simtext.USER_DATA_DIR,
+        cache_subdir='LICENSE',
+        verbose=1
+    )
+    print("file_path:", file_path)
