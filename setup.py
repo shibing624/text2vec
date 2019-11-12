@@ -10,7 +10,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 # Avoids IDE errors, but actual version is read from version.py
 __version__ = None
-exec(open('matchzoo/version.py').read())
+exec(open('simtext/version.py').read())
 
 if sys.version_info < (3,):
     sys.exit('Sorry, Python3 is required.')
@@ -25,7 +25,7 @@ with open('requirements.txt', 'r', encoding='utf-8') as f:
     reqs = f.read()
 
 setup(
-    name='pycorrector',
+    name='simtext',
     version=__version__,
     description='Chinese Text Similarity Calculation Tool',
     long_description=readme,

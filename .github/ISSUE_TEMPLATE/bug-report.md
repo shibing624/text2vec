@@ -23,7 +23,7 @@ You should also provide code snippets you tried as a workaround, StackOverflow s
  - **OS** [e.g. Windows 10, macOS 10.14]: 
  - **Hardware** [e.g. CPU only, GTX 1080 Ti]: 
 
-In addition, figure out your MatchZoo version by running `import simtext; simtext.__version__`.
+In addition, figure out your version by running `import simtext; simtext.__version__`.
 
 ### Additional Information
 Other things you want the developers to know.

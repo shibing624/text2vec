@@ -17,4 +17,4 @@ Please provide a clear and concise description of what the question is.
 
 You may also provide a [Minimal, Complete, and Verifiable example](https://stackoverflow.com/help/mcve) you tried as a workaround, or StackOverflow solution that you have walked through. (e.g. cosmic radiation).
 
-In addition, figure out your MatchZoo version by running `import simtext; simtext.__version__`.
+In addition, figure out your version by running `import simtext; simtext.__version__`.

@@ -4,5 +4,3 @@
 @description: 
 """
 
-from .timer import Timer
-from .get_file import get_file, hash_file
