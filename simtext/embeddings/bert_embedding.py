@@ -117,9 +117,10 @@ class BERTEmbedding(Embedding):
 
         dict_path = os.path.join(self.model_folder, 'vocab.txt')
         if not os.path.exists(dict_path):
-            url = self.pre_trained_models.get(self.model_key_map.get(self.model_folder, 'bert-base-chinese'))
+            model_name = self.model_key_map.get(self.model_folder, 'bert-base-chinese')
+            url = self.pre_trained_models.get(model_name)
             file_path = get_file(
-                'bert', url, extract=True,
+                model_name + ".zip", url, extract=True,
                 cache_dir=simtext.USER_DATA_DIR,
                 cache_subdir=simtext.USER_BERT_MODEL_DIR,
                 verbose=1
