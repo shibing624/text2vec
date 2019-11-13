@@ -8,7 +8,6 @@
 # time: 2019-05-21 11:27
 
 import collections
-import logging
 import operator
 from typing import List, Optional, Union, Dict, Any
 
@@ -109,7 +108,6 @@ class BaseProcessor(object):
         self.token2idx = token2idx
         self.idx2token = dict([(value, key)
                                for key, value in self.token2idx.items()])
-        logging.debug(f"build token2idx dict finished, contains {len(self.token2idx)} tokens.")
         self.dataset_info['token_count'] = len(self.token2idx)
 
     def _build_label_dict(self, corpus: Union[List[List[str]], List[str]]):

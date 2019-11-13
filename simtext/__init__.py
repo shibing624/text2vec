@@ -6,13 +6,10 @@
 
 from pathlib import Path
 
-import jieba
-
 from simtext.embeddings.bert_embedding import BERTEmbedding
 from simtext.embeddings.word_embedding import WordEmbedding
-from simtext.utils.distance import cos_dist
+from simtext.utils import cos_dist, segment
 
-jieba.setLogLevel('ERROR')
 USER_DIR = Path.expanduser(Path('~')).joinpath('.simtext')
 if not USER_DIR.exists():
     USER_DIR.mkdir()
@@ -46,13 +43,13 @@ class Similarity(object):
         if not text1.strip() or not text2.strip():
             return ret
         self.load_model()
-        if self.embedding_type == EmbType.BERT:
-            tokens_1 = self.model.tokenizer.tokenize(text1)
-            tokens_2 = self.model.tokenizer.tokenize(text2)
-        else:
-            tokens_1 = jieba.lcut(text1)
-            tokens_2 = jieba.lcut(text2)
+        tokens_1 = self.model.tokenizer.tokenize(text1)
+        tokens_2 = self.model.tokenizer.tokenize(text2)
         emb_1 = self.model.embed([tokens_1])[0]
         emb_2 = self.model.embed([tokens_2])[0]
         ret = cos_dist(emb_1, emb_2)
         return ret
+
+
+SIM = Similarity()
+score = SIM.score

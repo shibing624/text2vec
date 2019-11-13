@@ -104,13 +104,6 @@ class Embedding(object):
         """
         return self.processor.token2idx
 
-    # @property
-    # def tokenizer(self):
-    #     if self.tokenizer:
-    #         return self.tokenizer
-    #     else:
-    #         raise ValueError('This embedding not support built-in tokenizer')
-
     @sequence_length.setter
     def sequence_length(self, val: Union[int, str]):
         if isinstance(val, str):

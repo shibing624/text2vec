@@ -11,7 +11,7 @@ import simtext
 from simtext import utils
 
 
-def timer_test():
+def test_timer():
     timer = utils.Timer()
     start = timer.time
     timer.stop()
@@ -20,7 +20,7 @@ def timer_test():
     assert timer.time > start
 
 
-def get_file_test():
+def test_get_file():
     _url = "https://raw.githubusercontent.com/shibing624/simtext/master/LICENSE"
     file_path = utils.get_file(
         'LICENSE', _url, extract=True,
@@ -48,7 +48,7 @@ def get_file_test():
         shutil.rmtree(file_dir)
 
 
-def get_zip_file():
+def test_get_zip_file():
     _url = "https://raw.githubusercontent.com/shibing624/simtext/master/tests/a_dir.zip"
     file_path = utils.get_file(
         'aa', _url, extract=True,
@@ -57,7 +57,3 @@ def get_zip_file():
         verbose=1
     )
     print("file_path:", file_path)
-
-
-if __name__ == '__main__':
-    get_zip_file()

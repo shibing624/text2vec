@@ -12,6 +12,7 @@ from gensim.models import KeyedVectors
 from simtext.embeddings.embedding import Embedding
 from simtext.processors.base_processor import BaseProcessor
 from simtext.utils.logger import get_logger
+from simtext.utils.tokenizer import Tokenizer
 
 logger = get_logger(__name__)
 
@@ -51,14 +52,14 @@ class WordEmbedding(Embedding):
         self.w2v_kwargs = w2v_kwargs
         self.w2v = None
         self.w2v_model_loaded = False
-
+        logger.debug('load w2v embedding')
         super(WordEmbedding, self).__init__(sequence_length=sequence_length,
                                             embedding_size=0,
                                             processor=processor)
         self._build_token2idx_from_w2v()
 
     def _build_token2idx_from_w2v(self):
-        logger.debug('load w2v from:%s' % self.w2v_path)
+        logger.debug('load w2v from %s' % self.w2v_path)
         w2v = KeyedVectors.load_word2vec_format(self.w2v_path, **self.w2v_kwargs)
 
         token2idx = {
@@ -85,7 +86,9 @@ class WordEmbedding(Embedding):
         self.processor.token2idx = self.w2v_token2idx
         self.processor.idx2token = dict([(value, key) for key, value in self.w2v_token2idx.items()])
         logger.debug('word count   : {}'.format(len(self.w2v_vector_matrix)))
+        logger.debug('emb size     : {}'.format(self.embedding_size))
         logger.debug('Top 50 word  : {}'.format(self.w2v_top_words))
+        self.tokenizer = Tokenizer()
 
     def _build_model(self, **kwargs):
         logger.debug('no need build model for w2v')
@@ -114,8 +117,9 @@ class WordEmbedding(Embedding):
                 else:
                     e = 0
                 emb.append(e)
-            embeds.append(emb)
-        tensor_x = np.array(embeds).sum(axis=0)
+            tensor_x = np.array(emb).sum(axis=0)
+            embeds.append(tensor_x)
+        embeds = np.array(embeds)
         if debug:
-            logger.debug(f'sentence tensor shape: {tensor_x.shape}')
-        return tensor_x
+            logger.debug(f'sentence tensor shape: {embeds.shape}')
+        return embeds

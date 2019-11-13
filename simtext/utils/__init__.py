@@ -4,5 +4,8 @@
 @description: 
 """
 
-from .timer import Timer
+from .distance import cos_dist
 from .get_file import get_file, hash_file
+from .logger import get_logger
+from .timer import Timer
+from .tokenizer import segment

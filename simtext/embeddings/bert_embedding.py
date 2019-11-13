@@ -10,12 +10,14 @@ from typing import Union, Optional, Any, List, Tuple
 
 import numpy as np
 import tensorflow as tf
+
 import simtext
 from simtext.embeddings.embedding import Embedding
 from simtext.processors.base_processor import BaseProcessor
+from simtext.utils import get_file
 from simtext.utils.logger import get_logger
 from simtext.utils.non_masking_layer import NonMaskingLayer
-from simtext.utils import get_file
+
 os.environ['TF_KERAS'] = '1'
 import keras_bert
 
@@ -61,6 +63,10 @@ class BERTEmbedding(Embedding):
         # Chinese Simplified and Traditional, 12-layer, 768-hidden, 12-heads, 110M
         'chinese_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_11_03/'
                                    'chinese_L-12_H-768_A-12.zip',
+
+        # https://github.com/ymcui/Chinese-BERT-wwm 提供优化后的RoBERTa-wwm-ext-large中文模型，可供下载，
+        # 但由于提升有限（LCQMC句对语义任务识别任务中，BERT的测试集准确率86.9，RoBERTa-wwm-ext-large的测试集准确率87.0），
+        # 本项目暂不使用。
     }
 
     def info(self):
@@ -107,7 +113,7 @@ class BERTEmbedding(Embedding):
         self.processor.token_bos = '[CLS]'
         self.processor.token_eos = '[SEP]'
 
-        self.processor.add_bos_eos = True
+        self.processor.add_bos_eos = False  # bert_tokenizer added
 
         self.model_folder = model_folder
         self._build_token2idx_from_bert()
@@ -118,14 +124,14 @@ class BERTEmbedding(Embedding):
         if not os.path.exists(dict_path):
             model_name = self.model_key_map.get(self.model_folder, 'chinese_L-12_H-768_A-12')
             url = self.pre_trained_models.get(model_name)
-            file_path = get_file(
+            get_file(
                 model_name + ".zip", url, extract=True,
                 cache_dir=simtext.USER_DIR,
                 cache_subdir=simtext.USER_DATA_DIR,
                 verbose=1
             )
-            self.model_folder = os.path.join(simtext.USER_DATA_DIR, model_name )
-            dict_path = os.path.join(self.model_folder , 'vocab.txt')
+            self.model_folder = os.path.join(simtext.USER_DATA_DIR, model_name)
+            dict_path = os.path.join(self.model_folder, 'vocab.txt')
         logger.debug(f'load vocab.txt from {dict_path}')
         token2idx = {}
         with codecs.open(dict_path, 'r', encoding='utf-8') as f:
@@ -148,7 +154,7 @@ class BERTEmbedding(Embedding):
                 return
             config_path = os.path.join(self.model_folder, 'bert_config.json')
             check_point_path = os.path.join(self.model_folder, 'bert_model.ckpt')
-            logger.debug('load bert model from:%s' % check_point_path)
+            logger.debug('load bert model from %s' % check_point_path)
             bert_model = keras_bert.load_trained_model_from_checkpoint(config_path,
                                                                        check_point_path,
                                                                        seq_len=seq_len,
@@ -164,7 +170,7 @@ class BERTEmbedding(Embedding):
             self.embedding_size = int(bert_model.output.shape[-1])
             output_features = NonMaskingLayer()(bert_model.output)
             self.embed_model = tf.keras.Model(bert_model.inputs, output_features)
-            logger.warning(f'seq_len: {self.sequence_length}')
+            logger.debug(f'seq_len: {self.sequence_length}')
 
     def analyze_corpus(self,
                        x: Union[Tuple[List[List[str]], ...], List[List[str]]],
