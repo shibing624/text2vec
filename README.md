@@ -14,17 +14,16 @@ python3 setup.py install
 
 ## Usage:
 ```
-from simtext import Similarity
+import simtext
 
-sim = Similarity()
 a = '湖北人爱吃鱼'
 b = '甘肃人不爱吃鱼'
-s = sim.score(a, b)
+s = simtext.score(a, b)
 print(s)
 
 ```
 
 output:
 ```
-0.966466890301913
+0.7783981956422068
 ```

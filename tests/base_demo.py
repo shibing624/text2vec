@@ -4,17 +4,16 @@
 @description: 
 """
 
-from simtext import Similarity
+import simtext
 
-sim = Similarity()
 a = '湖北人爱吃鱼'
 b = '甘肃人不爱吃鱼'
 c = '武汉人'
-s = sim.score(a, b)
+s = simtext.score(a, b)
 print(a, b, s)
 
-s = sim.score(a, c)
+s = simtext.score(a, c)
 print(a, c, s)
 
-s = sim.score(b, c)
+s = simtext.score(b, c)
 print(b, c, s)
