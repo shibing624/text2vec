@@ -12,7 +12,6 @@ import operator
 from typing import List, Optional, Union, Dict, Any
 
 import numpy as np
-from tensorflow.python.keras.preprocessing.sequence import pad_sequences
 
 
 def get_list_subset(target: List, index_list: List[int]) -> List:
@@ -117,6 +116,7 @@ class BaseProcessor(object):
                           data: List[List[str]],
                           max_len: Optional[int] = None,
                           subset: Optional[List[int]] = None) -> np.ndarray:
+        from tensorflow.python.keras.preprocessing.sequence import pad_sequences
         if max_len is None:
             max_len = self.sequence_length
         if subset is not None:

@@ -6,8 +6,6 @@
 
 from pathlib import Path
 
-from simtext.embeddings.bert_embedding import BERTEmbedding
-from simtext.embeddings.word_embedding import WordEmbedding
 from simtext.utils import cos_dist, segment
 
 USER_DIR = Path.expanduser(Path('~')).joinpath('.simtext')
@@ -24,17 +22,18 @@ class EmbType(object):
 
 
 class Similarity(object):
-    def __init__(self, embedding_type='bert'):
+    def __init__(self, embedding_type='w2v'):
         self.embedding_type = embedding_type
         self.model = None
 
     def load_model(self):
         if not self.model:
             if self.embedding_type == EmbType.BERT:
+                from simtext.embeddings.bert_embedding import BERTEmbedding
                 self.model = BERTEmbedding(sequence_length=128)
             elif self.embedding_type == EmbType.W2V:
-                self.model = WordEmbedding(w2v_path='/Users/xuming06/Codes/ai-server-xuming/data/sentence_w2v.bin',
-                                           w2v_kwargs={'binary': True})
+                from simtext.embeddings.word_embedding import WordEmbedding
+                self.model = WordEmbedding()
             else:
                 raise ValueError('set error embedding_type.')
 

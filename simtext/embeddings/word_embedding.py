@@ -4,13 +4,16 @@
 @description: 
 """
 
+import os
 from typing import Union, Optional, Dict, Any, List, Tuple
 
 import numpy as np
 from gensim.models import KeyedVectors
 
+import simtext
 from simtext.embeddings.embedding import Embedding
 from simtext.processors.base_processor import BaseProcessor
+from simtext.utils.get_file import get_file
 from simtext.utils.logger import get_logger
 from simtext.utils.tokenizer import Tokenizer
 
@@ -19,6 +22,23 @@ logger = get_logger(__name__)
 
 class WordEmbedding(Embedding):
     """Pre-trained word2vec embedding"""
+    model_key_map = {
+        'w2v-tencent-chinese': 'Tencent_AILab_ChineseEmbedding.tar.gz',
+        'w2v-chinadaily-chinese': 'sentence_w2v.bin',
+    }
+
+    pre_trained_models = {
+        # 腾讯词向量, 6.78G
+        'Tencent_AILab_ChineseEmbedding.tar.gz': 'https://ai.tencent.com/ailab/nlp/data/'
+                                                 'Tencent_AILab_ChineseEmbedding.tar.gz',
+        # 中国人民日报训练的中文词向量, 32MB
+        'sentence_w2v.bin': 'https://www.borntowin.cn/mm/emb_models/sentence_w2v.bin'
+    }
+
+    model_binary_map = {
+        'w2v-tencent-chinese': {"binary": False},
+        'w2v-chinadaily-chinese': {"binary": True}
+    }
 
     def info(self):
         info = super(WordEmbedding, self).info()
@@ -30,7 +50,7 @@ class WordEmbedding(Embedding):
         return info
 
     def __init__(self,
-                 w2v_path: str,
+                 w2v_path: str = '',
                  w2v_kwargs: Dict[str, Any] = None,
                  sequence_length: Union[Tuple[int, ...], str, int] = 'auto',
                  processor: Optional[BaseProcessor] = None):
@@ -59,6 +79,17 @@ class WordEmbedding(Embedding):
         self._build_token2idx_from_w2v()
 
     def _build_token2idx_from_w2v(self):
+        if not self.w2v_path or not os.path.exists(self.w2v_path):
+            model_name = self.model_key_map.get(self.w2v_path, 'sentence_w2v.bin')
+            self.w2v_kwargs = self.model_binary_map.get(self.w2v_path, {"binary": True})
+            url = self.pre_trained_models.get(model_name)
+            get_file(
+                model_name, url, extract=False,
+                cache_dir=simtext.USER_DATA_DIR,
+                cache_subdir=simtext.USER_DATA_DIR,
+                verbose=1
+            )
+            self.w2v_path = os.path.join(simtext.USER_DATA_DIR, model_name)
         logger.debug('load w2v from %s' % self.w2v_path)
         w2v = KeyedVectors.load_word2vec_format(self.w2v_path, **self.w2v_kwargs)
 

@@ -5,8 +5,11 @@
 """
 import logging
 import os
+
 import jieba
 from jieba import posseg
+
+jieba.setLogLevel(log_level="ERROR")
 
 
 def segment(sentence, cut_type='word', pos=False):

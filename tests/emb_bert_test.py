@@ -6,8 +6,7 @@
 from simtext.embeddings.bert_embedding import BERTEmbedding
 
 if __name__ == '__main__':
-    b = BERTEmbedding(model_folder='/Users/xuming06/Codes/bert/data/chinese_L-12_H-768_A-12',
-                      sequence_length=12)
+    b = BERTEmbedding()
 
     data1 = 'all work and no play makes'.split(' ')
     data2 = '你 好 啊'.split(' ')

@@ -7,7 +7,6 @@
 from typing import List, Optional
 
 import numpy as np
-from tensorflow.python.keras.utils import to_categorical
 
 from .base_processor import BaseProcessor, get_list_subset
 
@@ -48,6 +47,7 @@ class DefaultProcessor(BaseProcessor):
                           data: List[str],
                           max_len: Optional[int] = None,
                           subset: Optional[List[int]] = None) -> np.ndarray:
+        from tensorflow.python.keras.utils import to_categorical
         if subset is not None:
             target = get_list_subset(data, subset)
         else:

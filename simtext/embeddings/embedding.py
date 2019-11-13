@@ -3,25 +3,18 @@
 @author:XuMing（xuming624@qq.com)
 @description: 
 """
-import os
-
-os.environ['TF_KERAS'] = '1'
 import json
+import os
 import pydoc
 from typing import Union, List, Optional, Dict
 
 import numpy as np
-from tensorflow import keras
 
 from simtext.processors.base_processor import BaseProcessor
 from simtext.processors.default_processor import DefaultProcessor
 from simtext.utils.logger import get_logger
-import keras_bert
 
-custom_objects = keras_bert.get_custom_objects()
 logger = get_logger(__name__)
-
-L = keras.layers
 
 
 class Embedding(object):
@@ -43,8 +36,12 @@ class Embedding(object):
     def _load_saved_instance(cls,
                              config_dict: Dict,
                              model_path: str,
-                             tf_model: keras.Model):
-
+                             tf_model):
+        os.environ['TF_KERAS'] = '1'
+        from tensorflow import keras
+        import keras_bert
+        L = keras.layers
+        custom_objects = keras_bert.get_custom_objects()
         processor_info = config_dict['processor']
         processor_class = pydoc.locate(f"{processor_info['module']}.{processor_info['class_name']}")
         processor = processor_class(**processor_info['config'])
@@ -72,8 +69,8 @@ class Embedding(object):
         else:
             self.processor = processor
 
-        self.sequence_length: Union[int, str] = sequence_length
-        self.embed_model: Optional[keras.Model] = None
+        self.sequence_length = sequence_length
+        self.embed_model = None
         self.tokenizer = None
 
     @property
@@ -108,7 +105,7 @@ class Embedding(object):
     def sequence_length(self, val: Union[int, str]):
         if isinstance(val, str):
             if val == 'auto':
-                logger.warning("Sequence length will auto set at 95% of sequence length")
+                logger.debug("Sequence length will auto set at 95% of sequence length")
             elif val == 'variable':
                 val = None
             else:

@@ -21,6 +21,9 @@ case_categories_corresponding_pairs = [['从广州到长沙在哪里定高铁票
                                        ['网上找工作可靠吗', '网上找工作靠谱吗', True],
                                        ['你们都喜欢火影忍者里的谁啊', '火影忍者里你最喜欢谁', True]]
 
+bert_sim = simtext.Similarity(embedding_type='bert')
+w2v_sim = simtext.Similarity(embedding_type='w2v')
+
 
 def apply_bert_case(cases: List[List[str]]):
     for line in cases:
@@ -28,11 +31,8 @@ def apply_bert_case(cases: List[List[str]]):
         q2 = line[1]
         a = line[2]
 
-        s = simtext.score(q1, q2)
+        s = bert_sim.score(q1, q2)
         print(f'q1:{q1}, q2:{q2}, expect a:{a}, actual a:{s}')
-
-
-w2v_sim = simtext.Similarity(embedding_type='w2v')
 
 
 def apply_w2v_case(cases: List[List[str]]):
