@@ -52,8 +52,8 @@ setup(
     packages=find_packages(exclude=['tests']),
     package_dir={'simtext': 'simtext'},
     package_data={
-        'simtext': ['*.*', 'LICENSE', '../LICENSE', 'README.*', '../*.txt', 'data/*',
-                    'utils/*', 'bert/*'],
+        'simtext': ['*.*', 'LICENSE', '../LICENSE', 'README.*', '../*.txt', 'embeddings/*',
+                    'utils/*', 'processors/*'],
     },
     test_suite='tests',
 )

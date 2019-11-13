@@ -1,3 +1,2 @@
-numpy
 jieba
-keras-bert==0.80.0
+keras-bert
