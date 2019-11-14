@@ -52,8 +52,9 @@ class WordEmbedding(Embedding):
     def __init__(self,
                  w2v_path: str = '',
                  w2v_kwargs: Dict[str, Any] = None,
-                 sequence_length: Union[Tuple[int, ...], str, int] = 'auto',
-                 processor: Optional[BaseProcessor] = None):
+                 sequence_length: Union[Tuple[int, ...], str, int] = 128,
+                 processor: Optional[BaseProcessor] = None,
+                 trainable: bool = False):
         """
 
         Args:
@@ -77,6 +78,8 @@ class WordEmbedding(Embedding):
                                             embedding_size=0,
                                             processor=processor)
         self._build_token2idx_from_w2v()
+        if trainable:
+            self._build_model()
 
     def _build_token2idx_from_w2v(self):
         if not self.w2v_path or not os.path.exists(self.w2v_path):
@@ -84,7 +87,7 @@ class WordEmbedding(Embedding):
             self.w2v_kwargs = self.model_binary_map.get(self.w2v_path, {"binary": True})
             url = self.pre_trained_models.get(model_name)
             get_file(
-                model_name, url, extract=False,
+                model_name, url, extract=True,
                 cache_dir=simtext.USER_DATA_DIR,
                 cache_subdir=simtext.USER_DATA_DIR,
                 verbose=1
@@ -122,7 +125,21 @@ class WordEmbedding(Embedding):
         self.tokenizer = Tokenizer()
 
     def _build_model(self, **kwargs):
-        logger.debug('no need build model for w2v')
+        if self.embed_model is None:
+            from tensorflow import keras
+            if self.token_count == 0:
+                logger.debug('need to build after build_word2idx')
+            else:
+                input_tensor = keras.layers.Input(shape=(self.sequence_length,),
+                                                  name='input')
+                layer_embedding = keras.layers.Embedding(self.token_count,
+                                                         self.embedding_size,
+                                                         weights=[self.w2v_vector_matrix],
+                                                         trainable=False,
+                                                         name='layer_embedding')
+
+                embedded_tensor = layer_embedding(input_tensor)
+                self.embed_model = keras.Model(input_tensor, embedded_tensor)
 
     def embed(self,
               sentence_list: Union[Tuple[List[List[str]], ...], List[List[str]]],

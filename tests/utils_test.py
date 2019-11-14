@@ -62,8 +62,8 @@ def test_get_zip_file():
 def test_bin_file():
     _url = 'https://www.borntowin.cn/mm/emb_models/sentence_w2v.bin'
     file_path = utils.get_file(
-        'sentence_w2v.bin', _url, extract=False,
-        cache_dir=simtext.USER_DATA_DIR,
-        cache_subdir='dir_test2'
+        'sentence_w2v.bin', _url, extract=True,
+        cache_dir=simtext.USER_DIR,
+        cache_subdir=simtext.USER_DATA_DIR
     )
     print("file_path:", file_path)

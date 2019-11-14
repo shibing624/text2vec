@@ -29,34 +29,8 @@ class Embedding(object):
                 'sequence_length': self.sequence_length,
                 'embedding_size': self.embedding_size,
             },
-            'embed_model': json.loads(self.embed_model.to_json()),
+            'embed_model': json.loads(self.embed_model.to_json()) if self.embed_model else None,
         }
-
-    @classmethod
-    def _load_saved_instance(cls,
-                             config_dict: Dict,
-                             model_path: str,
-                             tf_model):
-        os.environ['TF_KERAS'] = '1'
-        from tensorflow import keras
-        import keras_bert
-        L = keras.layers
-        custom_objects = keras_bert.get_custom_objects()
-        processor_info = config_dict['processor']
-        processor_class = pydoc.locate(f"{processor_info['module']}.{processor_info['class_name']}")
-        processor = processor_class(**processor_info['config'])
-
-        instance = cls(processor=processor,
-                       from_saved_model=True, **config_dict['config'])
-
-        embed_model_json_str = json.dumps(config_dict['embed_model'])
-        instance.embed_model = keras.models.model_from_json(embed_model_json_str,
-                                                            custom_objects=custom_objects)
-
-        # Load Weights from model
-        for layer in instance.embed_model.layers:
-            layer.set_weights(tf_model.get_layer(layer.name).get_weights())
-        return instance
 
     def __init__(self,
                  sequence_length: Union[int, str] = 'auto',
@@ -148,21 +122,7 @@ class Embedding(object):
     def embed(self,
               sentence_list: Union[List[List[str]], List[List[int]]],
               debug: bool = False) -> np.ndarray:
-        """
-        batch embed sentences
-
-        Args:
-            sentence_list: Sentence list to embed
-            debug: show debug info
-        Returns:
-            vectorized sentence list
-        """
-        tensor_x = self.process_x_dataset(sentence_list)
-
-        if debug:
-            logger.debug(f'sentence tensor: {tensor_x}')
-        embed_results = self.embed_model.predict(tensor_x)
-        return embed_results
+        raise NotImplementedError
 
     def process_x_dataset(self,
                           data: List[List[str]],
@@ -204,7 +164,3 @@ class Embedding(object):
 
     def __str__(self):
         return self.__repr__()
-
-
-if __name__ == "__main__":
-    print("Hello world")
