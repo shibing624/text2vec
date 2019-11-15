@@ -6,9 +6,9 @@
 
 import simtext
 
-a = '湖北人爱吃鱼'
-b = '甘肃人不爱吃鱼'
-c = '武汉人'
+a = '如何更换花呗绑定银行卡'
+b = '花呗更改绑定银行卡'
+c = '我什么时候开通了花呗'
 s = simtext.score(a, b)
 print(a, b, s)
 

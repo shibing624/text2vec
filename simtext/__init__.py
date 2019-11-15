@@ -37,18 +37,24 @@ class Similarity(object):
             else:
                 raise ValueError('set error embedding_type.')
 
+    def encode(self, text):
+        ret = 0.0
+        if not text.strip():
+            return ret
+        self.load_model()
+        tokens = self.model.tokenizer.tokenize(text)
+        return self.model.embed_one(tokens)
+
     def score(self, text1, text2):
         ret = 0.0
         if not text1.strip() or not text2.strip():
             return ret
-        self.load_model()
-        tokens_1 = self.model.tokenizer.tokenize(text1)
-        tokens_2 = self.model.tokenizer.tokenize(text2)
-        emb_1 = self.model.embed([tokens_1])[0]
-        emb_2 = self.model.embed([tokens_2])[0]
+        emb_1 = self.encode(text1)
+        emb_2 = self.encode(text2)
         ret = cos_dist(emb_1, emb_2)
         return ret
 
 
 SIM = Similarity()
 score = SIM.score
+encode = SIM.encode

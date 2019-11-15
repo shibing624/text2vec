@@ -16,8 +16,8 @@ python3 setup.py install
 ```
 import simtext
 
-a = '湖北人爱吃鱼'
-b = '甘肃人不爱吃鱼'
+a = '如何更换花呗绑定银行卡'
+b = '花呗更改绑定银行卡'
 s = simtext.score(a, b)
 print(s)
 
@@ -25,5 +25,5 @@ print(s)
 
 output:
 ```
-0.7783981956422068
+0.9569100456524151
 ```
