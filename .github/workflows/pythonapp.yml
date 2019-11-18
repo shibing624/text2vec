@@ -19,7 +19,7 @@ jobs:
         pip install -r requirements.txt
     - name: Lint with simtext
       run: |
-        pip install flake8
+        pip install simtext
     - name: Test with pytest
       run: |
         pip install pytest
