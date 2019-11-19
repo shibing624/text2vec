@@ -10,6 +10,7 @@ from threading import Thread
 
 import tensorflow as tf
 
+import simtext
 from simtext.bert import modeling
 from simtext.bert import tokenization
 from simtext.bert.graph import optimize_graph
@@ -339,7 +340,8 @@ class BertVector:
 
 
 if __name__ == "__main__":
-    bert = BertVector(model_dir='/Users/xuming06/.simtext/datasets/chinese_L-12_H-768_A-12', output_dir='../output')
-    vectors = bert.encode(['你好', '哈哈'])
-    print(str(vectors))
-    print(vectors.shape)
+    vector = BertVector(model_dir=os.path.join(simtext.USER_DATA_DIR, 'chinese_L-12_H-768_A-12'),
+                        output_dir=os.path.join(simtext.USER_DATA_DIR, 'bert_vector'))
+    emb = vector.encode(['你好吗朋友', '您好呀小盆友'])
+    print(str(emb))
+    print(emb.shape)

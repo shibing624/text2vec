@@ -7,16 +7,12 @@ import os
 
 import tensorflow as tf
 
+import simtext
 from simtext.bert.model import BertSimilarity
-from simtext.utils.logger import get_logger
-
-logger = get_logger(__name__)
-
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 if __name__ == '__main__':
-    sim = BertSimilarity(data_dir='../data/', model_dir='/Users/xuming06/.simtext/datasets/chinese_L-12_H-768_A-12',
-                         output_dir='../output')
+    sim = BertSimilarity(data_dir='../data/', model_dir=os.path.join(simtext.USER_DATA_DIR, 'chinese_L-12_H-768_A-12'),
+                         output_dir=os.path.join(simtext.USER_DATA_DIR, 'fine_tuned_bert_similarity'))
     sim.set_mode(tf.estimator.ModeKeys.PREDICT)
     while True:
         sentence1 = input('sentence1: ')
