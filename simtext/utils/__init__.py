@@ -4,7 +4,7 @@
 @description: 
 """
 
-from .distance import cos_dist
+from .distance import cosine_distance
 from .get_file import get_file, hash_file
 from .logger import get_logger
 from .timer import Timer

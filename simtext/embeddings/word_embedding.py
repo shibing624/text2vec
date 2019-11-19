@@ -5,6 +5,7 @@
 """
 
 import os
+import time
 from typing import Union, Optional, Dict, Any, List, Tuple
 
 import numpy as np
@@ -28,12 +29,18 @@ class WordEmbedding(Embedding):
                                 'url': 'https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz',
                                 'binary': False,
                                 'untar_filename': 'Tencent_AILab_ChineseEmbedding.txt'},
-        # 轻量版腾讯词向量，105MB
-        'w2v-light-tencent-chinese': {'tar_filename': 'light_Tencent_AILab_ChineseEmbedding.zip',
+        # 轻量版腾讯词向量，二进制，111MB
+        'w2v-light-tencent-chinese': {'tar_filename': 'light_Tencent_AILab_ChineseEmbedding.bin',
                                       'url': 'https://www.borntowin.cn/mm/emb_models/'
-                                             'light_Tencent_AILab_ChineseEmbedding.zip',
-                                      'binary': False,
-                                      'untar_filename': 'light_Tencent_AILab_ChineseEmbedding.txt'},
+                                             'light_Tencent_AILab_ChineseEmbedding.bin',
+                                      'binary': True,
+                                      'untar_filename': 'light_Tencent_AILab_ChineseEmbedding.bin'},
+        # 轻量版腾讯词向量，txt文本，261MB
+        'w2v-light-tencent-txt-chinese': {'tar_filename': 'light_Tencent_AILab_ChineseEmbedding.zip',
+                                          'url': 'https://www.borntowin.cn/mm/emb_models/'
+                                                 'light_Tencent_AILab_ChineseEmbedding.zip',
+                                          'binary': False,
+                                          'untar_filename': 'light_Tencent_AILab_ChineseEmbedding.txt'},
         # 中国人民日报训练的中文词向量, 32MB
         'w2v-china-daily-chinese': {'tar_filename': 'sentence_w2v.bin',
                                     'url': 'https://www.borntowin.cn/mm/emb_models/sentence_w2v.bin',
@@ -74,7 +81,7 @@ class WordEmbedding(Embedding):
         self.w2v_kwargs = w2v_kwargs
         self.w2v = None
         self.w2v_model_loaded = False
-        logger.debug('load w2v embedding')
+        logger.debug('load w2v embedding ...')
         super(WordEmbedding, self).__init__(sequence_length=sequence_length,
                                             embedding_size=0,
                                             processor=processor)
@@ -97,9 +104,9 @@ class WordEmbedding(Embedding):
                     cache_subdir=simtext.USER_DATA_DIR,
                     verbose=1
                 )
-        logger.debug('load w2v from %s' % self.w2v_path)
+        t0 = time.time()
         w2v = KeyedVectors.load_word2vec_format(self.w2v_path, **self.w2v_kwargs)
-
+        logger.debug('load w2v from %s, spend %s s' % (self.w2v_path, time.time() - t0))
         token2idx = {
             self.processor.token_pad: 0,
             self.processor.token_unk: 1,

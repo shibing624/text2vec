@@ -1,8 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+@author:XuMing（xuming624@qq.com)
+@description:
+"""
+
 import json
-import tempfile
-
 import tensorflow as tf
-
+import os
 from . import modeling
 from ..utils import get_logger
 logger = get_logger(__name__)
@@ -71,26 +75,28 @@ def optimize_graph(layer_indexes=[-2], config_name = '', ckpt_name = '', max_seq
             pooled = tf.identity(pooled, 'final_encodes')
 
             output_tensors = [pooled]
-            tmp_g = tf.get_default_graph().as_graph_def()
+            bert_graph = tf.get_default_graph().as_graph_def()
 
         with tf.Session(config=config) as sess:
             logger.info('load parameters from checkpoint...')
             sess.run(tf.global_variables_initializer())
             logger.info('freeze...')
-            tmp_g = tf.graph_util.convert_variables_to_constants(sess, tmp_g, [n.name[:-2] for n in output_tensors])
+            bert_graph = tf.graph_util.convert_variables_to_constants(sess, bert_graph, [n.name[:-2] for n in output_tensors])
             dtypes = [n.dtype for n in input_tensors]
             logger.info('optimize...')
-            tmp_g = optimize_for_inference(
-                tmp_g,
+            bert_graph = optimize_for_inference(
+                bert_graph,
                 [n.name[:-2] for n in input_tensors],
                 [n.name[:-2] for n in output_tensors],
                 [dtype.as_datatype_enum for dtype in dtypes],
                 False)
-        tmp_file = tempfile.NamedTemporaryFile('w', delete=False, dir=output_dir).name
-        logger.info('write graph to a tmp file: %s' % tmp_file)
-        with tf.gfile.GFile(tmp_file, 'wb') as f:
-            f.write(tmp_g.SerializeToString())
-        return tmp_file
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        graph_file = os.path.join(output_dir, 'graph.txt')
+        logger.info('write graph to file: %s' % graph_file)
+        with tf.gfile.GFile(graph_file, 'wb') as f:
+            f.write(bert_graph.SerializeToString())
+        return graph_file
     except Exception as e:
         logger.error('fail to optimize the graph!')
         logger.error(e)

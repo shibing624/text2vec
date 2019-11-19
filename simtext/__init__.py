@@ -6,7 +6,7 @@
 
 from pathlib import Path
 
-from simtext.utils import cos_dist, segment
+from simtext.utils import cosine_distance
 
 USER_DIR = Path.expanduser(Path('~')).joinpath('.simtext')
 if not USER_DIR.exists():
@@ -51,7 +51,7 @@ class Similarity(object):
             return ret
         emb_1 = self.encode(text1)
         emb_2 = self.encode(text2)
-        ret = cos_dist(emb_1, emb_2)
+        ret = cosine_distance(emb_1, emb_2)
         return ret
 
 

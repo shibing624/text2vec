@@ -1,16 +1,21 @@
-from . import modeling
-from . import tokenization
-from .graph import optimize_graph
+# -*- coding: utf-8 -*-
+"""
+@author:XuMing（xuming624@qq.com)
+@description:
+"""
+
+import os
 from queue import Queue
 from threading import Thread
-import tensorflow as tf
-import os
 
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+import tensorflow as tf
+
+from simtext.bert import modeling
+from simtext.bert import tokenization
+from simtext.bert.graph import optimize_graph
 
 
 class InputExample(object):
-
     def __init__(self, unique_id, text_a, text_b):
         self.unique_id = unique_id
         self.text_a = text_a
@@ -29,8 +34,7 @@ class InputFeatures(object):
 
 
 class BertVector:
-
-    def __init__(self, max_seq_len=128, batch_size=32, layer_indexes=[-2],vocab_file=''):
+    def __init__(self, max_seq_len=32, batch_size=32, layer_indexes=[-2], model_dir='', output_dir=''):
         """
         init BertVector
         :param batch_size:     Depending on your memory default is 32
@@ -38,7 +42,12 @@ class BertVector:
         self.max_seq_length = max_seq_len
         self.layer_indexes = layer_indexes
         self.gpu_memory_fraction = 1
-        self.graph_path = optimize_graph()
+        self.model_dir = model_dir
+        vocab_file = os.path.join(model_dir, 'vocab.txt')
+        config_name = os.path.join(model_dir, 'bert_config.json')
+        ckpt_name = os.path.join(model_dir, 'bert_model.ckpt')
+        self.graph_path = optimize_graph(layer_indexes=layer_indexes, config_name=config_name, ckpt_name=ckpt_name,
+                                         max_seq_len=max_seq_len, output_dir=output_dir)
         self.tokenizer = tokenization.FullTokenizer(vocab_file=vocab_file, do_lower_case=True)
         self.batch_size = batch_size
         self.estimator = self.get_estimator()
@@ -330,6 +339,7 @@ class BertVector:
 
 
 if __name__ == "__main__":
-    bert = BertVector()
+    bert = BertVector(model_dir='/Users/xuming06/.simtext/datasets/chinese_L-12_H-768_A-12', output_dir='../output')
     vectors = bert.encode(['你好', '哈哈'])
     print(str(vectors))
+    print(vectors.shape)
