@@ -53,7 +53,7 @@ setup(
     package_dir={'simtext': 'simtext'},
     package_data={
         'simtext': ['*.*', 'LICENSE', '../LICENSE', 'README.*', '../*.txt', 'embeddings/*',
-                    'utils/*', 'processors/*'],
+                    'utils/*', 'processors/*', 'bert/*'],
     },
     test_suite='tests',
 )
