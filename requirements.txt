@@ -1,2 +1,3 @@
 jieba
-keras-bert
+keras-bert>=0.80.0
+tensorflow>=1.14.0
