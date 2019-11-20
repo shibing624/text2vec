@@ -52,10 +52,10 @@ def test_case1():
     # q1:不锈钢上贴的膜怎么去除, q2:不锈钢上的胶怎么去除, expect a:True, actual a:0.9625103602739326
     # q1:动漫人物的口头禅, q2:白羊座的动漫人物, expect a:False, actual a:0.9254731623309143
     apply_w2v_case(case_same_keywords)
-    # q1:飞行员没钱买房怎么办？, q2:父母没钱买房子, expect a:False, actual a:0.3761319521207672
-    # q1:聊天室都有哪些好的, q2:聊天室哪个好, expect a:True, actual a:0.6761800308242283
-    # q1:不锈钢上贴的膜怎么去除, q2:不锈钢上的胶怎么去除, expect a:True, actual a:0.9680308625170728
-    # q1:动漫人物的口头禅, q2:白羊座的动漫人物, expect a:False, actual a:1.0
+    # q1:飞行员没钱买房怎么办？, q2:父母没钱买房子, expect a:False, actual a:0.8113352629229633
+    # q1:聊天室都有哪些好的, q2:聊天室哪个好, expect a:True, actual a:0.8509278390378958
+    # q1:不锈钢上贴的膜怎么去除, q2:不锈钢上的胶怎么去除, expect a:True, actual a:0.9617148170317945
+    # q1:动漫人物的口头禅, q2:白羊座的动漫人物, expect a:False, actual a:0.8928384526487808
 
 
 def test_case2():
@@ -68,10 +68,10 @@ def test_case2():
     # q1:网上找工作可靠吗, q2:网上找工作靠谱吗, expect a:True, actual a:0.9935955342946918
     # q1:你们都喜欢火影忍者里的谁啊, q2:火影忍者里你最喜欢谁, expect a:True, actual a:0.8950941719662809
     apply_w2v_case(case_categories_corresponding_pairs)
-    # q1:从广州到长沙在哪里定高铁票, q2:在长沙哪里坐高铁回广州？, expect a:False, actual a:0.7925367285111807
-    # q1:请问现在最好用的听音乐软件是什么啊, q2:听歌用什么软件比较好, expect a:True, actual a:0.7905707175554252
-    # q1:谁有吃过完美的产品吗？如何？, q2:完美产品好不好, expect a:True, actual a:0.5775977787974922
-    # q1:朱熹是哪个朝代的诗人, q2:朱熹是明理学的集大成者，他生活在哪个朝代, expect a:True, actual a:0.7512713030942898
-    # q1:这是哪个奥特曼？, q2:这是什么奥特曼..., expect a:True, actual a:0.5318252085174675
-    # q1:网上找工作可靠吗, q2:网上找工作靠谱吗, expect a:True, actual a:0.9507644087770979
-    # q1:你们都喜欢火影忍者里的谁啊, q2:火影忍者里你最喜欢谁, expect a:True, actual a:0.8474923584324268
+    # q1:从广州到长沙在哪里定高铁票, q2:在长沙哪里坐高铁回广州？, expect a:False, actual a:0.9462003367863537
+    # q1:请问现在最好用的听音乐软件是什么啊, q2:听歌用什么软件比较好, expect a:True, actual a:0.91920005053869
+    # q1:谁有吃过完美的产品吗？如何？, q2:完美产品好不好, expect a:True, actual a:0.8457867224089993
+    # q1:朱熹是哪个朝代的诗人, q2:朱熹是明理学的集大成者，他生活在哪个朝代, expect a:True, actual a:0.9282618882179348
+    # q1:这是哪个奥特曼？, q2:这是什么奥特曼..., expect a:True, actual a:0.9442881980424221
+    # q1:网上找工作可靠吗, q2:网上找工作靠谱吗, expect a:True, actual a:0.9300615734283796
+    # q1:你们都喜欢火影忍者里的谁啊, q2:火影忍者里你最喜欢谁, expect a:True, actual a:0.9473406335064555

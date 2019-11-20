@@ -57,6 +57,8 @@ def test_get_zip_file():
         verbose=1
     )
     print("file_path:", file_path)
+    if os.path.exists(file_path):
+        shutil.rmtree(file_path)
 
 
 def test_bin_file():
@@ -67,3 +69,5 @@ def test_bin_file():
         cache_subdir=simtext.USER_DATA_DIR
     )
     print("file_path:", file_path)
+    if os.path.exists(file_path):
+        shutil.rmtree(file_path)

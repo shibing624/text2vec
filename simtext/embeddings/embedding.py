@@ -33,7 +33,7 @@ class Embedding(object):
         }
 
     def __init__(self,
-                 sequence_length: Union[int, str] = 'auto',
+                 sequence_length: Union[int, str] = 128,
                  embedding_size: int = 100,
                  processor: Optional[BaseProcessor] = None):
         self.embedding_size = embedding_size
@@ -103,8 +103,6 @@ class Embedding(object):
 
         """
         self.processor.analyze_corpus(x, y)
-        if self.sequence_length == 'auto':
-            self.sequence_length = self.processor.dataset_info['RECOMMEND_LEN']
         self._build_model()
 
     def embed_one(self, sentence: Union[List[str], List[int]]) -> np.array:

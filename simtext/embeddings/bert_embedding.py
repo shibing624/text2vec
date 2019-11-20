@@ -81,7 +81,7 @@ class BERTEmbedding(Embedding):
                  model_folder: str = '',
                  layer_nums: int = 4,
                  trainable: bool = False,
-                 sequence_length: Union[str, int] = 'auto',
+                 sequence_length: Union[str, int] = 128,
                  processor: Optional[BaseProcessor] = None):
         """
 
@@ -105,7 +105,7 @@ class BERTEmbedding(Embedding):
             raise ValueError('BERT embedding only accept sequences in equal length')
 
         super(BERTEmbedding, self).__init__(sequence_length=sequence_length,
-                                            embedding_size=0,
+                                            embedding_size=100,
                                             processor=processor)
 
         self.processor.token_pad = '[PAD]'
@@ -149,9 +149,6 @@ class BERTEmbedding(Embedding):
             seq_len = self.sequence_length
             if isinstance(seq_len, tuple):
                 seq_len = seq_len[0]
-            if isinstance(seq_len, str):
-                logger.warning(f"Model will be built until sequence length is determined")
-                return
             config_path = os.path.join(self.model_folder, 'bert_config.json')
             check_point_path = os.path.join(self.model_folder, 'bert_model.ckpt')
             logger.debug('load bert model from %s' % check_point_path)
