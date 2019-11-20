@@ -9,7 +9,6 @@ import os
 from queue import Queue
 from threading import Thread
 
-import pandas as pd
 import tensorflow as tf
 
 from simtext.bert import modeling
@@ -55,49 +54,42 @@ class InputFeatures(object):
 
 class TrainProcessor(object):
     def get_train_examples(self, data_dir):
-        file_path = os.path.join(data_dir, 'train.csv')
-        train_df = pd.read_csv(file_path, encoding='utf-8')
-        train_data = []
-        for index, train in enumerate(train_df.values):
-            guid = 'train-%d' % index
-            text_a = tokenization.convert_to_unicode(str(train[0]))
-            text_b = tokenization.convert_to_unicode(str(train[1]))
-            label = str(train[2])
-            train_data.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
-        return train_data
+        data_list = []
+        file_path = os.path.join(data_dir, 'train.txt')
+        if os.path.exists(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                contents = f.readlines()
+                data_list = self.get_sentence_examples(contents, 'train')
+        return data_list
 
     def get_dev_examples(self, data_dir):
-        file_path = os.path.join(data_dir, 'dev.csv')
-        dev_df = pd.read_csv(file_path, encoding='utf-8')
-        dev_data = []
-        for index, dev in enumerate(dev_df.values):
-            guid = 'test-%d' % index
-            text_a = tokenization.convert_to_unicode(str(dev[0]))
-            text_b = tokenization.convert_to_unicode(str(dev[1]))
-            label = str(dev[2])
-            dev_data.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
-        return dev_data
+        data_list = []
+        file_path = os.path.join(data_dir, 'dev.txt')
+        if os.path.exists(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                contents = f.readlines()
+                data_list = self.get_sentence_examples(contents, 'dev')
+        return data_list
 
     def get_test_examples(self, data_dir):
-        test_data = []
-        file_path = os.path.join(data_dir, 'test.csv')
+        data_list = []
+        file_path = os.path.join(data_dir, 'test.txt')
         if os.path.exists(file_path):
-            test_df = pd.read_csv(file_path, encoding='utf-8')
-            for index, test in enumerate(test_df.values):
-                guid = 'test-%d' % index
-                text_a = tokenization.convert_to_unicode(str(test[0]))
-                text_b = tokenization.convert_to_unicode(str(test[1]))
-                label = str(test[2])
-                test_data.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
-        return test_data
+            with open(file_path, 'r', encoding='utf-8') as f:
+                contents = f.readlines()
+                data_list = self.get_sentence_examples(contents, 'test')
+        return data_list
 
-    def get_sentence_examples(self, questions):
+    def get_sentence_examples(self, questions, prefix):
+        data_list = []
         for index, data in enumerate(questions):
-            guid = 'test-%d' % index
+            data = data.strip().split('\t')
+            guid = '%s-%d' % (prefix, index)
             text_a = tokenization.convert_to_unicode(str(data[0]))
             text_b = tokenization.convert_to_unicode(str(data[1]))
-            label = str(0)
-            yield InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label)
+            label = str(data[2])
+            data_list.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return data_list
 
     def get_labels(self):
         return ['0', '1']

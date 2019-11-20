@@ -49,11 +49,11 @@ def test_get_file():
 
 
 def test_get_zip_file():
-    _url = "https://raw.githubusercontent.com/shibing624/simtext/master/tests/a_dir.zip"
+    _url = "https://raw.githubusercontent.com/pengming617/bert_textMatching/master/data/train.txt"
     file_path = utils.get_file(
-        'aa', _url, extract=True,
-        cache_dir=simtext.USER_DATA_DIR,
-        cache_subdir='dir_test1',
+        'train.txt', _url, extract=True,
+        cache_dir='./',
+        cache_subdir='./',
         verbose=1
     )
     print("file_path:", file_path)
