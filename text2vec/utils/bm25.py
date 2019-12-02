@@ -16,8 +16,10 @@ class BM25(object):
         self.bm25 = bm25.BM25(corpus)
         self.average_idf = sum(map(lambda k: float(self.bm25.idf[k]), self.bm25.idf.keys())) / len(self.bm25.idf.keys())
 
-    def similarity(self, query, size=10):
+    def similarity(self, query, num_best=10):
+        if not num_best:
+            num_best = 10
         scores = self.bm25.get_scores(query, self.average_idf)
         scores_sort = sorted(list(enumerate(scores)),
                              key=lambda item: item[1], reverse=True)
-        return scores_sort[:size]
+        return scores_sort[:num_best]

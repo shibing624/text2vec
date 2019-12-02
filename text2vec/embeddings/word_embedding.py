@@ -10,6 +10,7 @@ from typing import Union, Optional, Dict, Any, List, Tuple
 
 import numpy as np
 from gensim.models import KeyedVectors
+
 import text2vec
 from text2vec.embeddings.embedding import Embedding
 from text2vec.processors.base_processor import BaseProcessor

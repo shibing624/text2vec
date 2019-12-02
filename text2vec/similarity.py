@@ -3,16 +3,40 @@
 @author:XuMing（xuming624@qq.com)
 @description: 
 """
+import numpy
 
 from text2vec.utils import cosine_distance
-from text2vec.vector import Vector
+from text2vec.utils.bm25 import BM25
+from text2vec.vector import Vector, EmbType
 
 
 class Similarity(Vector):
-    def __init__(self, embedding_type='w2v', similarity_type='cosine', corpus = None):
+    def __init__(self, embedding_type='w2v', similarity_type='cosine', corpus=None, num_best=10, search_type='bm25'):
+        """
+        corpus: iterable of list of (int, float)
+            A list of documents in the BoW format.
+        num_best: int, optional
+            Number of results to retrieve.
+        :param embedding_type:
+        :param similarity_type:
+        :param corpus:
+        """
         super(Similarity, self).__init__(embedding_type=embedding_type)
         self.similarity_type = similarity_type
         self.corpus = corpus
+        self.num_best = num_best
+        self.search_type = search_type
+        self.bm25_instance = None
+        self.wmd_instance = None
+
+    def init(self):
+        if not self.bm25_instance:
+            self.bm25_instance = BM25(corpus=self.corpus)
+        if not self.wmd_instance:
+            from gensim.similarities import WmdSimilarity
+            self.embedding_type = EmbType.W2V
+            self.load_model()
+            self.wmd_instance = WmdSimilarity(corpus=self.corpus, w2v_model=self.model.w2v, num_best=self.num_best)
 
     def score(self, text1, text2):
         ret = 0.0
@@ -25,5 +49,25 @@ class Similarity(Vector):
         if self.similarity_type == 'cosine':
             ret = cosine_distance(emb_1, emb_2)
         elif self.similarity_type == 'wmd' and self.embedding_type == 'w2v':
-            ret = 1 - self.model.w2v.wmdistance(token_1, token_2)
+            ret = 1. / (1. + self.model.w2v.wmdistance(token_1, token_2))
         return ret
+
+    def get_similarities(self, query):
+        """Get similarity between `query` and this index.
+
+        Parameters
+        ----------
+        query : {list of (int, number), iterable of list of (int, number)
+            Document or collection of documents.
+
+        Return
+        ------
+        :class:`numpy.ndarray`
+            Similarity matrix.
+
+        """
+        self.init()
+        tokens = self.tokenize(query)
+        sim_items = self.bm25_instance.similarity(tokens, self.num_best)
+        docs = [(self.corpus[id], score) for id, score in sim_items]
+        return docs
