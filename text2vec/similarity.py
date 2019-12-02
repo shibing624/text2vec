@@ -13,8 +13,8 @@ from text2vec.vector import Vector, EmbType
 class Similarity(Vector):
     def __init__(self, embedding_type='w2v', similarity_type='cosine', corpus=None, num_best=10, search_type='bm25'):
         """
-        corpus: iterable of list of (int, float)
-            A list of documents in the BoW format.
+        corpus: list of token list.
+            A list of query in segment tokens.
         num_best: int, optional
             Number of results to retrieve.
         :param embedding_type:
