@@ -10,7 +10,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 # Avoids IDE errors, but actual version is read from version.py
 __version__ = None
-exec(open('simtext/version.py').read())
+exec(open('text2vec/version.py').read())
 
 if sys.version_info < (3,):
     sys.exit('Sorry, Python3 is required.')
@@ -25,14 +25,14 @@ with open('requirements.txt', 'r', encoding='utf-8') as f:
     reqs = f.read()
 
 setup(
-    name='simtext',
+    name='text2vec',
     version=__version__,
-    description='Chinese Text Similarity Calculation Tool',
+    description='Text to Vector Tool, encode text',
     long_description=readme,
     long_description_content_type='text/markdown',
     author='XuMing',
     author_email='xuming624@qq.com',
-    url='https://github.com/shibing624/simtext',
+    url='https://github.com/shibing624/text2vec',
     license="Apache 2.0",
     classifiers=[
         'Intended Audience :: Developers',
@@ -47,13 +47,13 @@ setup(
         'Topic :: Text Processing :: Indexing',
         'Topic :: Text Processing :: Linguistic',
     ],
-    keywords='NLP,simtext,Chinese Text Similarity Calculation Tool,similarity',
+    keywords='NLP,text2vec,Chinese Text Similarity Calculation Tool,similarity',
     install_requires=reqs.strip().split('\n'),
     packages=find_packages(exclude=['tests']),
-    package_dir={'simtext': 'simtext'},
+    package_dir={'text2vec': 'text2vec'},
     package_data={
-        'simtext': ['*.*', 'LICENSE', '../LICENSE', 'README.*', '../*.txt', 'embeddings/*',
-                    'utils/*', 'processors/*', 'bert/*'],
+        'text2vec': ['*.*', 'LICENSE', '../LICENSE', 'README.*', '../*.txt', 'embeddings/*',
+                     'utils/*', 'processors/*', 'bert/*'],
     },
     test_suite='tests',
 )

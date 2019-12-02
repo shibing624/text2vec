@@ -95,7 +95,7 @@ def wmd_distance(model, sent1_cut_list, sent2_cut_list):  # WMD距离
 
 
 def is_str_match(str1, str2, threshold=1.0):
-    assert threshold >= 0.0 and threshold <= 1.0, "Wrong threshold."
+    assert 0.0 <= threshold <= 1.0, "Wrong threshold."
     if float(threshold) == 1.0:
         return str1 == str2
     else:
@@ -168,9 +168,8 @@ def sim_hash(text):
     key_list = []
     for feature, weight in key_word:
         weight = int(weight * 20)
-        hash_feature = string_hash(feature)
         temp = []
-        for f in hash_feature:
+        for f in string_hash(feature):
             if f == '1':
                 temp.append(weight)
             else:
@@ -225,7 +224,7 @@ if __name__ == '__main__':
     print(euclidean_distance(vec1_test, vec2_test))
     print(cosine_distance(vec1_test, vec2_test))
 
-    print(hamming_distance(sim_hash(str1_test), sim_hash(str2_test)))
+    print('hamming_distance:', str1_test, str2_test, hamming_distance(sim_hash(str1_test), sim_hash(str2_test)))
     print(edit_distance(str1_test, str2_test))
     print(num_of_common_sub_str(str1_test, str2_test))
     print(normalization(vec1_test))  # 归一化（0-1）

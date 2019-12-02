@@ -10,9 +10,9 @@ from typing import Union, List, Optional, Dict
 
 import numpy as np
 
-from simtext.processors.base_processor import BaseProcessor
-from simtext.processors.default_processor import DefaultProcessor
-from simtext.utils.logger import get_logger
+from text2vec.processors.base_processor import BaseProcessor
+from text2vec.processors.default_processor import DefaultProcessor
+from text2vec.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

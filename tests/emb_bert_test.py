@@ -3,7 +3,7 @@
 @author:XuMing（xuming624@qq.com)
 @description: 
 """
-from simtext.embeddings.bert_embedding import BERTEmbedding
+from text2vec.embeddings.bert_embedding import BERTEmbedding
 
 if __name__ == '__main__':
     b = BERTEmbedding()

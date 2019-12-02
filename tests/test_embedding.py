@@ -13,7 +13,7 @@ SEQUENCE_LENGTH = 30
 class TestWordEmbeddings(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        from simtext.embeddings.word_embedding import WordEmbedding
+        from text2vec.embeddings.word_embedding import WordEmbedding
         cls.embedding = WordEmbedding(sequence_length=SEQUENCE_LENGTH)
 
     def test_tokenize(self):
@@ -38,7 +38,7 @@ class TestWordEmbeddings(unittest.TestCase):
 class TestBERTEmbedding(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        from simtext.embeddings.bert_embedding import BERTEmbedding
+        from text2vec.embeddings.bert_embedding import BERTEmbedding
         cls.embedding = BERTEmbedding(sequence_length=SEQUENCE_LENGTH)
 
     def test_build(self):

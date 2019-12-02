@@ -11,12 +11,12 @@ from typing import Union, Optional, Any, List, Tuple
 import numpy as np
 import tensorflow as tf
 
-import simtext
-from simtext.embeddings.embedding import Embedding
-from simtext.processors.base_processor import BaseProcessor
-from simtext.utils import get_file
-from simtext.utils.logger import get_logger
-from simtext.utils.non_masking_layer import NonMaskingLayer
+import text2vec
+from text2vec.embeddings.embedding import Embedding
+from text2vec.processors.base_processor import BaseProcessor
+from text2vec.utils import get_file
+from text2vec.utils.logger import get_logger
+from text2vec.utils.non_masking_layer import NonMaskingLayer
 
 os.environ['TF_KERAS'] = '1'
 import keras_bert
@@ -126,11 +126,11 @@ class BERTEmbedding(Embedding):
             url = self.pre_trained_models.get(model_name)
             get_file(
                 model_name + ".zip", url, extract=True,
-                cache_dir=simtext.USER_DIR,
-                cache_subdir=simtext.USER_DATA_DIR,
+                cache_dir=text2vec.USER_DIR,
+                cache_subdir=text2vec.USER_DATA_DIR,
                 verbose=1
             )
-            self.model_folder = os.path.join(simtext.USER_DATA_DIR, model_name)
+            self.model_folder = os.path.join(text2vec.USER_DATA_DIR, model_name)
             dict_path = os.path.join(self.model_folder, 'vocab.txt')
         logger.debug(f'load vocab.txt from {dict_path}')
         token2idx = {}

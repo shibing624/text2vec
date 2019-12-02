@@ -10,10 +10,10 @@ from threading import Thread
 
 import tensorflow as tf
 
-import simtext
-from simtext.bert import modeling
-from simtext.bert import tokenization
-from simtext.bert.graph import optimize_graph
+import text2vec
+from text2vec.bert import modeling
+from text2vec.bert import tokenization
+from text2vec.bert.graph import optimize_graph
 
 
 class InputExample(object):
@@ -340,8 +340,8 @@ class BertVector:
 
 
 if __name__ == "__main__":
-    vector = BertVector(model_dir=os.path.join(simtext.USER_DATA_DIR, 'chinese_L-12_H-768_A-12'),
-                        output_dir=os.path.join(simtext.USER_DATA_DIR, 'bert_vector'))
+    vector = BertVector(model_dir=os.path.join(text2vec.USER_DATA_DIR, 'chinese_L-12_H-768_A-12'),
+                        output_dir=os.path.join(text2vec.USER_DATA_DIR, 'bert_vector'))
     emb = vector.encode(['你好吗朋友', '您好呀小盆友'])
     print(str(emb))
     print(emb.shape)

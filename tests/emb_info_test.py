@@ -6,7 +6,7 @@
 
 a = '湖北人爱吃鱼'
 b = '甘肃人不爱吃鱼'
-from simtext import Similarity
+from text2vec import Similarity
 
 ss = Similarity(embedding_type='w2v')
 ss.score(a, b)

@@ -7,8 +7,8 @@
 import os
 import shutil
 
-import simtext
-from simtext import utils
+import text2vec
+from text2vec import utils
 
 
 def test_timer():
@@ -21,10 +21,10 @@ def test_timer():
 
 
 def test_get_file():
-    _url = "https://raw.githubusercontent.com/shibing624/simtext/master/LICENSE"
+    _url = "https://raw.githubusercontent.com/shibing624/text2vec/master/LICENSE"
     file_path = utils.get_file(
         'LICENSE', _url, extract=True,
-        cache_dir=simtext.USER_DATA_DIR,
+        cache_dir=text2vec.USER_DATA_DIR,
         cache_subdir='LICENSE',
         verbose=1
     )
@@ -36,14 +36,14 @@ def test_get_file():
     file_path2 = utils.get_file(
         'LICENSE', _url, extract=False,
         md5_hash=file_hash,
-        cache_dir=simtext.USER_DATA_DIR,
+        cache_dir=text2vec.USER_DATA_DIR,
         cache_subdir='LICENSE',
         verbose=1
     )
     file_hash2 = utils.hash_file(file_path2, algorithm='md5')
     assert file_hash == file_hash2
 
-    file_dir = simtext.USER_DATA_DIR.joinpath('LICENSE')
+    file_dir = text2vec.USER_DATA_DIR.joinpath('LICENSE')
     if os.path.exists(file_dir):
         shutil.rmtree(file_dir)
 
@@ -65,8 +65,8 @@ def test_bin_file():
     _url = 'https://www.borntowin.cn/mm/emb_models/sentence_w2v.bin'
     file_path = utils.get_file(
         'sentence_w2v.bin', _url, extract=True,
-        cache_dir=simtext.USER_DIR,
-        cache_subdir=simtext.USER_DATA_DIR
+        cache_dir=text2vec.USER_DIR,
+        cache_subdir=text2vec.USER_DATA_DIR
     )
     print("file_path:", file_path)
     if os.path.exists(file_path):

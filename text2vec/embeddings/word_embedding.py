@@ -10,13 +10,12 @@ from typing import Union, Optional, Dict, Any, List, Tuple
 
 import numpy as np
 from gensim.models import KeyedVectors
-
-import simtext
-from simtext.embeddings.embedding import Embedding
-from simtext.processors.base_processor import BaseProcessor
-from simtext.utils.get_file import get_file
-from simtext.utils.logger import get_logger
-from simtext.utils.tokenizer import Tokenizer
+import text2vec
+from text2vec.embeddings.embedding import Embedding
+from text2vec.processors.base_processor import BaseProcessor
+from text2vec.utils.get_file import get_file
+from text2vec.utils.logger import get_logger
+from text2vec.utils.tokenizer import Tokenizer
 
 logger = get_logger(__name__)
 
@@ -96,16 +95,17 @@ class WordEmbedding(Embedding):
             self.w2v_kwargs = {'binary': model_dict.get('binary')}
             url = model_dict.get('url')
             untar_filename = model_dict.get('untar_filename')
-            self.w2v_path = os.path.join(simtext.USER_DATA_DIR, untar_filename)
+            self.w2v_path = os.path.join(text2vec.USER_DATA_DIR, untar_filename)
             if not os.path.exists(self.w2v_path):
                 get_file(
                     tar_filename, url, extract=True,
-                    cache_dir=simtext.USER_DIR,
-                    cache_subdir=simtext.USER_DATA_DIR,
+                    cache_dir=text2vec.USER_DIR,
+                    cache_subdir=text2vec.USER_DATA_DIR,
                     verbose=1
                 )
         t0 = time.time()
         w2v = KeyedVectors.load_word2vec_format(self.w2v_path, **self.w2v_kwargs)
+        w2v.init_sims(replace=True)
         logger.debug('load w2v from %s, spend %s s' % (self.w2v_path, time.time() - t0))
         token2idx = {
             self.processor.token_pad: 0,
@@ -170,14 +170,15 @@ class WordEmbedding(Embedding):
         embeds = []
         for sentence in sentence_list:
             emb = []
+            count = 0
             for word in sentence:
-                if word in self.w2v.vocab:
-                    e = self.w2v[word]
-                else:
-                    e = 0
-                emb.append(e)
-            tensor_x = np.array(emb).sum(axis=0)
-            embeds.append(tensor_x)
+                if word not in self.w2v.vocab:
+                    continue
+                emb.append(self.w2v[word])
+                count += 1
+            tensor_x = np.array(emb).sum(axis=0)  # 纵轴相加
+            avg_tensor_x = np.divide(tensor_x, count)
+            embeds.append(avg_tensor_x)
         embeds = np.array(embeds)
         if debug:
             logger.debug(f'sentence tensor shape: {embeds.shape}')

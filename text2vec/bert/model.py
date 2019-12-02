@@ -11,10 +11,10 @@ from threading import Thread
 
 import tensorflow as tf
 
-from simtext.bert import modeling
-from simtext.bert import optimization
-from simtext.bert import tokenization
-from simtext.utils.logger import get_logger
+from text2vec.bert import modeling
+from text2vec.bert import optimization
+from text2vec.bert import tokenization
+from text2vec.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -3,7 +3,7 @@
 @author:XuMing（xuming624@qq.com)
 @description: 
 """
-from simtext.embeddings.word_embedding import WordEmbedding
+from text2vec.embeddings.word_embedding import WordEmbedding
 
 if __name__ == '__main__':
     b = WordEmbedding()
