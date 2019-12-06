@@ -1,36 +1,28 @@
 # -*- coding: utf-8 -*-
 """
 @author:XuMing（xuming624@qq.com)
-@description: 
+@description:
 """
 
-import text2vec
+from text2vec import Similarity
 
 a = '如何更换花呗绑定银行卡'
 b = '花呗更改绑定银行卡'
 c = '我什么时候开通了花呗'
 
-char = '我'
-print(char, text2vec.encode(char))
-
-word = '如何'
-print(word, text2vec.encode(word))
-
-emb = text2vec.encode(a)
-print(a, emb)
-
-s = text2vec.score(a, b)
+sim = Similarity()
+s = sim.get_score(a, b)
 print(a, b, s)
 
-s = text2vec.score(a, c)
+s = sim.get_score(a, c)
 print(a, c, s)
 
-s = text2vec.score(b, c)
+s = sim.get_score(b, c)
 print(b, c, s)
 
 from text2vec import SearchSimilarity
 
-corpus = ['如何更换花呗绑定银行卡1', '花呗更改绑定银行卡', '我什么时候开通了花呗']
+corpus = [a, b, c]
 search_sim = SearchSimilarity(corpus=corpus)
 
 print(search_sim.get_scores(query=a))

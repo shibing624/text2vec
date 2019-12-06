@@ -5,14 +5,15 @@
 """
 
 import json
-import tensorflow as tf
 import os
+
+import tensorflow as tf
+
 from . import modeling
-from ..utils import get_logger
-logger = get_logger(__name__)
+from ..utils.logger import logger
 
 
-def optimize_graph(layer_indexes=[-2], config_name = '', ckpt_name = '', max_seq_len=128, output_dir=''):
+def optimize_graph(layer_indexes=[-2], config_name='', ckpt_name='', max_seq_len=128, output_dir=''):
     try:
         # we don't need GPU for optimizing the graph
         from tensorflow.python.tools.optimize_for_inference_lib import optimize_for_inference
@@ -81,7 +82,8 @@ def optimize_graph(layer_indexes=[-2], config_name = '', ckpt_name = '', max_seq
             logger.info('load parameters from checkpoint...')
             sess.run(tf.global_variables_initializer())
             logger.info('freeze...')
-            bert_graph = tf.graph_util.convert_variables_to_constants(sess, bert_graph, [n.name[:-2] for n in output_tensors])
+            bert_graph = tf.graph_util.convert_variables_to_constants(sess, bert_graph,
+                                                                      [n.name[:-2] for n in output_tensors])
             dtypes = [n.dtype for n in input_tensors]
             logger.info('optimize...')
             bert_graph = optimize_for_inference(

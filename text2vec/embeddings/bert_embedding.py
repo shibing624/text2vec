@@ -15,13 +15,11 @@ import text2vec
 from text2vec.embeddings.embedding import Embedding
 from text2vec.processors.base_processor import BaseProcessor
 from text2vec.utils.get_file import get_file
-from text2vec.utils.logger import get_logger
+from text2vec.utils.logger import logger
 from text2vec.utils.non_masking_layer import NonMaskingLayer
 
 os.environ['TF_KERAS'] = '1'
 import keras_bert
-
-logger = get_logger(__name__)
 
 
 class BERTEmbedding(Embedding):

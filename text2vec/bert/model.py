@@ -14,9 +14,8 @@ import tensorflow as tf
 from text2vec.bert import modeling
 from text2vec.bert import optimization
 from text2vec.bert import tokenization
-from text2vec.utils.logger import get_logger
+from text2vec.utils.logger import logger
 
-logger = get_logger(__name__)
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 

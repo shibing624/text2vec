@@ -10,9 +10,7 @@ import numpy as np
 
 from text2vec.processors.base_processor import BaseProcessor
 from text2vec.processors.default_processor import DefaultProcessor
-from text2vec.utils.logger import get_logger
-
-logger = get_logger(__name__)
+from text2vec.utils.logger import logger
 
 
 class Embedding(object):

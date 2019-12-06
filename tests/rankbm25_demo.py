@@ -40,8 +40,3 @@ print(doc_scores)
 
 a = bm25.get_top_n(tokenized_query, corpus, n=2)
 print(a)
-
-import text2vec
-
-print(corpus[0], query, text2vec.score(corpus[0], query))
-print(corpus[1], query, text2vec.score(corpus[1], query))

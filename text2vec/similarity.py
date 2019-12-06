@@ -27,12 +27,14 @@ class Similarity(Vector):
                  bert_model_folder='',
                  bert_layer_nums=4):
         """
-        corpus: list of token list.
-            A list of query in segment tokens.
-        num_best: int, optional
-            Number of results to retrieve.
+        Cal text similarity
         :param similarity_type:
-        :param corpus:
+        :param embedding_type:
+        :param sequence_length:
+        :param w2v_path:
+        :param w2v_kwargs:
+        :param bert_model_folder:
+        :param bert_layer_nums:
         """
         super(Similarity, self).__init__(embedding_type=embedding_type,
                                          w2v_path=w2v_path,
@@ -43,7 +45,13 @@ class Similarity(Vector):
         self.similarity_type = similarity_type
         self.sequence_length = sequence_length
 
-    def score(self, text1, text2):
+    def get_score(self, text1, text2):
+        """
+        Get score between text1 and text2
+        :param text1: str
+        :param text2: str
+        :return: float, score
+        """
         ret = 0.0
         if not text1.strip() or not text2.strip():
             return ret
@@ -73,7 +81,8 @@ class SearchSimilarity(object):
     def init(self):
         if not self.bm25_instance:
             if not self.corpus:
-                raise ValueError("must set corpus, which is documents, list of token list")
+                logger.error('corpus is none, set corpus with docs.')
+                raise ValueError("must set corpus, which is documents, list of str")
 
             if isinstance(self.corpus, str):
                 self.corpus = [self.corpus]
@@ -94,9 +103,9 @@ class SearchSimilarity(object):
 
     def get_scores(self, query):
         """
-
+        Get scores between query and docs
         :param query:
-        :return:
+        :return: numpy array, scores for query between docs
         """
         self.init()
         tokens = self.tokenizer.tokenize(query)

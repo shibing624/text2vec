@@ -21,8 +21,8 @@ b = '你说的到底是谁？看Bert里面extract_features.py这个文件，可�
     '）就可以了。至于题主提到的句向量表示，上文中提到的向量c即可一定程度表'
 
 bert_sim = text2vec.Similarity(embedding_type='bert')
-s = bert_sim.score(a, b)
+s = bert_sim.get_score(a, b)
 print(s)
 
 w2v_sim = text2vec.Similarity(embedding_type='w2v')
-print(w2v_sim.score(a, b))
+print(w2v_sim.get_score(a, b))
