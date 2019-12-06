@@ -9,8 +9,15 @@ import text2vec
 a = '如何更换花呗绑定银行卡'
 b = '花呗更改绑定银行卡'
 c = '我什么时候开通了花呗'
+
+char = '我'
+print(char, text2vec.encode(char))
+
+word = '如何'
+print(word, text2vec.encode(word))
+
 emb = text2vec.encode(a)
-print(emb)
+print(a, emb)
 
 s = text2vec.score(a, b)
 print(a, b, s)

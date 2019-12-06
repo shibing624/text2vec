@@ -1,5 +1,5 @@
 # text2vec
-text2vec, text to vector tool, the most accurate Chinese text similarity calculation tool.(最准的中文文本相似度计算工具)
+text2vec, chinese text to vetor.(文本向量化表示工具，包括词向量化、句子向量化、段落向量化)
 
 ## Install
 * pip3 install text2vec
