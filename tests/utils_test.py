@@ -8,11 +8,12 @@ import os
 import shutil
 
 import text2vec
-from text2vec import utils
+from text2vec.utils.get_file import get_file, hash_file
+from text2vec.utils.timer import Timer
 
 
 def test_timer():
-    timer = utils.Timer()
+    timer = Timer()
     start = timer.time
     timer.stop()
     assert timer.time
@@ -22,7 +23,7 @@ def test_timer():
 
 def test_get_file():
     _url = "https://raw.githubusercontent.com/shibing624/text2vec/master/LICENSE"
-    file_path = utils.get_file(
+    file_path = get_file(
         'LICENSE', _url, extract=True,
         cache_dir=text2vec.USER_DATA_DIR,
         cache_subdir='LICENSE',
@@ -31,16 +32,16 @@ def test_get_file():
     print("file_path:", file_path)
     num_lines = 201
     assert len(open(file_path, 'rb').readlines()) == num_lines
-    file_hash = utils.hash_file(file_path, algorithm='md5')
+    file_hash = hash_file(file_path, algorithm='md5')
 
-    file_path2 = utils.get_file(
+    file_path2 = get_file(
         'LICENSE', _url, extract=False,
         md5_hash=file_hash,
         cache_dir=text2vec.USER_DATA_DIR,
         cache_subdir='LICENSE',
         verbose=1
     )
-    file_hash2 = utils.hash_file(file_path2, algorithm='md5')
+    file_hash2 = hash_file(file_path2, algorithm='md5')
     assert file_hash == file_hash2
 
     file_dir = text2vec.USER_DATA_DIR.joinpath('LICENSE')
@@ -50,7 +51,7 @@ def test_get_file():
 
 def test_get_zip_file():
     _url = "https://raw.githubusercontent.com/pengming617/bert_textMatching/master/data/train.txt"
-    file_path = utils.get_file(
+    file_path = get_file(
         'train.txt', _url, extract=True,
         cache_dir='./',
         cache_subdir='./',
@@ -63,7 +64,7 @@ def test_get_zip_file():
 
 def test_bin_file():
     _url = 'https://www.borntowin.cn/mm/emb_models/sentence_w2v.bin'
-    file_path = utils.get_file(
+    file_path = get_file(
         'sentence_w2v.bin', _url, extract=True,
         cache_dir=text2vec.USER_DIR,
         cache_subdir=text2vec.USER_DATA_DIR
