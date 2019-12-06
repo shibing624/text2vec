@@ -53,17 +53,15 @@ class Similarity(Vector):
         return ret
 
     def get_similarities(self, query):
-        """Get similarity between `query` and this index.
+        """Get similarity between `query` and this docs.
 
         Parameters
         ----------
-        query : {list of (int, number), iterable of list of (int, number)
-            Document or collection of documents.
+        query : str.
 
         Return
         ------
-        :class:`numpy.ndarray`
-            Similarity matrix.
+        :float scores.
 
         """
         self.init()
