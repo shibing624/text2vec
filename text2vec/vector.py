@@ -22,7 +22,7 @@ class Vector(object):
                 self.model = BERTEmbedding(sequence_length=128)
             elif self.embedding_type == EmbType.W2V:
                 from text2vec.embeddings.word_embedding import WordEmbedding
-                self.model = WordEmbedding()
+                self.model = WordEmbedding(w2v_path='')
             else:
                 raise ValueError('set error embedding type.')
 

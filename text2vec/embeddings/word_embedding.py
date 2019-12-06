@@ -91,6 +91,8 @@ class WordEmbedding(Embedding):
 
     def _build_token2idx_from_w2v(self):
         if not self.w2v_path or not os.path.exists(self.w2v_path):
+            if self.w2v_path in self.model_key_map:
+                self.w2v_path = self.model_key_map[self.w2v_path]
             model_dict = self.model_key_map.get(self.w2v_path, self.model_key_map['w2v-light-tencent-chinese'])
             tar_filename = model_dict.get('tar_filename')
             self.w2v_kwargs = {'binary': model_dict.get('binary')}
