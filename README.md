@@ -14,7 +14,7 @@ text2vec, chinese text to vetor.(文本向量化表示工具，包括词向量�
 - 基准方法，估计两句子间语义相似度最简单的方法就是求句子中所有单词词嵌入的平均值，然后计算两句子词嵌入之间的余弦相似性。
 - 词移距离（Word Mover’s Distance），词移距离使用两文本间的词嵌入，测量其中一文本中的单词在语义空间中移动到另一文本单词所需要的最短距离。
 
-#### query和docs的相似度比较*
+#### query和docs的相似度比较
 - rank_bm25方法，使用bm25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序。
 
 ## Result
@@ -40,7 +40,9 @@ text2vec, chinese text to vetor.(文本向量化表示工具，包括词向量�
 
 
 ## Install
-```pip3 install text2vec```
+```
+pip3 install text2vec
+```
 
 or
 
