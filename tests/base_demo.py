@@ -27,3 +27,11 @@ print(a, c, s)
 
 s = text2vec.score(b, c)
 print(b, c, s)
+
+from text2vec import SearchSimilarity
+
+corpus = ['如何更换花呗绑定银行卡1', '花呗更改绑定银行卡', '我什么时候开通了花呗']
+search_sim = SearchSimilarity(corpus=corpus)
+
+print(search_sim.get_scores(query=a))
+print(search_sim.get_similarities(query=a))

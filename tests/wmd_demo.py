@@ -10,7 +10,7 @@ a = '如何更换花呗绑定银行卡'
 b = '花呗更改绑定银行卡'
 c = '我什么时候开通了花呗'
 emb = sim.encode(a)
-print(emb)
+print(a, emb)
 
 s = sim.score(a, b)
 print(a, b, s)

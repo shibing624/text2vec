@@ -4,9 +4,10 @@
 @description: 
 """
 
-from text2vec.utils.bm25 import BM25
-from text2vec.utils.distance import cosine_distance
+from text2vec.algorithm.distance import cosine_distance
+from text2vec.algorithm.rank_bm25 import BM25Okapi
 from text2vec.utils.logger import get_logger
+from text2vec.utils.tokenizer import Tokenizer
 from text2vec.vector import Vector, EmbType
 
 logger = get_logger(__name__)
@@ -19,7 +20,12 @@ class SimType(object):
 
 class Similarity(Vector):
     def __init__(self, similarity_type=SimType.COSINE,
-                 sequence_length=128):
+                 embedding_type=EmbType.W2V,
+                 sequence_length=128,
+                 w2v_path='',
+                 w2v_kwargs=None,
+                 bert_model_folder='',
+                 bert_layer_nums=4):
         """
         corpus: list of token list.
             A list of query in segment tokens.
@@ -28,7 +34,12 @@ class Similarity(Vector):
         :param similarity_type:
         :param corpus:
         """
-        super(Similarity, self).__init__()
+        super(Similarity, self).__init__(embedding_type=embedding_type,
+                                         w2v_path=w2v_path,
+                                         w2v_kwargs=w2v_kwargs,
+                                         sequence_length=sequence_length,
+                                         bert_model_folder=bert_model_folder,
+                                         bert_layer_nums=bert_layer_nums)
         self.similarity_type = similarity_type
         self.sequence_length = sequence_length
 
@@ -47,41 +58,46 @@ class Similarity(Vector):
         return ret
 
 
-class SearchSimilarity(Similarity):
-    def __init__(self, similarity_type=SimType.COSINE, corpus=None, num_best=10, search_type='bm25'):
+class SearchSimilarity(object):
+    def __init__(self, corpus):
         """
-        corpus: list of token list.
-            A list of query in segment tokens.
-        num_best: int, optional
-            Number of results to retrieve.
-        :param similarity_type:
-        :param corpus:
+        Search sim doc with rank bm25
+        :param corpus: list of str.
+            A list of doc.(no need segment, do it in init)
         """
-        super(SearchSimilarity, self).__init__(similarity_type=similarity_type)
-        self.similarity_type = similarity_type
         self.corpus = corpus
-        self.num_best = num_best
-        self.search_type = search_type
+        self.corpus_seg = None
         self.bm25_instance = None
+        self.tokenizer = Tokenizer()
 
     def init(self):
         if not self.bm25_instance:
-            self.bm25_instance = BM25(corpus=self.corpus)
+            if not self.corpus:
+                raise ValueError("must set corpus, which is documents, list of token list")
 
-    def get_similarities(self, query):
-        """Get similarity between `query` and this docs.
+            if isinstance(self.corpus, str):
+                self.corpus = [self.corpus]
 
-        Parameters
-        ----------
-        query : str.
+            self.corpus_seg = [self.tokenizer.tokenize(i) for i in self.corpus]
+            self.bm25_instance = BM25Okapi(corpus=self.corpus_seg)
 
-        Return
-        ------
-        :float scores.
-
+    def get_similarities(self, query, n=5):
+        """
+        Get similarity between `query` and this docs.
+        :param query: str
+        :param n: int, num_best
+        :return: float scores
         """
         self.init()
-        tokens = self.tokenize(query)
-        sim_items = self.bm25_instance.similarity(tokens, self.num_best)
-        docs = [(self.corpus[id], score) for id, score in sim_items]
-        return docs
+        tokens = self.tokenizer.tokenize(query)
+        return self.bm25_instance.get_top_n(tokens, self.corpus_seg, n=n)
+
+    def get_scores(self, query):
+        """
+
+        :param query:
+        :return:
+        """
+        self.init()
+        tokens = self.tokenizer.tokenize(query)
+        return self.bm25_instance.get_scores(query=tokens)

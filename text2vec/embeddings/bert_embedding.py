@@ -14,7 +14,7 @@ import tensorflow as tf
 import text2vec
 from text2vec.embeddings.embedding import Embedding
 from text2vec.processors.base_processor import BaseProcessor
-from text2vec.utils import get_file
+from text2vec.utils.get_file import get_file
 from text2vec.utils.logger import get_logger
 from text2vec.utils.non_masking_layer import NonMaskingLayer
 
