@@ -23,7 +23,8 @@ print(b, c, s)
 from text2vec import SearchSimilarity
 
 corpus = [a, b, c]
+print(corpus)
 search_sim = SearchSimilarity(corpus=corpus)
 
-print(search_sim.get_scores(query=a))
-print(search_sim.get_similarities(query=a))
+print(a, 'scores:', search_sim.get_scores(query=a))
+print(a, 'rank similarities:', search_sim.get_similarities(query=a))

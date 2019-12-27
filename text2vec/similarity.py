@@ -4,6 +4,8 @@
 @description: 
 """
 
+import numpy as np
+
 from text2vec.algorithm.distance import cosine_distance
 from text2vec.algorithm.rank_bm25 import BM25Okapi
 from text2vec.utils.logger import get_logger
@@ -87,24 +89,26 @@ class SearchSimilarity(object):
             if isinstance(self.corpus, str):
                 self.corpus = [self.corpus]
 
-            self.corpus_seg = [self.tokenizer.tokenize(i) for i in self.corpus]
-            self.bm25_instance = BM25Okapi(corpus=self.corpus_seg)
+            self.corpus_seg = {k: self.tokenizer.tokenize(k) for k in self.corpus}
+            self.bm25_instance = BM25Okapi(corpus=list(self.corpus_seg.values()))
 
     def get_similarities(self, query, n=5):
         """
         Get similarity between `query` and this docs.
         :param query: str
         :param n: int, num_best
-        :return: float scores
+        :return: result, dict, float scores, docs rank
         """
-        self.init()
-        tokens = self.tokenizer.tokenize(query)
-        return self.bm25_instance.get_top_n(tokens, self.corpus_seg, n=n)
+        scores = self.get_scores(query)
+        rank_n = np.argsort(scores)[::-1]
+        if n > 0:
+            rank_n = rank_n[:n]
+        return [self.corpus[i] for i in rank_n]
 
     def get_scores(self, query):
         """
         Get scores between query and docs
-        :param query:
+        :param query: input str
         :return: numpy array, scores for query between docs
         """
         self.init()

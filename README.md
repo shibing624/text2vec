@@ -230,16 +230,18 @@ b = '花呗更改绑定银行卡'
 c = '我什么时候开通了花呗'
 
 corpus = [a, b, c]
+print(corpus)
 search_sim = SearchSimilarity(corpus=corpus)
 
-print(search_sim.get_scores(query=a))
-print(search_sim.get_similarities(query=a))
+print(a, 'scores:', search_sim.get_scores(query=a))
+print(a, 'rank similarities:', search_sim.get_similarities(query=a))
 ```
 
 output:
 ```
-[ 0.9527457  -0.07449248 -0.03204909]
-[['如何', '更换', '花', '呗', '绑定', '银行卡'], ['我', '什么', '时候', '开通', '了', '花', '呗'], ['花', '呗', '更改', '绑定', '银行卡']]
+['如何更换花呗绑定银行卡', '花呗更改绑定银行卡', '我什么时候开通了花呗']
+如何更换花呗绑定银行卡 scores: [ 0.9527457  -0.07449248 -0.03204909]
+如何更换花呗绑定银行卡 rank similarities: ['如何更换花呗绑定银行卡', '我什么时候开通了花呗', '花呗更改绑定银行卡']
 ```
 
 
