@@ -11,7 +11,9 @@ import text2vec
 text2vec.set_log_level('DEBUG')
 
 char = '我'
-print(char, text2vec.encode(char))
+result = text2vec.encode(char)
+print(type(result))
+print(char, result)
 
 word = '如何'
 print(word, text2vec.encode(word))
