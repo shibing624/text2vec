@@ -173,10 +173,18 @@ class WordEmbedding(Embedding):
             emb = []
             count = 0
             for word in sentence:
-                if word not in self.w2v.vocab:
-                    continue
-                emb.append(self.w2v[word])
-                count += 1
+                if word in self.w2v.vocab:
+                    emb.append(self.w2v[word])
+                    count += 1
+                else:
+                    if len(word) == 1:
+                        continue
+                    # 再切分，eg 特价机票
+                    ws = self.tokenizer.tokenize(word, cut_all=True)
+                    for w in ws:
+                        if w in self.w2v.vocab:
+                            emb.append(self.w2v[w])
+                            count += 1
             tensor_x = np.array(emb).sum(axis=0)  # 纵轴相加
             if count > 0:
                 avg_tensor_x = np.divide(tensor_x, count)

@@ -54,10 +54,12 @@ class Tokenizer(object):
             for w, f in custom_word_freq_dict.items():
                 self.model.add_word(w, freq=f)
 
-    def tokenize(self, sentence):
+    def tokenize(self, sentence, cut_all=False, HMM=True):
         """
         切词并返回切词位置
-        :param sentence:
+        :param sentence: 句子
+        :param cut_all: 全模式，默认关闭
+        :param HMM: 是否打开NER识别，默认打开
         :return:  A list of strings.
         """
-        return self.model.lcut(sentence)
+        return self.model.lcut(sentence, cut_all=cut_all, HMM=HMM)
