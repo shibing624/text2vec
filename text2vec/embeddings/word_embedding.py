@@ -178,7 +178,10 @@ class WordEmbedding(Embedding):
                 emb.append(self.w2v[word])
                 count += 1
             tensor_x = np.array(emb).sum(axis=0)  # 纵轴相加
-            avg_tensor_x = np.divide(tensor_x, count)
+            if count > 0:
+                avg_tensor_x = np.divide(tensor_x, count)
+            else:
+                avg_tensor_x = 0.0
             embeds.append(avg_tensor_x)
         embeds = np.array(embeds)
         if debug:
