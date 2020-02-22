@@ -66,3 +66,27 @@ def test_oov_sim():
     b = '特价的机票'
     s = sim.get_score(a, b)
     print(a, b, s)
+
+
+def test_sentence_emb():
+    char = '你'
+    result = text2vec.encode(char)
+    print(char, result)
+    char = '好'
+    result = text2vec.encode(char)
+    print(char, result)
+    char = '吗'
+    result = text2vec.encode(char)
+    print(char, result)
+
+    char = '你好'
+    result = text2vec.encode(char)
+    print(char, result)
+
+    char = '你好吗'
+    result = text2vec.encode(char)
+    print(char, result)
+
+    char = '你们好吗'
+    result = text2vec.encode(char)
+    print(char, result)
