@@ -87,6 +87,13 @@ def test_sentence_emb():
     result = text2vec.encode(char)
     print(char, result)
 
-    char = '你们好吗'
-    result = text2vec.encode(char)
-    print(char, result)
+    import numpy as np
+    emb = [text2vec.encode('你好'), text2vec.encode('吗')]
+    average = np.array(emb).sum(axis=0) / 2.0
+    print('average:', average)
+    act = text2vec.encode('你好吗')
+
+    if str(act) == str(average):
+        print("same")
+    else:
+        print('diff')
