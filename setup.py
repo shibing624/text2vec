@@ -48,7 +48,7 @@ setup(
         'Topic :: Text Processing :: Indexing',
         'Topic :: Text Processing :: Linguistic',
     ],
-    keywords='NLP,text2vec,Chinese Text Similarity Calculation Tool,similarity',
+    keywords='word embedding,text2vec,Chinese Text Similarity Calculation Tool,similarity,word2vec',
     install_requires=reqs.strip().split('\n'),
     packages=find_packages(exclude=['tests']),
     package_dir={'text2vec': 'text2vec'},
