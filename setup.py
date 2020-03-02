@@ -27,7 +27,7 @@ with open('requirements.txt', 'r', encoding='utf-8') as f:
 setup(
     name='text2vec',
     version=__version__,
-    description='Text to Vector Tool, encode text',
+    description='Text to vector Tool, encode text',
     long_description=readme,
     long_description_content_type='text/markdown',
     author='XuMing',
