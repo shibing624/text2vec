@@ -31,7 +31,7 @@ def apply_bert_case(cases: List[List[str]]):
         q2 = line[1]
         a = line[2]
 
-        s = bert_sim.score(q1, q2)
+        s = bert_sim.get_score(q1, q2)
         print(f'q1:{q1}, q2:{q2}, expect a:{a}, actual a:{s}')
 
 
@@ -41,21 +41,22 @@ def apply_w2v_case(cases: List[List[str]]):
         q2 = line[1]
         a = line[2]
 
-        s = w2v_sim.score(q1, q2)
+        s = w2v_sim.get_score(q1, q2)
         print(f'q1:{q1}, q2:{q2}, expect a:{a}, actual a:{s}')
 
 
 def test_case1():
-    apply_bert_case(case_same_keywords)
-    # q1:飞行员没钱买房怎么办？, q2:父母没钱买房子, expect a:False, actual a:0.846145250083127
-    # q1:聊天室都有哪些好的, q2:聊天室哪个好, expect a:True, actual a:0.9302744928458128
-    # q1:不锈钢上贴的膜怎么去除, q2:不锈钢上的胶怎么去除, expect a:True, actual a:0.9625103602739326
-    # q1:动漫人物的口头禅, q2:白羊座的动漫人物, expect a:False, actual a:0.9254731623309143
+
     apply_w2v_case(case_same_keywords)
     # q1:飞行员没钱买房怎么办？, q2:父母没钱买房子, expect a:False, actual a:0.8113352629229633
     # q1:聊天室都有哪些好的, q2:聊天室哪个好, expect a:True, actual a:0.8509278390378958
     # q1:不锈钢上贴的膜怎么去除, q2:不锈钢上的胶怎么去除, expect a:True, actual a:0.9617148170317945
     # q1:动漫人物的口头禅, q2:白羊座的动漫人物, expect a:False, actual a:0.8928384526487808
+    apply_bert_case(case_same_keywords)
+    # q1:飞行员没钱买房怎么办？, q2:父母没钱买房子, expect a:False, actual a:0.846145250083127
+    # q1:聊天室都有哪些好的, q2:聊天室哪个好, expect a:True, actual a:0.9302744928458128
+    # q1:不锈钢上贴的膜怎么去除, q2:不锈钢上的胶怎么去除, expect a:True, actual a:0.9625103602739326
+    # q1:动漫人物的口头禅, q2:白羊座的动漫人物, expect a:False, actual a:0.9254731623309143
 
 
 def test_case2():
