@@ -1,4 +1,5 @@
-jieba
-gensim
+jieba>=0.39
+gensim>=3.5.0
+numpy>=1.17.4
 keras-bert>=0.80.0
 tensorflow>=1.14.0 # tensorflow-gpu>=1.14.0
