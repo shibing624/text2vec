@@ -3,8 +3,9 @@
 # Brief: https://github.com/dorianbrown/rank_bm25
 
 import math
-import numpy as np
 from multiprocessing import Pool, cpu_count
+
+import numpy as np
 
 """
 All of these algorithms have been taken from the paper:
@@ -161,4 +162,3 @@ class BM25Plus(BM25):
             score += (self.idf.get(q) or 0) * (self.delta + (q_freq * (self.k1 + 1)) /
                                                (self.k1 * (1 - self.b + self.b * doc_len / self.avgdl) + q_freq))
         return score
-
