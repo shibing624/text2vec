@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-@author:XuMing（xuming624@qq.com)
+@author:XuMing<xuming624@qq.com>
 @description: 
 """
 
@@ -52,7 +52,7 @@ class Vector(object):
         if not text.strip():
             return []
         self.load_model()
-        return self.model.tokenizer.tokenize(text)
+        return self.model.tokenizer.tokenize(text.lower().strip())
 
     def encode(self, tokens):
         ret = 0.0
