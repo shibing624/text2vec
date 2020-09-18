@@ -54,6 +54,15 @@ python3 setup.py install
 ```
 
 ## Usage:
+
+- download embedding file:
+
+以下词向量，任选一个：
+
+轻量版腾讯词向量，二进制，111MB放到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin` 
+
+腾讯词向量, 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
+
 - get text vector
 ```
 
