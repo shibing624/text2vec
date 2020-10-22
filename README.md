@@ -5,7 +5,7 @@ text2vec, chinese text to vetor.(文本向量化表示工具，包括词向量�
 
 ## Feature
 #### 文本向量表示
-- 字词粒度，通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词）](https://ai.tencent.com/ailab/nlp/embedding.html)，获取字词的word2vec向量表示。
+- 字词粒度，通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe），获取字词的word2vec向量表示。
 - 句子粒度，通过求句子中所有单词词嵌入的平均值计算得到。
 - 篇章粒度，可以通过gensim库的doc2vec得到，应用较少，本项目不实现。
 
@@ -54,6 +54,15 @@ python3 setup.py install
 ```
 
 ## Usage:
+
+- download embedding file:
+
+以下词向量，任选一个：
+
+轻量版腾讯词向量，二进制，111MB放到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin` 
+
+腾讯词向量, 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
+
 - get text vector
 ```
 
