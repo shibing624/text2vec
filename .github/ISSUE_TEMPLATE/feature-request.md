@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 - [ ] I checked to make sure that this is not a duplicate issue
-- [ ] I'm submitting the request to the correct repository (for model requests, see [here](https://github.com/shibing624/simtext))
+- [ ] I'm submitting the request to the correct repository (for model requests, see [here](https://github.com/shibing624/text2vec))
 
 ### Is your feature request related to a problem? Please describe.
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
