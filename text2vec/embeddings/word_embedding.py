@@ -19,6 +19,8 @@ from text2vec.utils.logger import logger
 from text2vec.utils.tokenizer import Tokenizer
 
 
+
+
 class WordEmbedding(Embedding):
     """Pre-trained word2vec embedding"""
     model_key_map = {
@@ -60,7 +62,8 @@ class WordEmbedding(Embedding):
                  w2v_kwargs: Dict[str, Any] = None,
                  sequence_length: Union[Tuple[int, ...], str, int] = 128,
                  processor: Optional[BaseProcessor] = None,
-                 trainable: bool = False):
+                 trainable: bool = False,
+                 stopwords_file: str = ''):
         """
 
         Args:
@@ -82,7 +85,8 @@ class WordEmbedding(Embedding):
         logger.debug('load w2v embedding ...')
         super(WordEmbedding, self).__init__(sequence_length=sequence_length,
                                             embedding_size=0,
-                                            processor=processor)
+                                            processor=processor,
+                                            stopwords_file=stopwords_file)
         self._build_token2idx_from_w2v()
         if trainable:
             self._build_model()
@@ -131,9 +135,11 @@ class WordEmbedding(Embedding):
 
         self.processor.token2idx = self.w2v_token2idx
         self.processor.idx2token = dict([(value, key) for key, value in self.w2v_token2idx.items()])
-        logger.debug('word count   : {}'.format(len(self.w2v_vector_matrix)))
-        logger.debug('emb size     : {}'.format(self.embedding_size))
-        logger.debug('Top 50 word  : {}'.format(self.w2v_top_words))
+        logger.debug('word count: {}'.format(len(self.w2v_vector_matrix)))
+        logger.debug('emb size: {}'.format(self.embedding_size))
+        logger.debug('top 50 word: {}'.format(self.w2v_top_words))
+        logger.debug('filter stopwords: {}, count: {}'.format(sorted(list(self.stopwords))[:10], len(self.stopwords)))
+
         self.tokenizer = Tokenizer()
 
     def _build_model(self, **kwargs):
@@ -173,6 +179,10 @@ class WordEmbedding(Embedding):
             emb = []
             count = 0
             for word in sentence:
+                # 过滤停用词
+                if word in self.stopwords:
+                    continue
+                # 调用词向量
                 if word in self.w2v.vocab:
                     emb.append(self.w2v[word])
                     count += 1

@@ -4,6 +4,7 @@
 @description: 
 """
 import json
+import os
 from typing import Union, List, Optional, Dict
 
 import numpy as np
@@ -11,6 +12,16 @@ import numpy as np
 from text2vec.processors.base_processor import BaseProcessor
 from text2vec.processors.default_processor import DefaultProcessor
 from text2vec.utils.logger import logger
+
+
+def load_stopwords(file_path):
+    stopwords = set()
+    if file_path and os.path.exists(file_path):
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                stopwords.add(line)
+    return stopwords
 
 
 class Embedding(object):
@@ -31,7 +42,8 @@ class Embedding(object):
     def __init__(self,
                  sequence_length: Union[int, str] = 128,
                  embedding_size: int = 100,
-                 processor: Optional[BaseProcessor] = None):
+                 processor: Optional[BaseProcessor] = None,
+                 stopwords_file: str = ''):
         self.embedding_size = embedding_size
 
         if processor is None:
@@ -42,6 +54,7 @@ class Embedding(object):
         self.sequence_length = sequence_length
         self.embed_model = None
         self.tokenizer = None
+        self.stopwords = load_stopwords(file_path=stopwords_file)
 
     @property
     def token_count(self) -> int:

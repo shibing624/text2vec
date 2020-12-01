@@ -19,3 +19,4 @@ if not USER_DATA_DIR.exists():
 
 VEC = Vector()
 encode = VEC.encode
+set_stopwords_file = VEC.set_stopwords_file

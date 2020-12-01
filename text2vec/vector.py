@@ -4,6 +4,10 @@
 @description: 
 """
 
+import os
+
+pwd_path = os.path.abspath(os.path.dirname(__file__))
+
 
 class EmbType(object):
     BERT = 'bert'
@@ -28,6 +32,7 @@ class Vector(object):
         self.bert_model_folder = bert_model_folder
         self.bert_layer_nums = bert_layer_nums
         self.model = None
+        self.stopwords_file = os.path.join(pwd_path, 'data/stopwords.txt')
 
     def load_model(self):
         if not self.model:
@@ -44,7 +49,8 @@ class Vector(object):
                                            w2v_kwargs=self.w2v_kwargs,
                                            sequence_length=self.sequence_length,
                                            processor=self.processor,
-                                           trainable=self.trainable)
+                                           trainable=self.trainable,
+                                           stopwords_file=self.stopwords_file)
             else:
                 raise ValueError('set error embedding type.')
 
@@ -62,3 +68,7 @@ class Vector(object):
         if isinstance(tokens, str):
             tokens = self.tokenize(tokens)
         return self.model.embed_one(tokens)
+
+    def set_stopwords_file(self, stopwords_file_path):
+        self.stopwords_file = stopwords_file_path
+        self.load_model()

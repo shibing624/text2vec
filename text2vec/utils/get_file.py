@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 """Download file."""
-import typing
-from pathlib import Path
-
-import os
 import hashlib
+import os
 import shutil
 import sys
 import tarfile
 import time
+import typing
 import zipfile
-import collections
+from pathlib import Path
+
+import numpy as np
 import six
 from six.moves.urllib.error import HTTPError
 from six.moves.urllib.error import URLError
 from six.moves.urllib.request import urlretrieve
-import numpy as np
 
 
 class Progbar(object):
@@ -33,11 +32,11 @@ class Progbar(object):
     """
 
     def __init__(
-        self,
-        target,
-        width=30,
-        verbose=1,
-        interval=0.05,
+            self,
+            target,
+            width=30,
+            verbose=1,
+            interval=0.05,
     ):
         """Init."""
         self.target = target
@@ -46,7 +45,7 @@ class Progbar(object):
         self.interval = interval
 
         self._dynamic_display = ((hasattr(sys.stdout,
-                                  'isatty') and sys.stdout.isatty()
+                                          'isatty') and sys.stdout.isatty()
                                   ) or 'ipykernel' in sys.modules)
         self._total_width = 0
         self._seen_so_far = 0
@@ -61,7 +60,7 @@ class Progbar(object):
         info = ' - {0:.0f}s'.format(now - self._start)
         if self.verbose == 1:
             if (now - self._last_update < self.interval and self.target is not
-               None and current < self.target):
+                    None and current < self.target):
                 return
 
             prev_total_width = self._total_width
@@ -180,17 +179,17 @@ def _extract_archive(file_path, path='.', archive_format='auto'):
 
 
 def get_file(
-    fname: str = None,
-    origin: str = None,
-    untar: bool = False,
-    extract: bool = False,
-    md5_hash: typing.Any = None,
-    file_hash: typing.Any = None,
-    hash_algorithm: str = 'auto',
-    archive_format: str = 'auto',
-    cache_subdir: typing.Union[Path, str] = 'data',
-    cache_dir: typing.Union[Path, str] = 'dataset',
-    verbose: int = 1
+        fname: str = None,
+        origin: str = None,
+        untar: bool = False,
+        extract: bool = False,
+        md5_hash: typing.Any = None,
+        file_hash: typing.Any = None,
+        hash_algorithm: str = 'auto',
+        archive_format: str = 'auto',
+        cache_subdir: typing.Union[Path, str] = 'data',
+        cache_dir: typing.Union[Path, str] = 'dataset',
+        verbose: int = 1
 ) -> str:
     """
     Downloads a file from a URL if it not already in the cache.
@@ -314,7 +313,7 @@ def validate_file(fpath, file_hash, algorithm='auto', chunk_size=65535):
     :return: Whether the file is valid.
     """
     if ((algorithm == 'sha256') or (algorithm == 'auto' and len(
-                                    file_hash) == 64)):
+            file_hash) == 64)):
         hasher = 'sha256'
     else:
         hasher = 'md5'

@@ -8,22 +8,22 @@ import numpy as np
 
 import text2vec
 
-text2vec.set_log_level('DEBUG')
+text2vec.set_log_level('INFO')
 
-char = '我'
+char = '卡'
 result = text2vec.encode(char)
 print(type(result))
 print(char, result)
 
-word = '如何'
+word = '银行卡'
 print(word, text2vec.encode(word))
 
 a = '如何更换花呗绑定银行卡'
 emb = text2vec.encode(a)
 print(a, emb)
 
-b = ['我',
-     '如何',
+b = ['卡',
+     '银行卡',
      '如何更换花呗绑定银行卡',
      '如何更换花呗绑定银行卡,如何更换花呗绑定银行卡。如何更换花呗绑定银行卡？。。。这个，如何更换花呗绑定银行卡！']
 result = []
