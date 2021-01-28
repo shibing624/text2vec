@@ -3,7 +3,9 @@
 @author:XuMing<xuming624@qq.com>
 @description:
 """
+import sys
 
+sys.path.append('..')
 from text2vec import Similarity
 
 a = '如何更换花呗绑定银行卡'

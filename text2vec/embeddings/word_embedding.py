@@ -19,8 +19,6 @@ from text2vec.utils.logger import logger
 from text2vec.utils.tokenizer import Tokenizer
 
 
-
-
 class WordEmbedding(Embedding):
     """Pre-trained word2vec embedding"""
     model_key_map = {

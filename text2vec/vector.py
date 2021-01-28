@@ -22,7 +22,9 @@ class Vector(object):
                  processor=None,
                  trainable=False,
                  bert_model_folder='',
-                 bert_layer_nums=4):
+                 bert_layer_nums=4,
+                 stopwords_file=os.path.join(pwd_path, 'data/stopwords.txt')
+                 ):
         self.embedding_type = embedding_type
         self.w2v_path = w2v_path
         self.w2v_kwargs = w2v_kwargs  # default: {binary:False}
@@ -32,7 +34,7 @@ class Vector(object):
         self.bert_model_folder = bert_model_folder
         self.bert_layer_nums = bert_layer_nums
         self.model = None
-        self.stopwords_file = os.path.join(pwd_path, 'data/stopwords.txt')
+        self.stopwords_file = stopwords_file
 
     def load_model(self):
         if not self.model:
