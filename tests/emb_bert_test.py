@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-@author:XuMing<xuming624@qq.com>
+@author:XuMing(xuming624@qq.com)
 @description: 
 """
 from text2vec.embeddings.bert_embedding import BERTEmbedding
