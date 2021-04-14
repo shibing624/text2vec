@@ -55,14 +55,16 @@ python3 setup.py install
 
 ## Usage:
 
-- download embedding file:
+### Download Embedding File
 
 以下词向量，任选一个：
 
-轻量版腾讯词向量，二进制，111MB放到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin` 
+- 轻量版腾讯词向量 [百度云盘链接-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或者 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制，111MB放到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
 
-腾讯词向量, 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
+- [腾讯词向量-官方全量](https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz), 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
 
+
+### Text Embedding
 - get text vector
 ```
 
@@ -206,7 +208,7 @@ print(s)
 
 output:
 ```
-0.9519710685638405
+0.955147929720611
 ```
 
 

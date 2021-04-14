@@ -29,8 +29,7 @@ class WordEmbedding(Embedding):
                                 'untar_filename': 'Tencent_AILab_ChineseEmbedding.txt'},
         # 轻量版腾讯词向量，二进制，111MB
         'w2v-light-tencent-chinese': {'tar_filename': 'light_Tencent_AILab_ChineseEmbedding.bin',
-                                      'url': 'https://www.borntowin.cn/mm/emb_models/'
-                                             'light_Tencent_AILab_ChineseEmbedding.bin',
+                                      'url': 'https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download',
                                       'binary': True,
                                       'untar_filename': 'light_Tencent_AILab_ChineseEmbedding.bin'},
         # 轻量版腾讯词向量，txt文本，261MB
@@ -108,7 +107,7 @@ class WordEmbedding(Embedding):
                 )
         t0 = time.time()
         w2v = KeyedVectors.load_word2vec_format(self.w2v_path, **self.w2v_kwargs)
-        w2v.init_sims(replace=True)
+        # w2v.init_sims(replace=True)
         logger.debug('load w2v from %s, spend %s s' % (self.w2v_path, time.time() - t0))
         token2idx = {
             self.processor.token_pad: 0,
@@ -117,7 +116,7 @@ class WordEmbedding(Embedding):
             self.processor.token_eos: 3
         }
 
-        for token in w2v.index2word:
+        for token in w2v.key_to_index:
             token2idx[token] = len(token2idx)
 
         vector_matrix = np.zeros((len(token2idx), w2v.vector_size))
@@ -127,7 +126,7 @@ class WordEmbedding(Embedding):
         self.embedding_size = w2v.vector_size
         self.w2v_vector_matrix = vector_matrix
         self.w2v_token2idx = token2idx
-        self.w2v_top_words = w2v.index2entity[:50]
+        self.w2v_top_words = w2v.index_to_key[:50]
         self.w2v_model_loaded = True
         self.w2v = w2v
 
@@ -181,8 +180,8 @@ class WordEmbedding(Embedding):
                 if word in self.stopwords:
                     continue
                 # 调用词向量
-                if word in self.w2v.vocab:
-                    emb.append(self.w2v[word])
+                if word in self.w2v.key_to_index:
+                    emb.append(self.w2v.get_vector(word, norm=True))
                     count += 1
                 else:
                     if len(word) == 1:
@@ -190,8 +189,8 @@ class WordEmbedding(Embedding):
                     # 再切分，eg 特价机票
                     ws = self.tokenizer.tokenize(word, cut_all=True)
                     for w in ws:
-                        if w in self.w2v.vocab:
-                            emb.append(self.w2v[w])
+                        if w in self.w2v.key_to_index:
+                            emb.append(self.w2v.get_vector(word, norm=True))
                             count += 1
             tensor_x = np.array(emb).sum(axis=0)  # 纵轴相加
             if count > 0:
