@@ -55,7 +55,7 @@ python3 setup.py install
 
 ## Usage:
 
-### Download Embedding File
+1. Download Embedding File
 
 以下词向量，任选一个：
 
@@ -64,7 +64,7 @@ python3 setup.py install
 - [腾讯词向量-官方全量](https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz), 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
 
 
-### Text Embedding
+2. Text Embedding
 - get text vector
 ```
 
