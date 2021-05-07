@@ -190,7 +190,7 @@ class WordEmbedding(Embedding):
                     ws = self.tokenizer.tokenize(word, cut_all=True)
                     for w in ws:
                         if w in self.w2v.key_to_index:
-                            emb.append(self.w2v.get_vector(word, norm=True))
+                            emb.append(self.w2v.get_vector(w, norm=True))
                             count += 1
             tensor_x = np.array(emb).sum(axis=0)  # 纵轴相加
             if count > 0:

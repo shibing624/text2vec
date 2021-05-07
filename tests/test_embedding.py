@@ -4,7 +4,6 @@
 @description:
 """
 
-import logging
 import unittest
 
 SEQUENCE_LENGTH = 30
@@ -20,7 +19,7 @@ class TestWordEmbeddings(unittest.TestCase):
         sentence = ['我', '想', '看', '电影', '%%##!$#%']
         tokens = self.embedding.embed_one(sentence)
 
-        logging.info('tokenize test: {} -> {}'.format(sentence, tokens))
+        print('tokenize test: {} -> {}'.format(sentence, tokens))
         assert len(tokens) > 0
 
         token_list = self.embedding.embed([sentence])
@@ -30,7 +29,7 @@ class TestWordEmbeddings(unittest.TestCase):
         sentence = ['我', '想', '看', '电影', '%%##!$#%']
         embedded_sentence = self.embedding.embed_one(sentence)
         embedded_sentences = self.embedding.embed([sentence])
-        logging.info('embed test: {} -> {}'.format(sentence, embedded_sentence))
+        print('embed test: {} -> {}'.format(sentence, embedded_sentence))
         assert len(embedded_sentence.shape) > 0
         assert len(embedded_sentences.shape) > 0
 
@@ -48,7 +47,7 @@ class TestBERTEmbedding(unittest.TestCase):
         sentence = ['我', '想', '看', '电影', '%%##!$#%']
         embedded_sentence = self.embedding.embed_one(sentence)
         embedded_sentences = self.embedding.embed([sentence])
-        logging.info('embed test: {} -> {}'.format(sentence, embedded_sentence))
+        print('embed test: {} -> {}'.format(sentence, embedded_sentence))
 
         assert len(embedded_sentence.shape) > 0
         assert len(embedded_sentences.shape) > 0

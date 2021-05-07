@@ -29,6 +29,7 @@ def test_diff_len():
                  '两骑手，', '反身张弓射虎；', '虎，', '跃起前扑。', '上下右三边有框，', '上沿双边框内填刻三角纹，', '下沿双边框内填刻斜条纹。']
     print(len(sentences))
     uniq_sentences = set(sentences)
+    print(uniq_sentences)
     print(len(uniq_sentences))
     search_sim = text2vec.SearchSimilarity(corpus=uniq_sentences)
     print(len(search_sim.corpus))
