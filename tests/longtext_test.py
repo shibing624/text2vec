@@ -20,9 +20,18 @@ b = '你说的到底是谁？看Bert里面extract_features.py这个文件，可�
     'CLS的embedding），然后取bert输出中和CLS对应的那个vector（记为c）进行变换就可以了。原文中提到的是多分类任务，给出的输出变换是' \
     '）就可以了。至于题主提到的句向量表示，上文中提到的向量c即可一定程度表'
 
-bert_sim = text2vec.Similarity(embedding_type='bert')
-s = bert_sim.get_score(a, b)
-print(s)
 
-w2v_sim = text2vec.Similarity(embedding_type='w2v')
-print(w2v_sim.get_score(a, b))
+def bert_sim():
+    bert_sim = text2vec.Similarity(embedding_type='bert')
+    s = bert_sim.get_score(a, b)
+    print(s)
+
+
+def w2v_sim():
+    w2v_sim = text2vec.Similarity(embedding_type='w2v')
+    print(w2v_sim.get_score(a, b))
+
+
+if __name__ == '__main__':
+    w2v_sim()
+    bert_sim()
