@@ -1,6 +1,11 @@
 # text2vec
-text2vec, chinese text to vetor.(文本向量化表示工具，包括词向量化、句子向量化)
+[![PyPI version](https://badge.fury.io/py/text2vec.svg)](https://badge.fury.io/py/text2vec)
+[![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![License Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/shibing624/text2vec/LICENSE)
+![Language](https://img.shields.io/badge/Language-Python-blue.svg)
+![Python3](https://img.shields.io/badge/Python-3.X-red.svg)
 
+text2vec, chinese text to vetor.(文本向量化表示工具，包括词向量化、句子向量化)
 
 
 ## Feature
