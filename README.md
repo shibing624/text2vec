@@ -228,7 +228,7 @@ output:
 
 - 基于BERT预训练模型的文本向量计算
 
-基于中文BERT预训练模型`bert-base-chinese`，提取后四层layers计算各token的词向量，句子向量通过单词词向量取平均值得到。
+基于中文BERT预训练模型`chinese_L-12_H-768_A-12(bert-base-chinese)`，提取后四层layers计算各token的词向量，句子向量通过单词词向量取平均值得到。
 
 示例[bert_emb_demo.py](examples/bert_emb_demo.py)
 
