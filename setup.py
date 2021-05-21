@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-import os
 import sys
 
 from setuptools import setup, find_packages
-
-here = os.path.abspath(os.path.dirname(__file__))
 
 # Avoids IDE errors, but actual version is read from version.py
 __version__ = None
@@ -41,9 +38,6 @@ setup(
         'Natural Language :: Chinese (Traditional)',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Topic :: Text Processing',
         'Topic :: Text Processing :: Indexing',
         'Topic :: Text Processing :: Linguistic',
@@ -54,6 +48,6 @@ setup(
     package_dir={'text2vec': 'text2vec'},
     package_data={
         'text2vec': ['*.*', 'LICENSE', '../LICENSE', 'README.*', '../*.txt', 'embeddings/*',
-                     'utils/*', 'processors/*', 'bert/*'],
+                     'utils/*', 'processors/*', 'bert/*', 'data/*.*'],
     }
 )
