@@ -69,7 +69,10 @@ python3 setup.py install
 
 
 2. 文本向量计算
-- 计算文本向量
+
+- 基于预训练的word2vec计算文本向量
+
+通过腾讯词向量计算各字词的词向量，句子向量通过单词词向量取平均值得到。
 
 示例[base_demo.py](./examples/base_demo.py)
 
@@ -167,9 +170,65 @@ output:
 ```
 > 返回值`emb`是`numpy.ndarray`类型，shape为`(200, )`
 
-- 基于Bert预训练模型的词向量计算
 
-基于中文bert预训练模型`bert-base-chinese`，提取后四层layers计算各token的词向量，句子向量通过单词词向量平均值得到。
+- 计算句子之间的相似度值
+
+示例[similarity_demo.py](./examples/similarity_demo.py)
+
+```
+from text2vec import Similarity
+
+a = '如何更换花呗绑定银行卡'
+b = '花呗更改绑定银行卡'
+
+sim = Similarity()
+s = sim.get_score(a, b)
+print(s)
+
+```
+
+output:
+```
+0.9551
+```
+
+> 句子相似度值范围在0到1之间，值越大越相似。
+
+- 计算句子与文档集之间的相似度值
+
+一般在文档候选集中找与query最相似的文本，常用于QA场景的问句相似匹配任务。
+
+
+```
+from text2vec import SearchSimilarity
+
+a = '如何更换花呗绑定银行卡'
+b = '花呗更改绑定银行卡'
+c = '我什么时候开通了花呗'
+
+corpus = [a, b, c]
+print(corpus)
+search_sim = SearchSimilarity(corpus=corpus)
+
+print(a, 'scores:', search_sim.get_scores(query=a))
+print(a, 'rank similarities:', search_sim.get_similarities(query=a))
+```
+
+output:
+```
+['如何更换花呗绑定银行卡', '花呗更改绑定银行卡', '我什么时候开通了花呗']
+如何更换花呗绑定银行卡 scores: [ 0.9527457  -0.07449248 -0.03204909]
+如何更换花呗绑定银行卡 rank similarities: ['如何更换花呗绑定银行卡', '我什么时候开通了花呗', '花呗更改绑定银行卡']
+```
+
+> 'search_sim.get_scores(query)'的结果越大，表示该query与corpus的相似度越近。
+
+> 'search_sim.get_similarities(query)'的结果表示corpus中所有句子与query相似度rank排序的结果，越靠前的结果越相似。
+
+
+- 基于BERT预训练模型的文本向量计算
+
+基于中文BERT预训练模型`bert-base-chinese`，提取后四层layers计算各token的词向量，句子向量通过单词词向量取平均值得到。
 
 示例[bert_emb_demo.py](examples/bert_emb_demo.py)
 
@@ -231,61 +290,6 @@ output:
 
 0.9087
 ```
-
-- 计算句子之间的相似度值
-
-```
-from text2vec import Similarity
-
-a = '如何更换花呗绑定银行卡'
-b = '花呗更改绑定银行卡'
-
-sim = Similarity()
-s = sim.get_score(a, b)
-print(s)
-
-```
-
-output:
-```
-0.9551
-```
-
-> 句子相似度值范围在0到1之间，值越大越相似。
-
-- 计算句子与文档集之间的相似度值
-
-一般在文档候选集中找与query最相似的文本，常用于QA场景的问句相似匹配任务。
-
-示例[similarity_demo.py](./examples/similarity_demo.py)
-
-```
-
-from text2vec import SearchSimilarity
-
-a = '如何更换花呗绑定银行卡'
-b = '花呗更改绑定银行卡'
-c = '我什么时候开通了花呗'
-
-corpus = [a, b, c]
-print(corpus)
-search_sim = SearchSimilarity(corpus=corpus)
-
-print(a, 'scores:', search_sim.get_scores(query=a))
-print(a, 'rank similarities:', search_sim.get_similarities(query=a))
-```
-
-output:
-```
-['如何更换花呗绑定银行卡', '花呗更改绑定银行卡', '我什么时候开通了花呗']
-如何更换花呗绑定银行卡 scores: [ 0.9527457  -0.07449248 -0.03204909]
-如何更换花呗绑定银行卡 rank similarities: ['如何更换花呗绑定银行卡', '我什么时候开通了花呗', '花呗更改绑定银行卡']
-```
-
-> 'search_sim.get_scores(query)'的结果越大，表示该query与corpus的相似度越近。
-
-> 'search_sim.get_similarities(query)'的结果表示corpus中所有句子与query相似度rank排序的结果，越靠前的结果越相似。
-
 
 ## Reference
 
