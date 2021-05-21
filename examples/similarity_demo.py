@@ -8,25 +8,26 @@ import sys
 sys.path.append('..')
 from text2vec import Similarity
 
-a = '如何更换花呗绑定银行卡'
-b = '花呗更改绑定银行卡'
-c = '我什么时候开通了花呗'
+if __name__ == '__main__':
+    a = '如何更换花呗绑定银行卡'
+    b = '花呗更改绑定银行卡'
+    c = '我什么时候开通了花呗'
 
-sim = Similarity()
-s = sim.get_score(a, b)
-print(a, b, s)
+    sim = Similarity()
+    s = sim.get_score(a, b)
+    print(a, b, s)
 
-s = sim.get_score(a, c)
-print(a, c, s)
+    s = sim.get_score(a, c)
+    print(a, c, s)
 
-s = sim.get_score(b, c)
-print(b, c, s)
+    s = sim.get_score(b, c)
+    print(b, c, s)
 
-from text2vec import SearchSimilarity
+    from text2vec import SearchSimilarity
 
-corpus = [a, b, c]
-print(corpus)
-search_sim = SearchSimilarity(corpus=corpus)
+    corpus = [a, b, c]
+    print(corpus)
+    search_sim = SearchSimilarity(corpus=corpus)
 
-print(a, 'scores:', search_sim.get_scores(query=a))
-print(a, 'rank similarities:', search_sim.get_similarities(query=a))
+    print(a, 'scores:', search_sim.get_scores(query=a))
+    print(a, 'rank similarities:', search_sim.get_similarities(query=a))

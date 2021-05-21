@@ -65,7 +65,7 @@ class Similarity(Vector):
             ret = cosine_distance(emb_1, emb_2)
         elif self.similarity_type == SimType.WMD:
             ret = 1. / (1. + self.model.w2v.wmdistance(token_1, token_2))
-        return ret
+        return round(ret, 4)
 
 
 class SearchSimilarity(object):

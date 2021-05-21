@@ -47,8 +47,8 @@ class BaseProcessor(object):
         return {
             'class_name': self.__class__.__name__,
             'config': {
-                'label2idx': self.label2idx,
-                'token2idx': self.token2idx,
+                # 'label2idx': self.label2idx,
+                # 'token2idx': self.token2idx,
                 'token_pad': self.token_pad,
                 'token_unk': self.token_unk,
                 'token_bos': self.token_bos,

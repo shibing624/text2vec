@@ -3,7 +3,9 @@
 @author:XuMing(xuming624@qq.com)
 @description: 
 """
+import sys
 
+sys.path.append('..')
 import text2vec
 from text2vec import Vector
 
