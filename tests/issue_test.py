@@ -37,3 +37,10 @@ def test_diff_len():
     scores = search_sim.get_scores(query=query)
     print(scores)
     print(len(scores))
+
+
+def test_longword():
+    """test long word"""
+    words = ['编程语言', '活泼开朗']
+    for word in words:
+        print(word, text2vec.encode(word))
