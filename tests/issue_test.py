@@ -42,5 +42,6 @@ def test_diff_len():
 def test_longword():
     """test long word"""
     words = ['编程语言', '活泼开朗']
+    print(words)
     for word in words:
         print(word, text2vec.encode(word))
