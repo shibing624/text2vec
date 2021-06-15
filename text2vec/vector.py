@@ -16,12 +16,12 @@ class EmbType(object):
 
 class Vector(object):
     def __init__(self, embedding_type=EmbType.W2V,
-                 w2v_path='',
+                 w2v_path=None,
                  w2v_kwargs=None,
                  sequence_length=128,
                  processor=None,
                  trainable=False,
-                 bert_model_folder='',
+                 bert_model_folder=None,
                  bert_layer_nums=4,
                  stopwords_file=os.path.join(pwd_path, 'data/stopwords.txt')
                  ):

@@ -32,17 +32,6 @@ class WordEmbedding(Embedding):
                                       'url': 'https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download',
                                       'binary': True,
                                       'untar_filename': 'light_Tencent_AILab_ChineseEmbedding.bin'},
-        # 轻量版腾讯词向量，txt文本，261MB
-        'w2v-light-tencent-txt-chinese': {'tar_filename': 'light_Tencent_AILab_ChineseEmbedding.zip',
-                                          'url': 'https://www.borntowin.cn/mm/emb_models/'
-                                                 'light_Tencent_AILab_ChineseEmbedding.zip',
-                                          'binary': False,
-                                          'untar_filename': 'light_Tencent_AILab_ChineseEmbedding.txt'},
-        # 中国人民日报训练的中文词向量, 32MB
-        'w2v-china-daily-chinese': {'tar_filename': 'sentence_w2v.bin',
-                                    'url': 'https://www.borntowin.cn/mm/emb_models/sentence_w2v.bin',
-                                    'binary': True,
-                                    'untar_filename': 'sentence_w2v.bin'},
     }
 
     def info(self):
@@ -101,7 +90,7 @@ class WordEmbedding(Embedding):
             if not os.path.exists(self.w2v_path):
                 get_file(
                     tar_filename, url, extract=True,
-                    cache_dir=text2vec.USER_DIR,
+                    cache_dir=text2vec.USER_DATA_DIR,
                     cache_subdir=text2vec.USER_DATA_DIR,
                     verbose=1
                 )

@@ -124,7 +124,7 @@ class BERTEmbedding(Embedding):
             url = self.pre_trained_models.get(model_name)
             get_file(
                 model_name + ".zip", url, extract=True,
-                cache_dir=text2vec.USER_DIR,
+                cache_dir=text2vec.USER_DATA_DIR,
                 cache_subdir=text2vec.USER_DATA_DIR,
                 verbose=1
             )

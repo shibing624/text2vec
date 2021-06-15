@@ -14,8 +14,6 @@ import tensorflow as tf
 from text2vec.bert import modeling
 from text2vec.bert import optimization
 from text2vec.bert import tokenization
-from text2vec.utils.logger import logger
-
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -165,7 +163,7 @@ class BertSimilarity:
             logits = tf.matmul(output_layer, output_weights, transpose_b=True)
             logits = tf.nn.bias_add(logits, output_bias)
             probabilities = tf.nn.softmax(logits, axis=-1)
-            # 使用softmax losss 作为损失函数
+            # 使用softmax loss 作为损失函数
             log_probs = tf.nn.log_softmax(logits, axis=-1)
 
             one_hot_labels = tf.one_hot(labels, depth=num_labels, dtype=tf.float32)
