@@ -296,7 +296,8 @@ output:
 
 # Contact
 
-- 邮件我：xuming: xuming624@qq.com.
+- Issue(建议)：[![GitHub issues](https://img.shields.io/github/issues/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/issues)
+- 邮件我：xuming: xuming624@qq.com
 - 微信我：
 加我*微信号：xuming624, 备注：个人名称-NLP* 进NLP交流群。
 
