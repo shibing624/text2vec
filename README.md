@@ -1,13 +1,16 @@
 # text2vec
 [![PyPI version](https://badge.fury.io/py/text2vec.svg)](https://badge.fury.io/py/text2vec)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![GitHub contributors](https://img.shields.io/github/contributors/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/graphs/contributors)
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-![Python3](https://img.shields.io/badge/Python-3.X-red.svg)
+[![python_vesion](https://img.shields.io/badge/Python-3.5%2B-green.svg)](requirements.txt)
+[![GitHub issues](https://img.shields.io/github/issues/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/issues)
+[![Wechat Group](http://vlog.sfyc.ltd/wechat_everyday/wxgroup_logo.png?imageView2/0/w/60/h/20)](#Contact)
 
 text2vec, chinese text to vector.(文本向量化表示工具，包括词向量化、句子向量化)
 
 
-## Feature
+# Feature
 #### 文本向量表示
 - 字词粒度，通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe），获取字词的word2vec向量表示。
 - 句子粒度，通过求句子中所有单词词向量的平均值计算得到。
@@ -21,7 +24,7 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括词向量�
 #### query和docs的相似度比较
 - rank_bm25方法，使用bm25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序。
 
-## Result
+## 结论
 
 #### 文本相似度计算
 - 基准方法
@@ -44,7 +47,7 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括词向量�
 
 
 
-## Install
+# Install
 ```
 pip3 install text2vec
 ```
@@ -57,7 +60,7 @@ cd text2vec
 python3 setup.py install
 ```
 
-## Usage:
+# Usage:
 
 1. 下载预训练词向量文件
 
@@ -291,7 +294,43 @@ output:
 0.9087
 ```
 
-## Reference
+# Contact
+
+- 邮件我：xuming: xuming624@qq.com.
+- 微信我：
+加我*微信号：xuming624, 备注：个人名称-NLP* 进NLP交流群。
+
+<img src="docs/wechat.jpeg" width="200" />
+
+
+# Cite
+
+如果你在研究中使用了text2vec，请按如下格式引用：
+
+```latex
+@software{text2vec,
+  author = {Xu Ming},
+  title = {text2vec: A Tool for Text to Vector},
+  year = {2021},
+  url = {https://github.com/shibing624/text2vec},
+}
+```
+
+# License
+
+
+授权协议为 [The Apache License 2.0](/LICENSE)，可免费用做商业用途。请在产品说明中附加text2vec的链接和授权协议。
+
+
+# Contribute
+项目代码还很粗糙，如果大家对代码有所改进，欢迎提交回本项目，在提交之前，注意以下两点：
+
+ - 在`tests`添加相应的单元测试
+ - 使用`python setup.py test`来运行所有单元测试，确保所有单测都是通过的
+
+之后即可提交PR。
+
+# Reference
 
 1. [将句子表示为向量（上）：无监督句子表示学习（sentence embedding）](https://www.cnblogs.com/llhthinker/p/10335164.html)
 2. [将句子表示为向量（下）：无监督句子表示学习（sentence embedding）](https://www.cnblogs.com/llhthinker/p/10341841.html)
