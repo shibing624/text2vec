@@ -24,7 +24,7 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括词向量�
 #### query和docs的相似度比较
 - rank_bm25方法，使用bm25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序。
 
-## 结论
+## 调研结论
 
 #### 文本相似度计算
 - 基准方法
@@ -60,7 +60,7 @@ cd text2vec
 python3 setup.py install
 ```
 
-# Usage:
+# Usage
 
 1. 下载预训练词向量文件
 
