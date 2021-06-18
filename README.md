@@ -45,7 +45,9 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括：词向�
 
 ![词移距离的表现令人失望](./docs/move1.jpg)
 
+## Demo
 
+http://42.193.145.218/product/short_text_sim/
 
 # Install
 ```
