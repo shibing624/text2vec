@@ -91,9 +91,9 @@ python3 setup.py install
 
 - 基于`pretrained model`计算文本向量
 
-`SBert`通过预训练的`Sentence-Bert`模型计算句子向量；
+> `SBert`通过预训练的`Sentence-Bert`模型计算句子向量
 
-`Word2Vec`通过腾讯词向量计算各字词的词向量，句子向量通过单词词向量取平均值得到。
+> `Word2Vec`通过腾讯词向量计算各字词的词向量，句子向量通过单词词向量取平均值得到
 
 示例[computing_embeddings.py](./examples/computing_embeddings.py)
 
@@ -140,14 +140,15 @@ Embedding: [ 1.39491949e-02  8.62287879e-02 -1.35622978e-01 ... ]
 Sentence: 银行卡
 Embedding: [ 0.06216322  0.2731747  -0.6912158 ... ]
 ```
-> 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentence_size, model_embedding_size)`
 
-`paraphrase-multilingual-MiniLM-L12-v2`是`sentence-bert`预训练模型，Multilingual knowledge distilled version of multilingual 
+返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentence_size, model_embedding_size)`
+
+> `paraphrase-multilingual-MiniLM-L12-v2`是`sentence-bert`预训练模型，Multilingual knowledge distilled version of multilingual 
 Universal Sentence Encoder. Supports 50+ languages: Arabic, Chinese, Dutch, English, French, German, Italian, Korean, Polish, 
 Portuguese, Russian, Spanish, Turkish.
 模型自动下载到本机路径：`~/.cache/torch/sentence_transformers/`
 
-`w2v-light-tencent-chinese`是轻量版腾讯词向量模型，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+> `w2v-light-tencent-chinese`是轻量版腾讯词向量模型，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
 
 
 
@@ -155,9 +156,8 @@ Portuguese, Russian, Spanish, Turkish.
 
 以下提供两种`Word2Vec`词向量，任选一个：
 
-- 轻量版腾讯词向量 [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制，运行程序，自动下载到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
-
-- [腾讯词向量-官方全量](https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz), 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
+  - 轻量版腾讯词向量 [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制，运行程序，自动下载到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+  - [腾讯词向量-官方全量](https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz), 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
 
 
 
@@ -206,7 +206,7 @@ A man is playing guitar 		 A woman watches TV 		 Score: 0.0055
 The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 ```
 
-> 句子相似度值范围在0到1之间，值越大越相似。
+> 句子相似度值`score`范围在0到1之间，值越大越相似。
 
 3. 计算句子与文档集之间的相似度值
 
@@ -256,6 +256,40 @@ for query in queries:
     hits = hits[0]  # Get the hits for the first query
     for hit in hits:
         print(corpus[hit['corpus_id']], "(Score: {:.4f})".format(hit['score']))
+```
+output:
+```
+Query: 如何更换花呗绑定银行卡
+Top 5 most similar sentences in corpus:
+花呗更改绑定银行卡 (Score: 0.9477)
+我什么时候开通了花呗 (Score: 0.3635)
+A man is eating food. (Score: 0.0321)
+A man is riding a horse. (Score: 0.0228)
+Two men pushed carts through the woods. (Score: 0.0090)
+======================
+Query: A man is eating pasta.
+Top 5 most similar sentences in corpus:
+A man is eating food. (Score: 0.6734)
+A man is eating a piece of bread. (Score: 0.4269)
+A man is riding a horse. (Score: 0.2086)
+A man is riding a white horse on an enclosed ground. (Score: 0.1020)
+A cheetah is running behind its prey. (Score: 0.0566)
+======================
+Query: Someone in a gorilla costume is playing a set of drums.
+Top 5 most similar sentences in corpus:
+A monkey is playing drums. (Score: 0.8167)
+A cheetah is running behind its prey. (Score: 0.2720)
+A woman is playing violin. (Score: 0.1721)
+A man is riding a horse. (Score: 0.1291)
+A man is riding a white horse on an enclosed ground. (Score: 0.1213)
+======================
+Query: A cheetah chases prey on across a field.
+Top 5 most similar sentences in corpus:
+A cheetah is running behind its prey. (Score: 0.9147)
+A monkey is playing drums. (Score: 0.2655)
+A man is riding a horse. (Score: 0.1933)
+A man is riding a white horse on an enclosed ground. (Score: 0.1733)
+A man is eating food. (Score: 0.0329)
 ```
 
 > 'score'的结果越大，表示该query与corpus的相似度越近。
