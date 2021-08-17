@@ -54,7 +54,19 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括：词向�
 
 `paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L6-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec默认下载使用该模型。
 
-<iframe src="./docs/models_en_sentence_embeddings.html" height="500" style="width:100%; border:none;" title="Iframe Example"></iframe>
+
+| Model Name | STSb | DupQ | TwitterP | SciDocs | Clustering |  Avg. Performance | Speed |
+| :------- | :--------- | :--------- | :---------: | :---------: | :---------: | :---------: | :---------: |
+| paraphrase-mpnet-base-v2 | 86.99 | 87.80 | 76.05 | 80.57 | 52.81 | 76.84 | 2800 |
+| paraphrase-multilingual-mpnet-base-v2 | 86.82 | 87.50 | 76.52 | 78.66 | 47.46 | 75.39 | 2500 |
+| paraphrase-TinyBERT-L6-v2 | 84.91 | 86.93 | 75.39 | 81.51 | 48.04 | 75.36 | 4500 |
+| paraphrase-distilroberta-base-v2 | 85.37 | 86.97 | 73.96 | 80.25 | 49.18 | 75.15 | 4000 |
+| paraphrase-MiniLM-L12-v2 | 84.41 | 87.28 | 75.34 | 80.08 | 46.95 | 74.81 | 7500 |
+| paraphrase-MiniLM-L6-v2 | 84.12 | 87.23 | 76.32 | 78.91 | 45.34 | 74.38 | 14200 |
+| paraphrase-multilingual-MiniLM-L12-v2 | 84.42 | 87.52 | 74.94 | 78.27 | 43.87 | 73.80 | 7500 |
+| paraphrase-MiniLM-L3-v2 | 82.41 | 88.09 | 76.14 | 77.71 | 43.39 | 73.55 | 19000 |
+| distiluse-base-multilingual-cased-v2 | 80.75 | 83.52 | 76.26 | 70.39 | 37.03 | 69.59 | 4000 |
+| average_word_embeddings_glove.6B.300d | 61.77 | 78.07 | 68.60 | 63.69 | 30.46 | 60.52 | 34000 |
 
 # Demo
 
@@ -79,9 +91,9 @@ python3 setup.py install
 
 - 基于`pretrained model`计算文本向量
 
-`SBert`通过预训练的`Sentence-Bert`模型计算句子向量；
+> `SBert`通过预训练的`Sentence-Bert`模型计算句子向量
 
-`Word2Vec`通过腾讯词向量计算各字词的词向量，句子向量通过单词词向量取平均值得到。
+> `Word2Vec`通过腾讯词向量计算各字词的词向量，句子向量通过单词词向量取平均值得到
 
 示例[computing_embeddings.py](./examples/computing_embeddings.py)
 
@@ -128,14 +140,15 @@ Embedding: [ 1.39491949e-02  8.62287879e-02 -1.35622978e-01 ... ]
 Sentence: 银行卡
 Embedding: [ 0.06216322  0.2731747  -0.6912158 ... ]
 ```
-> 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentence_size, model_embedding_size)`
 
-`paraphrase-multilingual-MiniLM-L12-v2`是`sentence-bert`预训练模型，Multilingual knowledge distilled version of multilingual 
+返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentence_size, model_embedding_size)`
+
+> `paraphrase-multilingual-MiniLM-L12-v2`是`sentence-bert`预训练模型，Multilingual knowledge distilled version of multilingual 
 Universal Sentence Encoder. Supports 50+ languages: Arabic, Chinese, Dutch, English, French, German, Italian, Korean, Polish, 
 Portuguese, Russian, Spanish, Turkish.
 模型自动下载到本机路径：`~/.cache/torch/sentence_transformers/`
 
-`w2v-light-tencent-chinese`是轻量版腾讯词向量模型，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+> `w2v-light-tencent-chinese`是轻量版腾讯词向量模型，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
 
 
 
@@ -143,9 +156,8 @@ Portuguese, Russian, Spanish, Turkish.
 
 以下提供两种`Word2Vec`词向量，任选一个：
 
-- 轻量版腾讯词向量 [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制，运行程序，自动下载到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
-
-- [腾讯词向量-官方全量](https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz), 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
+  - 轻量版腾讯词向量 [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制，运行程序，自动下载到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+  - [腾讯词向量-官方全量](https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz), 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
 
 
 
@@ -194,7 +206,7 @@ A man is playing guitar 		 A woman watches TV 		 Score: 0.0055
 The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 ```
 
-> 句子相似度值范围在0到1之间，值越大越相似。
+> 句子相似度值`score`范围在0到1之间，值越大越相似。
 
 3. 计算句子与文档集之间的相似度值
 
@@ -244,6 +256,40 @@ for query in queries:
     hits = hits[0]  # Get the hits for the first query
     for hit in hits:
         print(corpus[hit['corpus_id']], "(Score: {:.4f})".format(hit['score']))
+```
+output:
+```
+Query: 如何更换花呗绑定银行卡
+Top 5 most similar sentences in corpus:
+花呗更改绑定银行卡 (Score: 0.9477)
+我什么时候开通了花呗 (Score: 0.3635)
+A man is eating food. (Score: 0.0321)
+A man is riding a horse. (Score: 0.0228)
+Two men pushed carts through the woods. (Score: 0.0090)
+======================
+Query: A man is eating pasta.
+Top 5 most similar sentences in corpus:
+A man is eating food. (Score: 0.6734)
+A man is eating a piece of bread. (Score: 0.4269)
+A man is riding a horse. (Score: 0.2086)
+A man is riding a white horse on an enclosed ground. (Score: 0.1020)
+A cheetah is running behind its prey. (Score: 0.0566)
+======================
+Query: Someone in a gorilla costume is playing a set of drums.
+Top 5 most similar sentences in corpus:
+A monkey is playing drums. (Score: 0.8167)
+A cheetah is running behind its prey. (Score: 0.2720)
+A woman is playing violin. (Score: 0.1721)
+A man is riding a horse. (Score: 0.1291)
+A man is riding a white horse on an enclosed ground. (Score: 0.1213)
+======================
+Query: A cheetah chases prey on across a field.
+Top 5 most similar sentences in corpus:
+A cheetah is running behind its prey. (Score: 0.9147)
+A monkey is playing drums. (Score: 0.2655)
+A man is riding a horse. (Score: 0.1933)
+A man is riding a white horse on an enclosed ground. (Score: 0.1733)
+A man is eating food. (Score: 0.0329)
 ```
 
 > 'score'的结果越大，表示该query与corpus的相似度越近。
