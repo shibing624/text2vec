@@ -15,9 +15,6 @@ if sys.version_info < (3,):
 with open('README.md', 'r', encoding='utf-8') as f:
     readme = f.read()
 
-with open('LICENSE', 'r', encoding='utf-8') as f:
-    license = f.read()
-
 with open('requirements.txt', 'r', encoding='utf-8') as f:
     reqs = f.read()
 
@@ -30,7 +27,7 @@ setup(
     author='XuMing',
     author_email='xuming624@qq.com',
     url='https://github.com/shibing624/text2vec',
-    license="Apache 2.0",
+    license="Apache License 2.0",
     classifiers=[
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
@@ -45,9 +42,4 @@ setup(
     keywords='word embedding,text2vec,Chinese Text Similarity Calculation Tool,similarity,word2vec',
     install_requires=reqs.strip().split('\n'),
     packages=find_packages(exclude=['tests']),
-    package_dir={'text2vec': 'text2vec'},
-    package_data={
-        'text2vec': ['*.*', 'LICENSE', '../LICENSE', 'README.*', '../*.txt', 'embeddings/*',
-                     'utils/*', 'processors/*', 'bert/*', 'data/*.*'],
-    }
 )

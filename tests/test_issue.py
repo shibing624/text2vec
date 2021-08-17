@@ -8,10 +8,17 @@ import unittest
 
 sys.path.append('..')
 
-import text2vec
-from text2vec import Similarity
+from text2vec import SBert
+from text2vec import BM25
+from sentence_transformers.util import cos_sim
 
-sim = Similarity()
+sbert_model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
+
+
+def sbert_sim_score(str_a, str_b):
+    a_emb = sbert_model.encode(str_a)
+    b_emb = sbert_model.encode(str_b)
+    return cos_sim(a_emb, b_emb)
 
 
 class IssueTestCase(unittest.TestCase):
@@ -19,16 +26,16 @@ class IssueTestCase(unittest.TestCase):
     def test_sim_diff(self):
         a = '研究团队面向国家重大战略需求追踪国际前沿发展借鉴国际人工智能研究领域的科研模式有效整合创新资源解决复'
         b = '英汉互译比较语言学'
-        r = sim.get_score(a, b)
+        r = sbert_sim_score(a, b)
         print(a, b, r)
-        self.assertTrue(r, 0.6225)
+        self.assertTrue(abs(r - 0.1733) < 0.001)
 
     def test_sim_same(self):
         a = '汉英翻译比较语言学'
         b = '英汉互译比较语言学'
-        r = sim.get_score(a, b)
+        r = sbert_sim_score(a, b)
         print(a, b, r)
-        self.assertTrue(r, 0.9704)
+        self.assertTrue(abs(r - 0.8639) < 0.001)
 
     def test_search_sim(self):
         sentences = [
@@ -38,24 +45,19 @@ class IssueTestCase(unittest.TestCase):
             '车上一驭者执鞭，', '一尊者坐；', '四导从，', '两两相对并排前行；', '两骑手，', '反身张弓射虎；', '虎，',
             '跃起前扑。', '上下右三边有框，', '上沿双边框内填刻三角纹，', '下沿双边框内填刻斜条纹。']
         self.assertEqual(len(sentences), 28)
-        uniq_sentences = set(sentences)
+        uniq_sentences = list(set(sentences))
         print(uniq_sentences)
         print(len(uniq_sentences))
         self.assertEqual(len(uniq_sentences), 23)
 
-        search_sim = text2vec.SearchSimilarity(corpus=uniq_sentences)
+        search_sim = BM25(corpus=uniq_sentences)
         print(len(search_sim.corpus))
         query = '上沿双边框内填刻三角形纹'
         scores = search_sim.get_scores(query=query)
         print(scores)
         print(len(scores))
+        print('rank:', search_sim.get_similarities(query))
         self.assertEqual(len(scores), 23)
-
-    def test_mergeword(self):
-        """Test merge long word"""
-        words = ['编程语言', '活泼开朗']
-        for word in words:
-            print(word, sim.encode(word))
 
 
 if __name__ == '__main__':

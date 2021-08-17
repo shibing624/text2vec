@@ -6,15 +6,13 @@
 import sys
 
 sys.path.append('..')
-import text2vec
-from text2vec import Vector
+from text2vec import Word2Vec
 
-text2vec.set_log_level('DEBUG')
 if __name__ == '__main__':
     sent1 = '我去银行开卡'
     sent2 = '到银行开卡了。'
 
-    vec = Vector()
+    vec = Word2Vec()
     emb1 = vec.encode(sent1)
     emb2 = vec.encode(sent2)
     print('check is same:', emb1 == emb2)
@@ -22,8 +20,7 @@ if __name__ == '__main__':
 
     # load custom stopwords
     custom_stopwords_file = './my_stopwords.txt'
-    new_vec = Vector()
-    new_vec.set_stopwords_file(custom_stopwords_file)
+    new_vec = Word2Vec(stopwords_file=custom_stopwords_file)
     emb1 = new_vec.encode(sent1)
     emb2 = new_vec.encode(sent2)
     print('check is same:', emb1 == emb2)

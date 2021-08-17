@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Download file."""
+"""
+@author:XuMing(xuming624@qq.com)
+@description: Download file.
+"""
+
 import hashlib
 import os
 import shutil

@@ -7,11 +7,11 @@ import sys
 import unittest
 
 sys.path.append('..')
-from text2vec.algorithm.rank_bm25 import BM25Okapi
+from text2vec.utils.rank_bm25 import BM25Okapi
 from text2vec.utils.tokenizer import segment
 
 
-class RTestCase(unittest.TestCase):
+class RankTestCase(unittest.TestCase):
     def test_en_topn(self):
         """测试en文本bm25 topn"""
         corpus = [
