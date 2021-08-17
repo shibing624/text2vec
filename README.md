@@ -23,6 +23,7 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括：词向�
 
 #### query和docs的相似度比较
 - rank_bm25方法，使用bm25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序。
+- semantic_search方法，使用cosine similarty + topk高效计算，比一对一暴力计算快一个数量级。
 
 ## 调研结论
 
