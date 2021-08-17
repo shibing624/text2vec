@@ -9,7 +9,6 @@ import os
 from typing import Union, Optional, Any, List, Tuple
 
 import numpy as np
-import tensorflow as tf
 
 import text2vec
 from text2vec.embeddings.embedding import Embedding
@@ -18,62 +17,8 @@ from text2vec.utils.get_file import get_file
 from text2vec.utils.logger import logger
 from text2vec.utils.non_masking_layer import NonMaskingLayer
 
-os.environ['TF_KERAS'] = '1'
-import keras_bert
 
-
-class BERTEmbedding(Embedding):
-    """Pre-trained BERT embedding"""
-    model_key_map = {
-        'bert-base-uncased': 'uncased_L-12_H-768_A-12',
-        'bert-large-uncased': 'uncased_L-24_H-1024_A-16',
-        'bert-base-cased': 'cased_L-12_H-768_A-12',
-        'bert-large-cased': 'cased_L-24_H-1024_A-16',
-        'bert-base-multilingual-cased': 'multi_cased_L-12_H-768_A-12',
-        'bert-base-chinese': 'chinese_L-12_H-768_A-12'
-    }
-
-    pre_trained_models = {
-        # BERT-Base, Uncased: 12-layer, 768-hidden, 12-heads, 110M parameters
-        'uncased_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_10_18/'
-                                   'uncased_L-12_H-768_A-12.zip',
-        # BERT-Large, Uncased
-        # 24-layer, 1024-hidden, 16-heads, 340M parameters
-        'uncased_L-24_H-1024_A-16': 'https://storage.googleapis.com/bert_models/2018_10_18/'
-                                    'uncased_L-24_H-1024_A-16.zip',
-        # BERT-Base, Cased
-        # 12-layer, 768-hidden, 12-heads , 110M parameters
-        'cased_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_10_18/'
-                                 'cased_L-12_H-768_A-12.zip',
-        # BERT-Large, Cased
-        # 24-layer, 1024-hidden, 16-heads, 340M parameters
-        'cased_L-24_H-1024_A-16': 'https://storage.googleapis.com/bert_models/2018_10_18/'
-                                  'cased_L-24_H-1024_A-16.zip',
-        # BERT-Base, Multilingual Cased (New, recommended)
-        # 104 languages, 12-layer, 768-hidden, 12-heads, 110M parameters
-        'multi_cased_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_11_23/'
-                                       'multi_cased_L-12_H-768_A-12.zip',
-        # BERT-Base, Multilingual Uncased (Orig, not recommended)
-        # 12-layer, 768-hidden, 12-heads, 110M parameters
-        'multilingual_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_11_03/'
-                                        'multilingual_L-12_H-768_A-12.zip',
-        # BERT-Base, Chinese
-        # Chinese Simplified and Traditional, 12-layer, 768-hidden, 12-heads, 110M
-        'chinese_L-12_H-768_A-12': 'https://storage.googleapis.com/bert_models/2018_11_03/'
-                                   'chinese_L-12_H-768_A-12.zip',
-
-        # https://github.com/ymcui/Chinese-BERT-wwm 提供优化后的RoBERTa-wwm-ext-large中文模型，可供下载，
-        # 但由于提升有限（LCQMC句对语义任务识别任务中，BERT的测试集准确率86.9，RoBERTa-wwm-ext-large的测试集准确率87.0），
-        # 本项目暂不使用。
-    }
-
-    def info(self):
-        info = super(BERTEmbedding, self).info()
-        info['config'] = {
-            'model_folder': self.model_folder,
-            'sequence_length': self.sequence_length
-        }
-        return info
+class Bert:
 
     def __init__(self,
                  model_folder: str = '',
@@ -101,17 +46,6 @@ class BERTEmbedding(Embedding):
 
         if sequence_length == 'variable':
             raise ValueError('BERT embedding only accept sequences in equal length')
-
-        super(BERTEmbedding, self).__init__(sequence_length=sequence_length,
-                                            embedding_size=100,
-                                            processor=processor)
-
-        self.processor.token_pad = '[PAD]'
-        self.processor.token_unk = '[UNK]'
-        self.processor.token_bos = '[CLS]'
-        self.processor.token_eos = '[SEP]'
-
-        self.processor.add_bos_eos = False  # bert_tokenizer added
 
         self.model_folder = model_folder
         self._build_token2idx_from_bert()

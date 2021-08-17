@@ -79,56 +79,99 @@ python3 setup.py install
 
 通过腾讯词向量计算各字词的词向量，句子向量通过单词词向量取平均值得到。
 
-示例[base_demo.py](./examples/base_demo.py)
+示例[computing_embeddings.py](./examples/computing_embeddings.py)
 
 ```python
-import text2vec
-# 计算字向量
-char = '卡'
-emb = text2vec.encode(char)
-print(type(emb), emb.shape)
+import sys
 
-# 计算词向量
-word = '银行卡'
-print(word, text2vec.encode(word))
+sys.path.append('..')
+from text2vec import SBert
+from text2vec import Word2Vec
 
-# 计算句子向量
-a = '如何更换花呗绑定银行卡'
-emb = text2vec.encode(a)
-print(a, emb)
+
+def compute_emb(model):
+    # Embed a list of sentences
+    sentences = ['卡',
+                 '银行卡',
+                 '如何更换花呗绑定银行卡',
+                 '花呗更改绑定银行卡',
+                 'This framework generates embeddings for each input sentence',
+                 'Sentences are passed as a list of string.',
+                 'The quick brown fox jumps over the lazy dog.']
+    sentence_embeddings = model.encode(sentences)
+
+    print(type(sentence_embeddings), sentence_embeddings.shape)
+
+    # The result is a list of sentence embeddings as numpy arrays
+    for sentence, embedding in zip(sentences, sentence_embeddings):
+        print("Sentence:", sentence)
+        print("Embedding:", embedding)
+        print("")
+
+
+sbert_model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
+compute_emb(sbert_model)
+
+w2v_model = Word2Vec('w2v-light-tencent-chinese')
+compute_emb(w2v_model)
 ```
 
 output:
 ```
-<class 'numpy.ndarray'> (200,)
-
-银行卡 [ 0.0020064  -0.12582362  ...     0.09727262]
-
-如何更换花呗绑定银行卡 [ 0.0412493  -0.12568748  ...  0.02760466]
-
+<class 'numpy.ndarray'> (7, 384)
+Sentence: 卡
+Embedding: [ 1.39491949e-02  8.62287879e-02 -1.35622978e-01 ... ]
+Sentence: 银行卡
+Embedding: [ 0.06216322  0.2731747  -0.6912158 ... ]
 ```
-> 返回值`emb`是`numpy.ndarray`类型，shape为`(200, )`
+> 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentence_size, model_embedding_size)`
 
+`SBert`是`sentence-bert`模型计算的句子向量结果；
+`Word2Vec`是腾讯词向量计算单词向量取平均结果。
 
 - 计算句子之间的相似度值
 
-示例[similarity_demo.py](./examples/similarity_demo.py)
+示例[semantic_text_similarity.py](./examples/semantic_text_similarity.py)
 
 ```
-from text2vec import Similarity
+import sys
 
-a = '如何更换花呗绑定银行卡'
-b = '花呗更改绑定银行卡'
+sys.path.append('..')
+from text2vec import SBert
+from sentence_transformers.util import cos_sim
 
-sim = Similarity()
-s = sim.get_score(a, b)
-print(s)
+# Load pre-trained Sentence Transformer Model (based on DistilBERT). It will be downloaded automatically
+model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
 
+# Two lists of sentences
+sentences1 = ['如何更换花呗绑定银行卡',
+              'The cat sits outside',
+              'A man is playing guitar',
+              'The new movie is awesome']
+
+sentences2 = ['花呗更改绑定银行卡',
+              'The dog plays in the garden',
+              'A woman watches TV',
+              'The new movie is so great']
+
+# Compute embedding for both lists
+embeddings1 = model.encode(sentences1)
+embeddings2 = model.encode(sentences2)
+
+# Compute cosine-similarits
+cosine_scores = cos_sim(embeddings1, embeddings2)
+
+# Output the pairs with their score
+for i in range(len(sentences1)):
+    print("{} \t\t {} \t\t Score: {:.4f}".format(sentences1[i], sentences2[i], cosine_scores[i][i]))
 ```
 
 output:
 ```
-0.9551
+如何更换花呗绑定银行卡 		 花呗更改绑定银行卡 		 Score: 0.9477
+The cat sits outside 		 The dog plays in the garden 		 Score: 0.1908
+A man is playing guitar 		 A woman watches TV 		 Score: 0.0055
+The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 ```
 
 > 句子相似度值范围在0到1之间，值越大越相似。
@@ -138,81 +181,54 @@ output:
 一般在文档候选集中找与query最相似的文本，常用于QA场景的问句相似匹配任务。
 
 
+示例[semantic_search.py](./examples/semantic_search.py)
+
 ```
-from text2vec import SearchSimilarity
+import sys
 
-a = '如何更换花呗绑定银行卡'
-b = '花呗更改绑定银行卡'
-c = '我什么时候开通了花呗'
+sys.path.append('..')
+from text2vec import SBert
+from sentence_transformers.util import cos_sim, semantic_search
 
-corpus = [a, b, c]
-print(corpus)
-search_sim = SearchSimilarity(corpus=corpus)
+embedder = SBert()
 
-print(a, 'scores:', search_sim.get_scores(query=a))
-print(a, 'rank similarities:', search_sim.get_similarities(query=a))
+# Corpus with example sentences
+corpus = [
+    '花呗更改绑定银行卡',
+    '我什么时候开通了花呗',
+    'A man is eating food.',
+    'A man is eating a piece of bread.',
+    'The girl is carrying a baby.',
+    'A man is riding a horse.',
+    'A woman is playing violin.',
+    'Two men pushed carts through the woods.',
+    'A man is riding a white horse on an enclosed ground.',
+    'A monkey is playing drums.',
+    'A cheetah is running behind its prey.'
+]
+corpus_embeddings = embedder.encode(corpus)
+
+# Query sentences:
+queries = [
+    '如何更换花呗绑定银行卡',
+    'A man is eating pasta.',
+    'Someone in a gorilla costume is playing a set of drums.',
+    'A cheetah chases prey on across a field.']
+
+for query in queries:
+    query_embedding = embedder.encode(query)
+    hits = semantic_search(query_embedding, corpus_embeddings, top_k=5)
+    print("\n\n======================\n\n")
+    print("Query:", query)
+    print("\nTop 5 most similar sentences in corpus:")
+    hits = hits[0]  # Get the hits for the first query
+    for hit in hits:
+        print(corpus[hit['corpus_id']], "(Score: {:.4f})".format(hit['score']))
 ```
 
-output:
-```
-['如何更换花呗绑定银行卡', '花呗更改绑定银行卡', '我什么时候开通了花呗']
-如何更换花呗绑定银行卡 scores: [ 0.9527457  -0.07449248 -0.03204909]
-如何更换花呗绑定银行卡 rank similarities: ['如何更换花呗绑定银行卡', '我什么时候开通了花呗', '花呗更改绑定银行卡']
-```
-
-> 'search_sim.get_scores(query)'的结果越大，表示该query与corpus的相似度越近。
-
-> 'search_sim.get_similarities(query)'的结果表示corpus中所有句子与query相似度rank排序的结果，越靠前的结果越相似。
+> 'score'的结果越大，表示该query与corpus的相似度越近。
 
 
-- 基于BERT预训练模型的文本向量计算
-
-基于中文BERT预训练模型`chinese_L-12_H-768_A-12(bert-base-chinese)`，提取后四层layers计算各token的词向量，句子向量通过单词词向量取平均值得到。
-
-示例[bert_emb_demo.py](examples/bert_emb_demo.py)
-
-```python
-from text2vec import Vector
-from text2vec import Similarity
-
-vec = Vector(embedding_type='bert')
-char = '卡'
-emb = vec.encode(char)
-# <class 'numpy.ndarray'> (128, 3072) 128=seq_len, 3072=768*4
-print(type(emb), emb.shape)
-
-word = '银行卡'
-print(word, vec.encode(word))
-
-a = '如何更换花呗绑定银行卡'
-emb = vec.encode(a)
-print(a, emb)
-print(emb.shape)
-
-sim = Similarity(embedding_type='bert')
-b = '花呗更改绑定银行卡'
-print(sim.get_score(a, b))
-```
-output:
-```
-<class 'numpy.ndarray'> (128, 3072)
-
-银行卡 [[-0.91093725  0.54408133 -0.4109965  ...  0.48191142 -0.48503038
-   0.26117468]
- ...
- [-1.2602367   0.00573288 -0.6756776  ...  0.33792442 -0.1214454
-   0.11303894]]
-
-如何更换花呗绑定银行卡 [[-0.6816437   0.13298336  0.11106233 ... -0.4509677  -0.4271722
-  -0.39778918]
- ...
- [-0.5474275  -0.24083692 -0.6185864  ... -0.20258519 -0.2466043
-  -0.2537103 ]]
-
-(128, 3072)
-
-0.9087
-```
 
 # Contact
 

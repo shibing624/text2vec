@@ -4,16 +4,7 @@
 @description: 
 """
 
-import os
-
-from text2vec.similarity import Similarity, SearchSimilarity, SimType
-from text2vec.utils.logger import set_log_level
-from text2vec.vector import EmbType, Vector
 from text2vec.version import __version__
-
-USER_DATA_DIR = os.path.expanduser('~/.text2vec/datasets/')
-os.makedirs(USER_DATA_DIR, exist_ok=True)
-
-VEC = Vector()
-encode = VEC.encode
-set_stopwords_file = VEC.set_stopwords_file
+from text2vec.word2vec import Word2Vec
+from text2vec.sbert import SBert
+from text2vec.bm25 import BM25

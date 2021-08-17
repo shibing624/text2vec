@@ -1,7 +1,0 @@
-jieba>=0.39
-gensim>=4.0.0
-numpy>=1.17.4
-pyemd # for wmd
-nose # for test
-tensorflow>=1.14.0 # tensorflow-gpu>=1.14.0
-keras-bert>=0.80.0
