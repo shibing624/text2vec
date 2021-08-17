@@ -10,3 +10,4 @@ scipy
 sentencepiece
 huggingface-hub
 sentence-transformers
+colorlog
