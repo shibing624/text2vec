@@ -54,7 +54,19 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括：词向�
 
 `paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L6-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec默认下载使用该模型。
 
-<iframe src="./docs/models_en_sentence_embeddings.html" height="500" style="width:100%; border:none;" title="Iframe Example"></iframe>
+
+| Model Name | STSb | DupQ | TwitterP | SciDocs | Clustering |  Avg. Performance | Speed |
+| :------- | :--------- | :--------- | :---------: | :---------: | :---------: | :---------: | :---------: |
+| paraphrase-mpnet-base-v2 | 86.99 | 87.80 | 76.05 | 80.57 | 52.81 | 76.84 | 2800 |
+| paraphrase-multilingual-mpnet-base-v2 | 86.82 | 87.50 | 76.52 | 78.66 | 47.46 | 75.39 | 2500 |
+| paraphrase-TinyBERT-L6-v2 | 84.91 | 86.93 | 75.39 | 81.51 | 48.04 | 75.36 | 4500 |
+| paraphrase-distilroberta-base-v2 | 85.37 | 86.97 | 73.96 | 80.25 | 49.18 | 75.15 | 4000 |
+| paraphrase-MiniLM-L12-v2 | 84.41 | 87.28 | 75.34 | 80.08 | 46.95 | 74.81 | 7500 |
+| paraphrase-MiniLM-L6-v2 | 84.12 | 87.23 | 76.32 | 78.91 | 45.34 | 74.38 | 14200 |
+| paraphrase-multilingual-MiniLM-L12-v2 | 84.42 | 87.52 | 74.94 | 78.27 | 43.87 | 73.80 | 7500 |
+| paraphrase-MiniLM-L3-v2 | 82.41 | 88.09 | 76.14 | 77.71 | 43.39 | 73.55 | 19000 |
+| distiluse-base-multilingual-cased-v2 | 80.75 | 83.52 | 76.26 | 70.39 | 37.03 | 69.59 | 4000 |
+| average_word_embeddings_glove.6B.300d | 61.77 | 78.07 | 68.60 | 63.69 | 30.46 | 60.52 | 34000 |
 
 # Demo
 
