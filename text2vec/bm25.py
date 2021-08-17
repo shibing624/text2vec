@@ -29,7 +29,7 @@ class BM25(object):
                 logger.error('corpus is None, set corpus with documents.')
                 raise ValueError("must set corpus, which is documents, list of str")
 
-            if isinstance(self.corpus, str):
+            if isinstance(self.corpus, str) or not hasattr(self.corpus, '__len__'):
                 self.corpus = [self.corpus]
 
             self.corpus_seg = {k: self.tokenizer.tokenize(k) for k in self.corpus}

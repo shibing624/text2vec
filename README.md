@@ -45,6 +45,16 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括：词向�
 
 ![词移距离的表现令人失望](./docs/move1.jpg)
 
+- Sentence-Bert
+
+以下模型已经过finetuned调整，可以嵌入长达128个单词的句子和短段落。
+
+`paraphrase-MiniLM-L6-v2`模型预测快速，效果较好，推荐。
+
+`paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L6-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec默认下载使用该模型。
+
+<iframe src="./docs/models_en_sentence_embeddings.html" height="500" style="width:100%; border:none;" title="Iframe Example"></iframe>
+
 # Demo
 
 http://42.193.145.218/product/short_text_sim/
@@ -64,20 +74,13 @@ python3 setup.py install
 
 # Usage
 
-1. 下载预训练词向量文件
+1. 计算文本向量
 
-以下词向量，任选一个：
+- 基于`pretrained model`计算文本向量
 
-- 轻量版腾讯词向量 [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制，111MB放到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+`SBert`通过预训练的`Sentence-Bert`模型计算句子向量；
 
-- [腾讯词向量-官方全量](https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz), 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
-
-
-2. 文本向量计算
-
-- 基于预训练的word2vec计算文本向量
-
-通过腾讯词向量计算各字词的词向量，句子向量通过单词词向量取平均值得到。
+`Word2Vec`通过腾讯词向量计算各字词的词向量，句子向量通过单词词向量取平均值得到。
 
 示例[computing_embeddings.py](./examples/computing_embeddings.py)
 
@@ -126,10 +129,26 @@ Embedding: [ 0.06216322  0.2731747  -0.6912158 ... ]
 ```
 > 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentence_size, model_embedding_size)`
 
-`SBert`是`sentence-bert`模型计算的句子向量结果；
-`Word2Vec`是腾讯词向量计算单词向量取平均结果。
+`paraphrase-multilingual-MiniLM-L12-v2`是`sentence-bert`预训练模型，Multilingual knowledge distilled version of multilingual 
+Universal Sentence Encoder. Supports 50+ languages: Arabic, Chinese, Dutch, English, French, German, Italian, Korean, Polish, 
+Portuguese, Russian, Spanish, Turkish.
+模型自动下载到本机路径：`~/.cache/torch/sentence_transformers/`
 
-- 计算句子之间的相似度值
+`w2v-light-tencent-chinese`是轻量版腾讯词向量模型，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+
+
+
+- 预训练词向量模型
+
+以下提供两种`Word2Vec`词向量，任选一个：
+
+- 轻量版腾讯词向量 [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制，运行程序，自动下载到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+
+- [腾讯词向量-官方全量](https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz), 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`
+
+
+
+2. 计算句子之间的相似度值
 
 示例[semantic_text_similarity.py](./examples/semantic_text_similarity.py)
 
@@ -176,7 +195,7 @@ The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 
 > 句子相似度值范围在0到1之间，值越大越相似。
 
-- 计算句子与文档集之间的相似度值
+3. 计算句子与文档集之间的相似度值
 
 一般在文档候选集中找与query最相似的文本，常用于QA场景的问句相似匹配任务。
 
