@@ -102,8 +102,6 @@ import sys
 
 sys.path.append('..')
 from text2vec import SBert
-from text2vec import Word2Vec
-
 
 def compute_emb(model):
     # Embed a list of sentences
@@ -127,9 +125,6 @@ def compute_emb(model):
 
 sbert_model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
 compute_emb(sbert_model)
-
-w2v_model = Word2Vec('w2v-light-tencent-chinese')
-compute_emb(w2v_model)
 ```
 
 output:
@@ -148,7 +143,7 @@ Universal Sentence Encoder. Supports 50+ languages: Arabic, Chinese, Dutch, Engl
 Portuguese, Russian, Spanish, Turkish.
 模型自动下载到本机路径：`~/.cache/torch/sentence_transformers/`
 
-> `w2v-light-tencent-chinese`是轻量版腾讯词向量模型，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+> `w2v-light-tencent-chinese`是`Word2Vec`的轻量版腾讯词向量模型，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
 
 
 
