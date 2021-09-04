@@ -33,8 +33,9 @@ def compute_emb(model):
         print("")
 
 
-sbert_model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
-compute_emb(sbert_model)
+if __name__ == '__main__':
+    sbert_model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
+    compute_emb(sbert_model)
 
-w2v_model = Word2Vec('w2v-light-tencent-chinese')
-compute_emb(w2v_model)
+    w2v_model = Word2Vec('w2v-light-tencent-chinese')
+    compute_emb(w2v_model)

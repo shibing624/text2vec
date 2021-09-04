@@ -10,9 +10,8 @@ import sys
 
 sys.path.append('..')
 
-from text2vec import SBert
+from text2vec import SBert, cos_sim, semantic_search
 from text2vec import BM25
-from sentence_transformers.util import cos_sim, semantic_search
 import torch
 
 embedder = SBert()

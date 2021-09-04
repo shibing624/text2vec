@@ -6,8 +6,7 @@
 import sys
 
 sys.path.append('..')
-from text2vec import SBert
-from sentence_transformers.util import cos_sim
+from text2vec import SBert, cos_sim
 
 # Load pre-trained Sentence Transformer Model (based on DistilBERT). It will be downloaded automatically
 model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
