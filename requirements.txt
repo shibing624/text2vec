@@ -1,0 +1,13 @@
+jieba>=0.39
+gensim>=4.0.0
+numpy
+transformers>=4.6.0,<5.0.0
+tokenizers>=0.10.3
+tqdm
+torch>=1.6.0
+scikit-learn
+scipy
+sentencepiece
+huggingface-hub
+sentence-transformers
+colorlog
