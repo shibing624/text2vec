@@ -160,7 +160,7 @@ Portuguese, Russian, Spanish, Turkish.
 
 示例[semantic_text_similarity.py](./examples/semantic_text_similarity.py)
 
-```
+```python
 import sys
 
 sys.path.append('..')
@@ -193,7 +193,7 @@ for i in range(len(sentences1)):
 ```
 
 output:
-```
+```shell
 如何更换花呗绑定银行卡 		 花呗更改绑定银行卡 		 Score: 0.9477
 The cat sits outside 		 The dog plays in the garden 		 Score: 0.1908
 A man is playing guitar 		 A woman watches TV 		 Score: 0.0055
@@ -209,7 +209,7 @@ The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 
 示例[semantic_search.py](./examples/semantic_search.py)
 
-```
+```python
 import sys
 
 sys.path.append('..')
@@ -251,7 +251,7 @@ for query in queries:
         print(corpus[hit['corpus_id']], "(Score: {:.4f})".format(hit['score']))
 ```
 output:
-```
+```shell
 Query: 如何更换花呗绑定银行卡
 Top 5 most similar sentences in corpus:
 花呗更改绑定银行卡 (Score: 0.9477)
