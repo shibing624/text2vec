@@ -28,6 +28,8 @@ setup(
     author_email='xuming624@qq.com',
     url='https://github.com/shibing624/text2vec',
     license="Apache License 2.0",
+    zip_safe=False,
+    python_requires='>=3.5',
     classifiers=[
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
