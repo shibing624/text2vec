@@ -11,3 +11,4 @@ from text2vec.bm25 import BM25
 
 from sentence_transformers.util import semantic_search, cos_sim, paraphrase_mining, community_detection, \
     normalize_embeddings
+from text2vec.similarity import Similarity, SearchSimilarity, SimType

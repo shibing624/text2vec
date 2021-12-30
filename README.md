@@ -10,6 +10,15 @@
 text2vec, chinese text to vector.(文本向量化表示工具，包括：词向量化表示，句子向量化表示，长文本向量化表示，文本相似度计算。)
 
 
+**Guide**
+
+- [Feature](#Feature)
+- [Install](#install)
+- [Usage](#usage)
+- [Contact](#Contact)
+- [Cite](#Cite)
+- [Reference](#reference)
+
 # Feature
 #### 文本向量表示
 - 字词粒度，通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe），获取字词的word2vec向量表示。
