@@ -11,7 +11,7 @@ from text2vec.utils.tokenizer import Tokenizer
 from text2vec.utils.log import logger
 
 
-class BM25(object):
+class BM25:
     def __init__(self, corpus):
         """
         Search sim doc with rank bm25

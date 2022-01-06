@@ -1,13 +1,13 @@
 jieba>=0.39
 gensim>=4.0.0
-numpy
 tokenizers>=0.10.3
 tqdm
 torch>=1.6.0
 scikit-learn
-sentencepiece
-huggingface-hub
+#sentencepiece
+#huggingface-hub
 transformers>=4.6.0,<5.0.0
-sentence-transformers
+numpy
+#sentence-transformers
 colorlog
 #pyemd

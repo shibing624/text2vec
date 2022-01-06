@@ -30,12 +30,12 @@ def compute_emb(model):
     for sentence, embedding in zip(sentences, sentence_embeddings):
         print("Sentence:", sentence)
         print("Embedding:", embedding)
-        print("")
+        print()
 
 
 if __name__ == '__main__':
-    sbert_model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
+    sbert_model = SBert()
     compute_emb(sbert_model)
 
-    w2v_model = Word2Vec('w2v-light-tencent-chinese')
+    w2v_model = Word2Vec()
     compute_emb(w2v_model)

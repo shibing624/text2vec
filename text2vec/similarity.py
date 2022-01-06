@@ -3,15 +3,13 @@
 @author:XuMing(xuming624@qq.com)
 @description: 
 """
-import os
 import numpy as np
 
-from text2vec.utils.distance import cosine_distance
 from text2vec.utils.rank_bm25 import BM25Okapi
 from text2vec.utils.log import logger
 from text2vec.utils.tokenizer import Tokenizer
 from text2vec.word2vec import Word2Vec
-from text2vec.sbert import SBert
+from text2vec.sbert import SBert, cos_sim
 
 
 class EmbType(object):
@@ -25,7 +23,7 @@ class SimType(object):
 
 
 class Similarity(object):
-    def __init__(self, similarity_type=SimType.COSINE, embedding_type=EmbType.W2V):
+    def __init__(self, similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT):
         """
         Cal text similarity
         :param similarity_type:
@@ -34,7 +32,7 @@ class Similarity(object):
         if similarity_type == SimType.WMD and embedding_type != EmbType.W2V:
             logger.warning('wmd sim type, emb type must be w2v')
             embedding_type = EmbType.W2V
-        logger.debug('embedding type: {}'.format(embedding_type))
+        # logger.debug('embedding type: {}'.format(embedding_type))
         self.similarity_type = similarity_type
         self.embedding_type = embedding_type
         self.tokenizer = Tokenizer()
@@ -65,7 +63,8 @@ class Similarity(object):
         if self.similarity_type == SimType.COSINE:
             emb1 = self.model.encode(text1)
             emb2 = self.model.encode(text2)
-            res = cosine_distance(emb1, emb2)
+            res = cos_sim(emb1, emb2)[0]
+            res = float(res)
         elif self.similarity_type == SimType.WMD:
             token1 = self.tokenizer.tokenize(text1)
             token2 = self.tokenizer.tokenize(text2)

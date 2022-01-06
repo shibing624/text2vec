@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
 """
+@author:XuMing(xuming624@qq.com)
+@description: 语义相似文本检索
 This is a simple application for sentence embeddings: semantic search
 
 We have a corpus with various sentences. Then, for a given query sentence,
