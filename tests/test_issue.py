@@ -8,11 +8,10 @@ import unittest
 
 sys.path.append('..')
 
-from text2vec import SBert
+from text2vec import SBert, cos_sim
 from text2vec import BM25
-from sentence_transformers.util import cos_sim
 
-sbert_model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
+sbert_model = SBert()
 
 
 def sbert_sim_score(str_a, str_b):

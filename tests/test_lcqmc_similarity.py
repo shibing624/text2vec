@@ -8,10 +8,9 @@ import unittest
 
 sys.path.append('..')
 
-from text2vec import SBert
-from sentence_transformers.util import cos_sim
+from text2vec import SBert, cos_sim
 
-sbert_model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
+sbert_model = SBert()
 
 # query1 query2 matching?
 case_same_keywords = [['飞行员没钱买房怎么办？', '父母没钱买房子', False],
@@ -41,27 +40,25 @@ def apply_sbert_case(cases):
         a = line[2]
 
         s = sbert_sim_score(q1, q2)
-        print(f'q1:{q1}, q2:{q2}, expect:{a}, actual:{s}')
+        print(f'q1:{q1}, q2:{q2}, expect:{a}, actual:{s:.4f}')
 
 
 class LcqTestCase(unittest.TestCase):
     def test_sbert(self):
         """测试sbert结果"""
         apply_sbert_case(case_same_keywords)
-        # q1:飞行员没钱买房怎么办？, q2:父母没钱买房子, expect a:False, actual a:0.846145250083127
-        # q1:聊天室都有哪些好的, q2:聊天室哪个好, expect a:True, actual a:0.9302744928458128
-        # q1:不锈钢上贴的膜怎么去除, q2:不锈钢上的胶怎么去除, expect a:True, actual a:0.9625103602739326
-        # q1:动漫人物的口头禅, q2:白羊座的动漫人物, expect a:False, actual a:0.9254731623309143
-
         apply_sbert_case(case_categories_corresponding_pairs)
-        # q1:从广州到长沙在哪里定高铁票, q2:在长沙哪里坐高铁回广州？, expect a:False, actual a:0.9243307258941305
-        # q1:请问现在最好用的听音乐软件是什么啊, q2:听歌用什么软件比较好, expect a:True, actual a:0.8689272207970375
-        # q1:谁有吃过完美的产品吗？如何？, q2:完美产品好不好, expect a:True, actual a:0.8615442355066881
-        # q1:朱熹是哪个朝代的诗人, q2:朱熹是明理学的集大成者，他生活在哪个朝代, expect a:True, actual a:0.8630224628595393
-        # q1:这是哪个奥特曼？, q2:这是什么奥特曼..., expect a:True, actual a:0.9050183814431813
-        # q1:网上找工作可靠吗, q2:网上找工作靠谱吗, expect a:True, actual a:0.9935955342946918
-        # q1:你们都喜欢火影忍者里的谁啊, q2:火影忍者里你最喜欢谁, expect a:True, actual a:0.8950941719662809
-
+        # q1: 飞行员没钱买房怎么办？, q2: 父母没钱买房子, expect: False, actual: 0.3742
+        # q1: 聊天室都有哪些好的, q2: 聊天室哪个好, expect: True, actual: 0.9497
+        # q1: 不锈钢上贴的膜怎么去除, q2: 不锈钢上的胶怎么去除, expect: True, actual: 0.8708
+        # q1: 动漫人物的口头禅, q2: 白羊座的动漫人物, expect: False, actual: 0.8510
+        # q1: 从广州到长沙在哪里定高铁票, q2: 在长沙哪里坐高铁回广州？, expect: False, actual: 0.9163
+        # q1: 请问现在最好用的听音乐软件是什么啊, q2: 听歌用什么软件比较好, expect: True, actual: 0.9182
+        # q1: 谁有吃过完美的产品吗？如何？, q2: 完美产品好不好, expect: True, actual: 0.7370
+        # q1: 朱熹是哪个朝代的诗人, q2: 朱熹是明理学的集大成者，他生活在哪个朝代, expect: True, actual: 0.7382
+        # q1: 这是哪个奥特曼？, q2: 这是什么奥特曼..., expect: True, actual: 0.8744
+        # q1: 网上找工作可靠吗, q2: 网上找工作靠谱吗, expect: True, actual: 0.9531
+        # q1: 你们都喜欢火影忍者里的谁啊, q2: 火影忍者里你最喜欢谁, expect: True, actual: 0.9643
 
 if __name__ == '__main__':
     unittest.main()
