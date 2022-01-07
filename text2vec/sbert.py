@@ -47,7 +47,8 @@ class SBert:
 
         # Perform pooling
         all_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
-        all_embeddings = np.array(all_embeddings)
+        all_embeddings = np.asarray([emb.cpu().numpy() for emb in all_embeddings])
+
         if input_is_string:
             all_embeddings = all_embeddings[0]
 
