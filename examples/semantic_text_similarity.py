@@ -19,10 +19,10 @@ sentences2 = ['花呗更改绑定银行卡',
               'A woman watches TV',
               'The new movie is so great']
 
-sim3 = Similarity(similarity_type='cosine', embedding_type='sbert')
+sim_model = Similarity(similarity_type='cosine', embedding_type='sbert')
 for i in range(len(sentences1)):
     for j in range(len(sentences2)):
-        score = sim3.get_score(sentences1[i], sentences2[j])
+        score = sim_model.get_score(sentences1[i], sentences2[j])
         print("{} \t\t {} \t\t Score: {:.4f}".format(sentences1[i], sentences2[j], score))
 print()
 

@@ -37,7 +37,7 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括：词向�
 ## 调研结论
 
 #### 文本相似度计算
-- 基准方法
+- 基准方法（Word2Vec + Cosine）
 
 尽管文本相似度计算的基准方法很简洁，但用平均词向量之间求余弦相似度的表现非常好。实验有以下结论：
 
@@ -49,19 +49,19 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括：词向�
 ![基准方法效果很好](./docs/base1.jpg)
 
 
-- 词移距离
+- 词移距离（WMD）
 
 基于我们的结果，好像没有什么使用词移距离的必要了，因为上述方法表现得已经很好了。只有在STS-TEST数据集上，而且只有在有停止词列表的情况下，词移距离才能和简单基准方法一较高下。
 
 ![词移距离的表现令人失望](./docs/move1.jpg)
 
-- Sentence-Bert
+- 预训练语言模型（SentenceBERT）
 
-以下模型已经过finetuned调整，可以嵌入长达128个单词的句子和短段落。
+对SentenceBERT系列模型经过fine-tune和多语言迁移，可以embedding表示多语言的，长达128个字符的句子。
 
-`paraphrase-MiniLM-L6-v2`模型预测快速，效果较好，推荐。
+`paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L6-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec默认使用transformers库调用该模型`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`。
 
-`paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L6-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec默认下载使用该模型。
+大家也可以通过sentence-transformers库调用以下SentenceBERT系列模型，具体见[https://github.com/UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
 
 
 | Model Name | STSb | DupQ | TwitterP | SciDocs | Clustering |  Avg. Performance | Speed |
@@ -83,7 +83,7 @@ http://42.193.145.218/product/short_text_sim/
 
 # Install
 ```
-pip3 install text2vec
+pip3 install -U text2vec
 ```
 
 or
@@ -100,9 +100,9 @@ python3 setup.py install
 
 - 基于`pretrained model`计算文本向量
 
-> `SBert`通过预训练的`Sentence-Bert`模型计算句子向量
+> `SBert`通过预训练的`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`模型计算句子向量
 
-> `Word2Vec`通过腾讯词向量计算各字词的词向量，句子向量通过单词词向量取平均值得到
+> `Word2Vec`通过腾讯词向量`Tencent_AILab_ChineseEmbedding.tar.gz`计算各字词的词向量，句子向量通过单词词向量取平均值得到
 
 示例[computing_embeddings.py](./examples/computing_embeddings.py)
 
@@ -132,7 +132,7 @@ def compute_emb(model):
         print("")
 
 
-sbert_model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
+sbert_model = SBert('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
 compute_emb(sbert_model)
 ```
 
@@ -173,10 +173,7 @@ Portuguese, Russian, Spanish, Turkish.
 import sys
 
 sys.path.append('..')
-from text2vec import SBert, cos_sim
-
-# Load pre-trained Sentence Transformer Model (based on DistilBERT). It will be downloaded automatically
-model = SBert('paraphrase-multilingual-MiniLM-L12-v2')
+from text2vec import Similarity
 
 # Two lists of sentences
 sentences1 = ['如何更换花呗绑定银行卡',
@@ -189,31 +186,38 @@ sentences2 = ['花呗更改绑定银行卡',
               'A woman watches TV',
               'The new movie is so great']
 
-# Compute embedding for both lists
-embeddings1 = model.encode(sentences1)
-embeddings2 = model.encode(sentences2)
-
-# Compute cosine-similarits
-cosine_scores = cos_sim(embeddings1, embeddings2)
-
-# Output the pairs with their score
+sim_model = Similarity(similarity_type='cosine', embedding_type='sbert')
 for i in range(len(sentences1)):
-    print("{} \t\t {} \t\t Score: {:.4f}".format(sentences1[i], sentences2[i], cosine_scores[i][i]))
+    for j in range(len(sentences2)):
+        score = sim_model.get_score(sentences1[i], sentences2[j])
+        print("{} \t\t {} \t\t Score: {:.4f}".format(sentences1[i], sentences2[j], score))
 ```
 
 output:
 ```shell
 如何更换花呗绑定银行卡 		 花呗更改绑定银行卡 		 Score: 0.9477
+如何更换花呗绑定银行卡 		 The dog plays in the garden 		 Score: -0.1748
+如何更换花呗绑定银行卡 		 A woman watches TV 		 Score: -0.0839
+如何更换花呗绑定银行卡 		 The new movie is so great 		 Score: -0.0044
+The cat sits outside 		 花呗更改绑定银行卡 		 Score: -0.0097
 The cat sits outside 		 The dog plays in the garden 		 Score: 0.1908
+The cat sits outside 		 A woman watches TV 		 Score: -0.0203
+The cat sits outside 		 The new movie is so great 		 Score: 0.0302
+A man is playing guitar 		 花呗更改绑定银行卡 		 Score: -0.0010
+A man is playing guitar 		 The dog plays in the garden 		 Score: 0.1062
 A man is playing guitar 		 A woman watches TV 		 Score: 0.0055
+A man is playing guitar 		 The new movie is so great 		 Score: 0.0097
+The new movie is awesome 		 花呗更改绑定银行卡 		 Score: 0.0302
+The new movie is awesome 		 The dog plays in the garden 		 Score: -0.0160
+The new movie is awesome 		 A woman watches TV 		 Score: 0.1321
 The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 ```
 
-> 句子相似度值`score`范围在0到1之间，值越大越相似。
+> 句子余弦相似度值`score`范围在-1到1之间，值越大越相似。
 
 3. 计算句子与文档集之间的相似度值
 
-一般在文档候选集中找与query最相似的文本，常用于QA场景的问句相似匹配任务。
+一般在文档候选集中找与query最相似的文本，常用于QA场景的问句相似匹配、文本相似检索等任务。
 
 
 示例[semantic_search.py](./examples/semantic_search.py)
@@ -294,7 +298,7 @@ A man is riding a white horse on an enclosed ground. (Score: 0.1733)
 A man is eating food. (Score: 0.0329)
 ```
 
-> 'score'的结果越大，表示该query与corpus的相似度越近。
+> `Score`的值越大，表示该query与corpus的相似度越近。
 
 
 
