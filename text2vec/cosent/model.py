@@ -10,10 +10,9 @@ from transformers import BertConfig, BertModel
 
 
 class Model(nn.Module):
-    def __init__(self):
+    def __init__(self, model_name='bert-base-chinese'):
         super(Model, self).__init__()
-        self.config = BertConfig.from_pretrained('./mengzi_pretrain/config.json')
-        self.bert = BertModel.from_pretrained('./mengzi_pretrain/pytorch_model.bin', config=self.config)
+        self.bert = BertModel.from_pretrained(model_name)
 
     def forward(self, input_ids, attention_mask, encoder_type='fist-last-avg'):
         '''
