@@ -14,7 +14,6 @@ from tqdm import tqdm
 from torch import nn
 from config import set_args
 from model import SentenceBert
-from sklearn.model_selection import StratifiedKFold
 from torch.utils.data import TensorDataset, DataLoader
 from utils import compute_corrcoef, l2_normalize
 from transformers import BertTokenizer, AdamW, get_linear_schedule_with_warmup
