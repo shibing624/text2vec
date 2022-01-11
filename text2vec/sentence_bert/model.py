@@ -11,13 +11,9 @@ from transformers import BertConfig, BertModel
 
 
 class SentenceBert(nn.Module):
-    def __init__(self):
+    def __init__(self, model_name='bert-base-chinese'):
         super(SentenceBert, self).__init__()
-
-        self.config = BertConfig.from_pretrained('../mengzi_pretrain/config.json')
-        self.model = BertModel.from_pretrained('../mengzi_pretrain/pytorch_model.bin', config=self.config)
-
-        # self.model = AutoModel.from_pretrained('./pretrain_weight')
+        self.model = BertModel.from_pretrained(model_name)
 
     def get_embedding_vec(self, output, mask):
         token_embedding = output[0]
