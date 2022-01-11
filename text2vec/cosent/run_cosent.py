@@ -17,6 +17,7 @@ from utils import l2_normalize, compute_corrcoef
 from transformers.models.bert import BertTokenizer
 from transformers import AdamW, get_linear_schedule_with_warmup
 from data_helper import CustomDataset, collate_fn, pad_to_maxlen, load_data, load_test_data
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 def set_seed():
@@ -123,7 +124,7 @@ if __name__ == '__main__':
     model = Model(args.pretrained_model_path)
 
     if torch.cuda.is_available():
-        model.cuda()
+        model = model.cuda()
 
     param_optimizer = list(model.named_parameters())
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']

@@ -20,7 +20,6 @@ def set_args():
     parser.add_argument('--output_dir', default='./outputs', type=str, help='模型输出')
     parser.add_argument('--num_train_epochs', default=5, type=int, help='训练几轮')
     parser.add_argument('--train_batch_size', default=64, type=int, help='训练批次大小')
-    parser.add_argument('--val_batch_size', default=32, type=int, help='验证批次大小')
     parser.add_argument('--gradient_accumulation_steps', default=1, type=int, help='梯度积累几次更新')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='学习率大小')
     parser.add_argument('--seed', default=43, type=int, help='随机种子')

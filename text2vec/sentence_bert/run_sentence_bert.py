@@ -17,6 +17,7 @@ from model import SentenceBert
 from torch.utils.data import TensorDataset, DataLoader
 from utils import compute_corrcoef, l2_normalize
 from transformers import BertTokenizer, AdamW, get_linear_schedule_with_warmup
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 class Features:
@@ -76,7 +77,7 @@ def evaluate(model):
             s2_input_ids = s2_input_ids.cuda()
             label = label.cuda()
         with torch.no_grad():
-            s1_embeddings, s2_embeddings = model(s1_input_ids=s1_input_ids, s2_input_ids=s2_input_ids)
+            s1_embeddings, s2_embeddings = model(s1_input_ids, s2_input_ids)
             s1_embeddings = s1_embeddings.cpu().numpy()
             s2_embeddings = s2_embeddings.cpu().numpy()
             label = label.cpu().numpy()
@@ -105,7 +106,6 @@ def calc_loss(s1_vec, s2_vec, true_label):
 
 if __name__ == '__main__':
     args = set_args()
-    args.output_dir = 'outputs'
     os.makedirs(args.output_dir, exist_ok=True)
 
     # 1. 加载数据集
