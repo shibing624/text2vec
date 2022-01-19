@@ -1,38 +1,35 @@
+# -*- coding: utf-8 -*-
 """
-@file   : data_helper.py
-@author : xiaolu
-@email  : luxiaonlp@163.com
-@time   : 2022-01-07
+@author:XuMing(xuming624@qq.com), xiaolu(luxiaonlp@163.com)
+@description:
 """
 import torch
 from torch.utils.data import Dataset
 
 
 def load_data(path):
-    sentence, label = [], []
+    sents, labels = [], []
     with open(path, 'r', encoding='utf8') as f:
-        lines = f.readlines()
-        for line in lines:
+        for line in f:
             line = line.strip().split('\t')
             try:
-                sentence.extend([line[0], line[1]])
+                sents.extend([line[0], line[1]])
                 lab = int(line[2])
-                label.extend([lab, lab])
+                labels.extend([lab, lab])
             except:
                 continue
-    return sentence, label
+    return sents, labels
 
 
 def load_test_data(path):
-    sent1, sent2, label = [], [], []
+    sents1, sents2, labels = [], [], []
     with open(path, 'r', encoding='utf8') as f:
-        lines = f.readlines()
-        for line in lines:
+        for line in f:
             line = line.strip().split('\t')
-            sent1.append(line[0])
-            sent2.append(line[1])
-            label.append(int(line[2]))
-    return sent1, sent2, label
+            sents1.append(line[0])
+            sents2.append(line[1])
+            labels.append(int(line[2]))
+    return sents1, sents2, labels
 
 
 class CustomDataset(Dataset):
@@ -74,10 +71,6 @@ def pad_to_maxlen(input_ids, max_len, pad_value=0):
 def collate_fn(batch):
     # 按batch进行padding获取当前batch中最大长度
     max_len = max([len(d['input_ids']) for d in batch])
-
-    # 定一个全局的max_len
-    # max_len = 128
-
     input_ids, attention_mask, token_type_ids, labels = [], [], [], []
 
     for item in batch:

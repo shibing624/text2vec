@@ -29,8 +29,8 @@ def mean_pooling(model_output, attention_mask):
 class SBert:
     def __init__(self, model_name='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'):
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModel.from_pretrained(model_name)
-        self.model = model.to(device)
+        self.model = AutoModel.from_pretrained(model_name)
+        self.model.to(device)
 
     def encode(self, sentences):
         input_is_string = False
