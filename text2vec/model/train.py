@@ -74,7 +74,7 @@ def set_seed():
 
 
 def get_sent_id_tensor(tokenizer, s_list):
-    input_ids, attention_mask, token_type_ids, = [], [], []
+    input_ids, attention_mask, token_type_ids = [], [], []
     max_len = max([len(_) + 2 for _ in s_list])
     for s in s_list:
         inputs = tokenizer.encode_plus(text=s, text_pair=None, add_special_tokens=True, return_token_type_ids=True)
