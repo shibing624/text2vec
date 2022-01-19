@@ -1,4 +1,4 @@
-# CoSENT_Pytorch
+# CoSENT model
 
 比Sentence-BERT更有效的句向量方案
 
@@ -15,14 +15,14 @@
 parser.add_argument('--train_data', default='./data/STS-B/STS-B.train.data', type=str, help='训练数据集')  
 parser.add_argument('--test_data', default='./data/STS-B/STS-B.test.data', type=str, help='测试数据集')
 
-<b>我的实验结果</b>
+### 本项目实验结果
 test测试集的评估结果：
 
 | | ATEC | BQ | LCQMC | PAWSX | STS-B |
-| :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| :-: | :-: | :-: | :-: | :-: | :-: |
 | MengZi+CoSENT | **50.5270** | **72.2789** | **78.6981** | **?** | **80.1544** |
 
-<b>苏剑林的结果:</b>
+### 苏剑林的结果
 train训练、test测试：
 
 | | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg |
