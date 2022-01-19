@@ -36,8 +36,8 @@ if __name__ == '__main__':
     args = set_args()
     tokenizer = BertTokenizer.from_pretrained(args.output_dir)
     model = Model(args.output_dir)
-    corr = evaluate(model, tokenizer, args.test_data)
+    corr = evaluate(model, tokenizer, args.test_path)
     print(corr)
 
-    corr = sbert_cos(args.output_dir, args.test_data)
+    corr = sbert_cos(args.output_dir, args.test_path)
     print(corr)

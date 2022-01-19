@@ -136,10 +136,7 @@ def calc_loss(y_true, y_pred):
     y_true = y_true.float()
     y_pred = y_pred - (1 - y_true) * 1e12
     y_pred = y_pred.view(-1)
-    if torch.cuda.is_available():
-        y_pred = torch.cat((torch.tensor([0]).float().cuda(), y_pred), dim=0)  # 这里加0是因为e^0 = 1相当于在log中加了1
-    else:
-        y_pred = torch.cat((torch.tensor([0]).float(), y_pred), dim=0)  # 这里加0是因为e^0 = 1相当于在log中加了1
+    y_pred = torch.cat((torch.tensor([0]).float().to(device), y_pred), dim=0)  # 这里加0是因为e^0 = 1相当于在log中加了1
     return torch.logsumexp(y_pred, dim=0)
 
 
@@ -193,7 +190,7 @@ if __name__ == '__main__':
                 scheduler.step()
                 optimizer.zero_grad()
 
-        corr = evaluate(model, tokenizer, args.valid_data)
+        corr = evaluate(model, tokenizer, args.valid_path)
 
         with open(logs_path, 'a+') as f:
             s = 'Epoch:{} Valid| corr: {:.6f}\n'.format(epoch, corr)
@@ -206,7 +203,7 @@ if __name__ == '__main__':
         output_model_file = os.path.join(args.output_dir, "pytorch_model.bin")
         torch.save(model_to_save.state_dict(), output_model_file)
     model = Model(args.output_dir)
-    corr = evaluate(model, tokenizer, args.test_data)
+    corr = evaluate(model, tokenizer, args.test_path)
     with open(logs_path, 'a+') as f:
         s = 'Test | corr: {:.6f}\n'.format(corr)
         f.write(s)
