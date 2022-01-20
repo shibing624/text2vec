@@ -14,8 +14,10 @@ def load_data(path):
             line = line.strip().split('\t')
             try:
                 sents.extend([line[0], line[1]])
-                lab = int(line[2])
-                labels.extend([lab, lab])
+                score = int(line[2])
+                if 'STS' in path:
+                    score = float(score) / 5.0  # Normalize score to range 0 ... 1
+                labels.extend([score, score])
             except:
                 continue
     return sents, labels
@@ -28,7 +30,10 @@ def load_test_data(path):
             line = line.strip().split('\t')
             sents1.append(line[0])
             sents2.append(line[1])
-            labels.append(int(line[2]))
+            score = int(line[2])
+            if 'STS' in path:
+                score = float(score) / 5.0  # Normalize score to range 0 ... 1
+            labels.append(score)
     return sents1, sents2, labels
 
 
