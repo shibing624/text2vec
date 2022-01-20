@@ -6,12 +6,10 @@
 
 import os
 import time
-
+from loguru import logger
 import numpy as np
 from gensim.models import KeyedVectors
-
 from text2vec.utils.get_file import get_file
-from text2vec.utils.log import logger
 from text2vec.utils.tokenizer import Tokenizer
 
 USER_DATA_DIR = os.path.expanduser('~/.text2vec/datasets/')

@@ -4,9 +4,8 @@
 @description: 
 """
 import numpy as np
-
+from loguru import logger
 from text2vec.utils.rank_bm25 import BM25Okapi
-from text2vec.utils.log import logger
 from text2vec.utils.tokenizer import Tokenizer
 from text2vec.word2vec import Word2Vec
 from text2vec.sbert import SBert, cos_sim
@@ -32,7 +31,6 @@ class Similarity(object):
         if similarity_type == SimType.WMD and embedding_type != EmbType.W2V:
             logger.warning('wmd sim type, emb type must be w2v')
             embedding_type = EmbType.W2V
-        # logger.debug('embedding type: {}'.format(embedding_type))
         self.similarity_type = similarity_type
         self.embedding_type = embedding_type
         self.tokenizer = Tokenizer()
@@ -87,7 +85,6 @@ class SearchSimilarity(object):
     def init(self):
         if not self.bm25_instance:
             if not self.corpus:
-                logger.error('corpus is none, set corpus with docs.')
                 raise ValueError("must set corpus, which is documents, list of str")
 
             if isinstance(self.corpus, str):

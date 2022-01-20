@@ -1,5 +1,6 @@
 jieba>=0.39
 gensim>=4.0.0
+loguru
 tokenizers>=0.10.3
 tqdm
 torch>=1.6.0

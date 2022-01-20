@@ -10,6 +10,7 @@ import numpy as np
 import argparse
 import scipy.stats
 from tqdm import tqdm
+from loguru import logger
 from model import Model
 from torch.utils.data import DataLoader
 from transformers.models.bert import BertTokenizer
@@ -31,9 +32,12 @@ def set_args():
     # ./data/LCQMC/LCQMC.train.data
     # ./data/PAWSX/PAWSX.train.data
     # ./data/STS-B/STS-B.train.data
-    parser.add_argument('--train_path', default=os.path.join(pwd_path, '../data/STS-B/STS-B.train.data'), type=str, help='训练数据集')
-    parser.add_argument('--valid_path', default=os.path.join(pwd_path, '../data/STS-B/STS-B.valid.data'), type=str, help='验证数据集')
-    parser.add_argument('--test_path', default=os.path.join(pwd_path, '../data/STS-B/STS-B.test.data'), type=str, help='测试数据集')
+    parser.add_argument('--train_path', default=os.path.join(pwd_path, '../data/STS-B/STS-B.train.data'), type=str,
+                        help='训练数据集')
+    parser.add_argument('--valid_path', default=os.path.join(pwd_path, '../data/STS-B/STS-B.valid.data'), type=str,
+                        help='验证数据集')
+    parser.add_argument('--test_path', default=os.path.join(pwd_path, '../data/STS-B/STS-B.test.data'), type=str,
+                        help='测试数据集')
     parser.add_argument('--pretrained_model_path', default='hfl/chinese-macbert-base', type=str, help='预训练模型的路径')
     parser.add_argument('--output_dir', default='./outputs', type=str, help='模型输出')
     parser.add_argument('--num_train_epochs', default=5, type=int, help='训练几轮')
@@ -112,10 +116,11 @@ def evaluate(model, tokenizer, data_path):
     # 计算cos相似度，句子向量l2归一化，对应相乘得到
     sims = (l2_normalize(source_vecs) * l2_normalize(target_vecs)).sum(axis=1)
     corrcoef = compute_corrcoef(all_labels, sims)
-    print('labels:', all_labels[:10])
-    print('sims:', sims[:10])
-    print('Spearman corr:', corrcoef)
+    logger.debug(f'labels: {all_labels[:10]}')
+    logger.debug(f'sims: {sims[:10]}')
+    logger.debug(f'Spearman corr: {corrcoef}')
     return corrcoef
+
 
 def calc_loss(y_true, y_pred):
     """
@@ -165,24 +170,25 @@ if __name__ == '__main__':
     optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate)
     scheduler = get_linear_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=0.05 * total_steps,
                                                 num_training_steps=total_steps)
-    print("***** Running training *****")
-    print("  Num examples = %d" % len(train_dataset))
-    print("  Batch size = %d" % args.train_batch_size)
-    print("  Num steps = %d" % num_train_optimization_steps)
+    logger.info("***** Running training *****")
+    logger.info("  Num examples = %d" % len(train_dataset))
+    logger.info("  Batch size = %d" % args.train_batch_size)
+    logger.info("  Num steps = %d" % num_train_optimization_steps)
     logs_path = os.path.join(args.output_dir, 'logs.txt')
     best = 0
     for epoch in range(args.num_train_epochs):
         model.train()
         train_label, train_predict = [], []
         epoch_loss = 0
-        for step, batch in enumerate(train_dataloader):
+        for step, batch in enumerate(tqdm(train_dataloader)):
             input_ids, input_mask, token_type_ids, labels = batch
-            input_ids, input_mask, token_type_ids = input_ids.to(device), input_mask.to(device), token_type_ids.to(device)
+            input_ids, input_mask, token_type_ids = input_ids.to(device), input_mask.to(device), token_type_ids.to(
+                device)
             labels = labels.to(device)
             output = model(input_ids=input_ids, attention_mask=input_mask, token_type_ids=token_type_ids)
             loss = calc_loss(labels, output)
             loss.backward()
-            print("当前轮次:{}, 正在迭代:{}/{}, Loss:{:.6f}".format(epoch, step, len(train_dataloader), loss.item()))
+            logger.info(f"Epoch:{epoch}, Batch:{step}/{len(train_dataloader)}, Loss:{loss.item():.6f}")
             # nn.utils.clip_grad_norm_(model.parameters(), max_norm=20, norm_type=2)
             epoch_loss += loss
 
@@ -204,7 +210,7 @@ if __name__ == '__main__':
             model_to_save = model.module if hasattr(model, 'module') else model  # Only save the model it-self
             output_model_file = os.path.join(args.output_dir, "pytorch_model.bin")
             torch.save(model_to_save.state_dict(), output_model_file)
-            print(f"higher corrcoef: {best:.6f} in epoch: {epoch}, save model")
+            logger.info(f"higher corrcoef: {best:.6f} in epoch: {epoch}, save model")
     model = Model(args.output_dir, encoder_type='first-last-avg')
     corr = evaluate(model, tokenizer, args.test_path)
     with open(logs_path, 'a+') as f:

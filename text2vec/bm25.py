@@ -8,7 +8,6 @@ import numpy as np
 
 from text2vec.utils.rank_bm25 import BM25Okapi
 from text2vec.utils.tokenizer import Tokenizer
-from text2vec.utils.log import logger
 
 
 class BM25:
@@ -26,7 +25,6 @@ class BM25:
     def init(self):
         if not self.bm25_instance:
             if not self.corpus:
-                logger.error('corpus is None, set corpus with documents.')
                 raise ValueError("must set corpus, which is documents, list of str")
 
             if isinstance(self.corpus, str) or not hasattr(self.corpus, '__len__'):
