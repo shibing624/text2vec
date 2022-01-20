@@ -198,6 +198,7 @@ if __name__ == '__main__':
     num_train_optimization_steps = int(
         len(train_dataset) / args.train_batch_size / args.gradient_accumulation_steps) * args.num_train_epochs
     model = Model(args.pretrained_model_path)
+    model.to(device)
     param_optimizer = list(model.named_parameters())
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
