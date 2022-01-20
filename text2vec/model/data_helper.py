@@ -63,6 +63,9 @@ class CustomDataset(Dataset):
 
 
 def pad_to_maxlen(input_ids, max_len=64, pad_value=0):
+    """
+    Padding text
+    """
     if len(input_ids) >= max_len:
         input_ids = input_ids[:max_len]
     else:
