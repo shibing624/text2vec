@@ -35,17 +35,17 @@ def load_test_data(path):
 
 
 class CustomDataset(Dataset):
-    def __init__(self, sentence, label, tokenizer):
-        self.sentence = sentence
-        self.label = label
+    def __init__(self, sentences, labels, tokenizer):
+        self.sentences = sentences
+        self.labels = labels
         self.tokenizer = tokenizer
 
     def __len__(self):
-        return len(self.sentence)
+        return len(self.sentences)
 
     def __getitem__(self, index):
         inputs = self.tokenizer.encode_plus(
-            text=self.sentence[index],
+            text=self.sentences[index],
             text_pair=None,
             add_special_tokens=True,
             return_token_type_ids=True
@@ -58,11 +58,11 @@ class CustomDataset(Dataset):
             'input_ids': input_ids,
             'attention_mask': attention_mask,
             'token_type_ids': token_type_ids,
-            'label': self.label[index]
+            'labels': self.labels[index]
         }
 
 
-def pad_to_maxlen(input_ids, max_len, pad_value=0):
+def pad_to_maxlen(input_ids, max_len=64, pad_value=0):
     if len(input_ids) >= max_len:
         input_ids = input_ids[:max_len]
     else:
@@ -79,7 +79,7 @@ def collate_fn(batch):
         input_ids.append(pad_to_maxlen(item['input_ids'], max_len=max_len))
         attention_mask.append(pad_to_maxlen(item['attention_mask'], max_len=max_len))
         token_type_ids.append(pad_to_maxlen(item['token_type_ids'], max_len=max_len))
-        labels.append(item['label'])
+        labels.append(item['labels'])
 
     all_input_ids = torch.tensor(input_ids, dtype=torch.long)
     all_input_mask = torch.tensor(attention_mask, dtype=torch.long)

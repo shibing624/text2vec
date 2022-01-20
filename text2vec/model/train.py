@@ -40,6 +40,7 @@ def set_args():
                         help='测试数据集')
     parser.add_argument('--pretrained_model_path', default='hfl/chinese-macbert-base', type=str, help='预训练模型的路径')
     parser.add_argument('--output_dir', default='./outputs', type=str, help='模型输出')
+    parser.add_argument('--max_len', default=64, type=int, help='句子最大长度')
     parser.add_argument('--num_train_epochs', default=5, type=int, help='训练几轮')
     parser.add_argument('--train_batch_size', default=64, type=int, help='训练批次大小')
     parser.add_argument('--gradient_accumulation_steps', default=1, type=int, help='梯度积累几次更新')
@@ -78,21 +79,20 @@ def compute_pearsonr(x, y):
     return scipy.stats.perasonr(x, y)[0]
 
 
-def get_sent_id_tensor(tokenizer, s_list):
+def get_sent_id_tensor(tokenizer, sents, max_len):
     input_ids, attention_mask, token_type_ids = [], [], []
-    max_len = max([len(_) + 2 for _ in s_list])
-    for s in s_list:
+    for s in sents:
         inputs = tokenizer.encode_plus(text=s, text_pair=None, add_special_tokens=True, return_token_type_ids=True)
         input_ids.append(pad_to_maxlen(inputs['input_ids'], max_len=max_len))
         attention_mask.append(pad_to_maxlen(inputs['attention_mask'], max_len=max_len))
         token_type_ids.append(pad_to_maxlen(inputs['token_type_ids'], max_len=max_len))
-    all_input_ids = torch.tensor(input_ids, dtype=torch.long, device=device)
-    all_input_mask = torch.tensor(attention_mask, dtype=torch.long, device=device)
-    all_token_type_ids = torch.tensor(token_type_ids, dtype=torch.long, device=device)
-    return all_input_ids, all_input_mask, all_token_type_ids
+    input_ids = torch.tensor(input_ids, dtype=torch.long, device=device)
+    attention_mask = torch.tensor(attention_mask, dtype=torch.long, device=device)
+    token_type_ids = torch.tensor(token_type_ids, dtype=torch.long, device=device)
+    return input_ids, attention_mask, token_type_ids
 
 
-def evaluate(model, tokenizer, data_path):
+def evaluate(model, tokenizer, data_path, max_len=64):
     """模型评估函数
     批量预测, batch结果拼接, 一次性求spearman相关度
     """
@@ -105,7 +105,7 @@ def evaluate(model, tokenizer, data_path):
     for s1, s2, lab in tqdm(zip(sents1, sents2, labels)):
         lab = torch.tensor([lab], dtype=torch.float, device=device)
         all_labels.extend(lab.cpu().numpy())
-        input_ids, input_mask, token_type_ids = get_sent_id_tensor(tokenizer, [s1, s2])
+        input_ids, input_mask, token_type_ids = get_sent_id_tensor(tokenizer, [s1, s2], max_len)
         with torch.no_grad():
             output = model(input_ids, input_mask, token_type_ids)
         source_vecs.append(output[0].cpu().numpy())
@@ -140,7 +140,8 @@ def calc_loss(y_true, y_pred):
     y_true = y_true.float()
     y_pred = y_pred - (1 - y_true) * 1e12
     y_pred = y_pred.view(-1)
-    y_pred = torch.cat((torch.tensor([0]).float().to(device), y_pred), dim=0)  # 这里加0是因为e^0 = 1相当于在log中加了1
+    # 这里加0是因为e^0 = 1相当于在log中加了1
+    y_pred = torch.cat((torch.tensor([0]).float().to(device), y_pred), dim=0)
     return torch.logsumexp(y_pred, dim=0)
 
 
@@ -151,9 +152,9 @@ if __name__ == '__main__':
     tokenizer = BertTokenizer.from_pretrained(args.pretrained_model_path)
 
     # 加载数据集
-    train_sentence, train_label = load_data(args.train_path)
-    # train_sentence, train_label = train_sentence[:200], train_label[:200]
-    train_dataset = CustomDataset(sentence=train_sentence, label=train_label, tokenizer=tokenizer)
+    train_sentences, train_labels = load_data(args.train_path)
+    # train_sentences, train_labels = train_sentences[:200], train_labels[:200]
+    train_dataset = CustomDataset(sentences=train_sentences, labels=train_labels, tokenizer=tokenizer)
     train_dataloader = DataLoader(dataset=train_dataset, shuffle=False, batch_size=args.train_batch_size,
                                   collate_fn=collate_fn, num_workers=1)
     total_steps = len(train_dataloader) * args.num_train_epochs
@@ -178,29 +179,25 @@ if __name__ == '__main__':
     best = 0
     for epoch in range(args.num_train_epochs):
         model.train()
-        train_label, train_predict = [], []
-        epoch_loss = 0
         for step, batch in enumerate(tqdm(train_dataloader)):
-            input_ids, input_mask, token_type_ids, labels = batch
-            input_ids, input_mask, token_type_ids = input_ids.to(device), input_mask.to(device), token_type_ids.to(
+            input_ids, attention_mask, token_type_ids, labels = batch
+            input_ids, attention_mask, token_type_ids = input_ids.to(device), attention_mask.to(device), token_type_ids.to(
                 device)
             labels = labels.to(device)
-            output = model(input_ids=input_ids, attention_mask=input_mask, token_type_ids=token_type_ids)
+            output = model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
             loss = calc_loss(labels, output)
             loss.backward()
             logger.info(f"Epoch:{epoch}, Batch:{step}/{len(train_dataloader)}, Loss:{loss.item():.6f}")
             # nn.utils.clip_grad_norm_(model.parameters(), max_norm=20, norm_type=2)
-            epoch_loss += loss
 
             if (step + 1) % args.gradient_accumulation_steps == 0:
                 optimizer.step()
                 scheduler.step()
                 optimizer.zero_grad()
 
-        corr = evaluate(model, tokenizer, args.valid_path)
+        corr = evaluate(model, tokenizer, args.valid_path, args.max_len)
         with open(logs_path, 'a+') as f:
-            s = 'Epoch:{} Valid| corr: {:.6f}\n'.format(epoch, corr)
-            f.write(s)
+            f.write(f'Epoch:{epoch} Valid| corr: {corr:.6f}\n')
         model.train()
         if best < corr:
             best = corr
@@ -212,7 +209,6 @@ if __name__ == '__main__':
             torch.save(model_to_save.state_dict(), output_model_file)
             logger.info(f"higher corrcoef: {best:.6f} in epoch: {epoch}, save model")
     model = Model(args.output_dir, encoder_type='first-last-avg')
-    corr = evaluate(model, tokenizer, args.test_path)
+    corr = evaluate(model, tokenizer, args.test_path, args.max_len)
     with open(logs_path, 'a+') as f:
-        s = 'Test | corr: {:.6f}\n'.format(corr)
-        f.write(s)
+        f.write(f'Test | corr: {corr:.6f}\n')
