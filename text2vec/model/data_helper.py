@@ -5,6 +5,7 @@
 """
 import torch
 from torch.utils.data import Dataset
+from loguru import logger
 
 
 def load_data(path):
@@ -12,6 +13,9 @@ def load_data(path):
     with open(path, 'r', encoding='utf8') as f:
         for line in f:
             line = line.strip().split('\t')
+            if len(line) != 3:
+                logger.warning(f'line size not match, pass: {line}')
+                continue
             sents.extend([line[0], line[1]])
             score = int(line[2])
             # if 'STS' in path:
@@ -25,6 +29,9 @@ def load_test_data(path):
     with open(path, 'r', encoding='utf8') as f:
         for line in f:
             line = line.strip().split('\t')
+            if len(line) != 3:
+                logger.warning(f'line size not match, pass: {line}')
+                continue
             sents1.append(line[0])
             sents2.append(line[1])
             score = int(line[2])
