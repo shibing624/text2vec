@@ -206,7 +206,7 @@ if __name__ == '__main__':
 
         corr = evaluate(model, tokenizer, args.valid_path, args.max_len)
         with open(logs_path, 'a+') as f:
-            f.write(f'Epoch:{epoch} Valid| corr: {corr:.6f}\n')
+            f.write(f'Task:{args.task_name}, Epoch:{epoch}, Valid, Spearman corr: {corr:.6f}\n')
         model.train()
         if best < corr:
             best = corr
@@ -220,4 +220,4 @@ if __name__ == '__main__':
     model = Model(args.output_dir, encoder_type='first-last-avg')
     corr = evaluate(model, tokenizer, args.test_path, args.max_len)
     with open(logs_path, 'a+') as f:
-        f.write(f'Test | corr: {corr:.6f}\n')
+        f.write(f'Task:{args.task_name}, Test, Spearman corr: {corr:.6f}\n')
