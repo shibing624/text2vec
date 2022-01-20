@@ -25,13 +25,16 @@ class Model(nn.Module):
 
         if encoder_type == 'fist-last-avg':
             # 第一层和最后一层的隐层取出  然后经过平均池化
-            first = output.hidden_states[1]   # hidden_states列表有13个hidden_state，第一个其实是embeddings，第二个元素才是第一层的hidden_state
+            # hidden_states列表有13个hidden_state，第一个其实是embeddings，第二个元素才是第一层的hidden_state
+            first = output.hidden_states[1]
             last = output.hidden_states[-1]
-            seq_length = first.size(1)   # 序列长度
+            seq_length = first.size(1)  # 序列长度
 
             first_avg = torch.avg_pool1d(first.transpose(1, 2), kernel_size=seq_length).squeeze(-1)  # batch, hid_size
             last_avg = torch.avg_pool1d(last.transpose(1, 2), kernel_size=seq_length).squeeze(-1)  # batch, hid_size
-            final_encoding = torch.avg_pool1d(torch.cat([first_avg.unsqueeze(1), last_avg.unsqueeze(1)], dim=1).transpose(1, 2), kernel_size=2).squeeze(-1)
+            final_encoding = torch.avg_pool1d(
+                torch.cat([first_avg.unsqueeze(1), last_avg.unsqueeze(1)], dim=1).transpose(1, 2),
+                kernel_size=2).squeeze(-1)
             return final_encoding
 
         if encoder_type == 'last-avg':
@@ -42,9 +45,9 @@ class Model(nn.Module):
 
         if encoder_type == "cls":
             sequence_output = output.last_hidden_state
-            cls = sequence_output[:, 0]  # [b,d]
+            cls = sequence_output[:, 0]  # [batch_size, 768]
             return cls
 
         if encoder_type == "pooler":
-            pooler_output = output.pooler_output  # [b,d]
+            pooler_output = output.pooler_output  # [batch_size, 768]
             return pooler_output

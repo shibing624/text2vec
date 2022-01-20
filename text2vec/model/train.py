@@ -83,8 +83,8 @@ def get_sent_id_tensor(tokenizer, s_list):
         token_type_ids.append(pad_to_maxlen(inputs['token_type_ids'], max_len=max_len))
     all_input_ids = torch.tensor(input_ids, dtype=torch.long)
     all_input_mask = torch.tensor(attention_mask, dtype=torch.long)
-    all_segment_ids = torch.tensor(token_type_ids, dtype=torch.long)
-    return all_input_ids, all_input_mask, all_segment_ids
+    all_token_type_ids = torch.tensor(token_type_ids, dtype=torch.long)
+    return all_input_ids, all_input_mask, all_token_type_ids
 
 
 def evaluate(model, tokenizer, data_path):
@@ -95,9 +95,9 @@ def evaluate(model, tokenizer, data_path):
     model.to(device)
     model.eval()
     for s1, s2, lab in tqdm(zip(sents1, sents2, labels)):
-        input_ids, input_mask, segment_ids = get_sent_id_tensor(tokenizer, [s1, s2])
+        input_ids, input_mask, token_type_ids = get_sent_id_tensor(tokenizer, [s1, s2])
         lab = torch.tensor([lab], dtype=torch.float)
-        input_ids, input_mask, segment_ids = input_ids.to(device), input_mask.to(device), segment_ids.to(device)
+        input_ids, input_mask, token_type_ids = input_ids.to(device), input_mask.to(device), token_type_ids.to(device)
         lab = lab.to(device)
         with torch.no_grad():
             output = model(input_ids=input_ids, attention_mask=input_mask, encoder_type='fist-last-avg')
@@ -117,6 +117,49 @@ def evaluate(model, tokenizer, data_path):
     print('Spearman corr:', corrcoef)
     return corrcoef
 
+
+def eval(model, tokenizer, data_path) -> float:
+    """模型评估函数
+    批量预测, batch结果拼接, 一次性求spearman相关度
+    """
+    import torch.nn.functional as F
+    sim_tensor = torch.tensor([], device=device)
+    sents1, sents2, labels = load_test_data(data_path)
+    all_a_vecs = []
+    all_b_vecs = []
+    all_labels = []
+    model.to(device)
+    model.eval()
+    for s1, s2, lab in tqdm(zip(sents1, sents2, labels)):
+        input_ids, input_mask, token_type_ids = get_sent_id_tensor(tokenizer, [s1, s2])
+        lab = torch.tensor([lab], dtype=torch.float)
+        input_ids, input_mask, token_type_ids = input_ids.to(device), input_mask.to(device), token_type_ids.to(device)
+        lab = lab.to(device)
+        with torch.no_grad():
+            output = model(input_ids=input_ids, attention_mask=input_mask, encoder_type='fist-last-avg')
+        all_a_vecs.append(output[0].cpu().numpy())
+        all_b_vecs.append(output[1].cpu().numpy())
+        # concat
+        source_pred = output[0]
+        target_pred = output[1]
+        sim = F.cosine_similarity(source_pred, target_pred, dim=-1)
+        sim_tensor = torch.cat((sim_tensor, sim), dim=0)
+        all_labels.extend(lab.cpu().numpy())
+    all_a_vecs = np.array(all_a_vecs)
+    all_b_vecs = np.array(all_b_vecs)
+    all_labels = np.array(all_labels)
+
+    a_vecs = l2_normalize(all_a_vecs)
+    b_vecs = l2_normalize(all_b_vecs)
+    sims = (a_vecs * b_vecs).sum(axis=1)
+    print('sims:', sims[:10])
+    print('labels:', all_labels[:10])
+    corrcoef = compute_corrcoef(all_labels, sims)
+    cos_spearman = compute_corrcoef(all_labels, sim_tensor.cpu().numpy())
+    print('cos sim:', sim_tensor.cpu().numpy()[:10])
+    print('cos spearman:', cos_spearman)
+    print('Spearman corr:', corrcoef)
+    return corrcoef
 
 def calc_loss(y_true, y_pred):
     """
@@ -169,19 +212,20 @@ if __name__ == '__main__':
     print("  Batch size = %d" % args.train_batch_size)
     print("  Num steps = %d" % num_train_optimization_steps)
     logs_path = os.path.join(args.output_dir, 'logs.txt')
+    best = 0
     for epoch in range(args.num_train_epochs):
         model.train()
         train_label, train_predict = [], []
         epoch_loss = 0
         for step, batch in enumerate(train_dataloader):
             # for step, batch in enumerate(train_dataloader):
-            input_ids, input_mask, segment_ids, label_ids = batch
-            input_ids, input_mask, segment_ids = input_ids.to(device), input_mask.to(device), segment_ids.to(device)
+            input_ids, input_mask, token_type_ids, label_ids = batch
+            input_ids, input_mask, token_type_ids = input_ids.to(device), input_mask.to(device), token_type_ids.to(device)
             label_ids = label_ids.to(device)
             output = model(input_ids=input_ids, attention_mask=input_mask, encoder_type='fist-last-avg')
             loss = calc_loss(label_ids, output)
             loss.backward()
-            print("当前轮次:{}, 正在迭代:{}/{}, Loss:{:10f}".format(epoch, step, len(train_dataloader), loss))  # 在进度条前面定义一段文字
+            print("当前轮次:{}, 正在迭代:{}/{}, Loss:{:.4f}".format(epoch, step, len(train_dataloader), loss.item()))
             # nn.utils.clip_grad_norm_(model.parameters(), max_norm=20, norm_type=2)
             epoch_loss += loss
 
@@ -190,20 +234,22 @@ if __name__ == '__main__':
                 scheduler.step()
                 optimizer.zero_grad()
 
-        corr = evaluate(model, tokenizer, args.valid_path)
-
+        corr = eval(model, tokenizer, args.valid_path)
         with open(logs_path, 'a+') as f:
             s = 'Epoch:{} Valid| corr: {:.6f}\n'.format(epoch, corr)
             f.write(s)
-        # 先保存原始transformer bert model
-        tokenizer.save_pretrained(args.output_dir)
-        model.bert.save_pretrained(args.output_dir)
-
-        model_to_save = model.module if hasattr(model, 'module') else model  # Only save the model it-self
-        output_model_file = os.path.join(args.output_dir, "pytorch_model.bin")
-        torch.save(model_to_save.state_dict(), output_model_file)
+        model.train()
+        if best < corr:
+            best = corr
+            # 先保存原始transformer bert model
+            tokenizer.save_pretrained(args.output_dir)
+            model.bert.save_pretrained(args.output_dir)
+            model_to_save = model.module if hasattr(model, 'module') else model  # Only save the model it-self
+            output_model_file = os.path.join(args.output_dir, "pytorch_model.bin")
+            torch.save(model_to_save.state_dict(), output_model_file)
+            print(f"higher corrcoef: {best:.4f} in epoch: {epoch}, save model")
     model = Model(args.output_dir)
-    corr = evaluate(model, tokenizer, args.test_path)
+    corr = eval(model, tokenizer, args.test_path)
     with open(logs_path, 'a+') as f:
         s = 'Test | corr: {:.6f}\n'.format(corr)
         f.write(s)
