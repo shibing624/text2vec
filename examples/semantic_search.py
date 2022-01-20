@@ -13,8 +13,7 @@ import sys
 
 sys.path.append('..')
 
-from text2vec import SBert, cos_sim, semantic_search
-from text2vec import BM25
+from text2vec import SBert, cos_sim, semantic_search, BM25
 import torch
 
 embedder = SBert()

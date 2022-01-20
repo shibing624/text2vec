@@ -4,18 +4,20 @@
 @description:
 """
 import os
+import sys
 import random
-import torch
 import numpy as np
 import argparse
 import scipy.stats
 from tqdm import tqdm
 from loguru import logger
-from model import Model
+import torch
 from torch.utils.data import DataLoader
 from transformers.models.bert import BertTokenizer
 from transformers import AdamW, get_linear_schedule_with_warmup
-from data_helper import CustomDataset, collate_fn, pad_to_maxlen, load_data, load_test_data
+sys.path.append('../..')
+from text2vec.model.model import Model
+from text2vec.model.data_helper import CustomDataset, collate_fn, pad_to_maxlen, load_data, load_test_data
 
 pwd_path = os.path.abspath(os.path.dirname(__file__))
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -147,6 +149,7 @@ def calc_loss(y_true, y_pred):
 
 if __name__ == '__main__':
     args = set_args()
+    logger.info(args)
     set_seed()
     os.makedirs(args.output_dir, exist_ok=True)
     tokenizer = BertTokenizer.from_pretrained(args.pretrained_model_path)

@@ -4,11 +4,14 @@
 @description: 
 """
 import os
+import sys
 import numpy as np
-from model import Model
+from loguru import logger
 from transformers import BertTokenizer
-from data_helper import load_test_data
-from train import set_args, compute_corrcoef, evaluate
+sys.path.append('../..')
+from text2vec.model.data_helper import load_test_data
+from text2vec.model.model import Model
+from text2vec.model.train import set_args, compute_corrcoef, evaluate
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -25,15 +28,16 @@ def sbert_cos(model_dir, data_path):
         sims.append(s[i][i])
     sims = np.array(sims)
     labels = np.array(labels)
-    print('sims:', sims[:10])
-    print('labels:', labels[:10])
     corrcoef = compute_corrcoef(labels, sims)
-    print('corr:', corrcoef)
+    logger.debug(f'labels: {labels[:10]}')
+    logger.debug(f'sims: {sims[:10]}')
+    logger.debug(f'Spearman corr: {corrcoef}')
     return corrcoef
 
 
 if __name__ == '__main__':
     args = set_args()
+    logger.info(args)
     tokenizer = BertTokenizer.from_pretrained(args.output_dir)
     model = Model(args.output_dir)
     corr = evaluate(model, tokenizer, args.test_path)
