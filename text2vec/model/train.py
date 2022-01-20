@@ -34,6 +34,7 @@ def set_args():
     # ./data/LCQMC/LCQMC.train.data
     # ./data/PAWSX/PAWSX.train.data
     # ./data/STS-B/STS-B.train.data
+    parser.add_argument('--task_name', default='STS-B', type=str, help='数据名称')
     parser.add_argument('--train_path', default=os.path.join(pwd_path, '../data/STS-B/STS-B.train.data'), type=str,
                         help='训练数据集')
     parser.add_argument('--valid_path', default=os.path.join(pwd_path, '../data/STS-B/STS-B.valid.data'), type=str,
@@ -48,7 +49,12 @@ def set_args():
     parser.add_argument('--gradient_accumulation_steps', default=1, type=int, help='梯度积累几次更新')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='学习率大小')
     parser.add_argument('--seed', default=42, type=int, help='随机种子')
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.task_name in ['ATEC', 'BQ', 'LCQMC', 'PAWSX', 'STS-B']:
+        args.train_path = os.path.join(pwd_path, f'../data/{args.task_name}/{args.task_name}.train.data')
+        args.valid_path = os.path.join(pwd_path, f'../data/{args.task_name}/{args.task_name}.valid.data')
+        args.test_path = os.path.join(pwd_path, f'../data/{args.task_name}/{args.task_name}.test.data')
+    return args
 
 
 def set_seed():
