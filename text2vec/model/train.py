@@ -181,8 +181,8 @@ if __name__ == '__main__':
         model.train()
         for step, batch in enumerate(tqdm(train_dataloader)):
             input_ids, attention_mask, token_type_ids, labels = batch
-            input_ids, attention_mask, token_type_ids = input_ids.to(device), attention_mask.to(device), token_type_ids.to(
-                device)
+            input_ids, attention_mask, token_type_ids = input_ids.to(device), attention_mask.to(
+                device), token_type_ids.to(device)
             labels = labels.to(device)
             output = model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
             loss = calc_loss(labels, output)

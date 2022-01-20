@@ -81,8 +81,8 @@ def collate_fn(batch):
         token_type_ids.append(pad_to_maxlen(item['token_type_ids'], max_len=max_len))
         labels.append(item['labels'])
 
-    all_input_ids = torch.tensor(input_ids, dtype=torch.long)
-    all_input_mask = torch.tensor(attention_mask, dtype=torch.long)
-    all_segment_ids = torch.tensor(token_type_ids, dtype=torch.long)
-    all_label_ids = torch.tensor(labels, dtype=torch.float)
-    return all_input_ids, all_input_mask, all_segment_ids, all_label_ids
+    input_ids = torch.tensor(input_ids, dtype=torch.long)
+    attention_mask = torch.tensor(attention_mask, dtype=torch.long)
+    token_type_ids = torch.tensor(token_type_ids, dtype=torch.long)
+    labels = torch.tensor(labels, dtype=torch.float)
+    return input_ids, attention_mask, token_type_ids, labels
