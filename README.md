@@ -133,8 +133,8 @@ Cross-Encoder适用于向量检索精排。
 | Sentence-BERT | 46.36 | 70.36 | **78.72** | 46.86 | 66.41 | 61.74 | 1365 |
 | RoBERTa+CoSENT | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
 | Sentence-RoBERTa | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
-| Word2Vec+Cosine | - | - | - | - | - | - | 10283 |
-| paraphrase-multilingual-MiniLM-L12-v2 | - | - | - | - | - | - | 2371 |
+| Word2Vec+Cosine | - | - | - | - | 55.77 | - | 10283 |
+| paraphrase-multilingual-MiniLM-L12-v2 | - | - | - | - | 78.90 | - | 2371 |
 
 - 结果值均使用spearman系数
 - `MacBERT+CoSENT`模型达到SOTA效果，运行本项目[text2vec/cosent](text2vec/cosent)文件夹下代码可以直接复现该结果
