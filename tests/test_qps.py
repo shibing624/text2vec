@@ -1,0 +1,108 @@
+# -*- coding: utf-8 -*-
+"""
+@author:XuMing(xuming624@qq.com)
+@description: 
+"""
+import os
+import sys
+import unittest
+from time import time
+
+sys.path.append('..')
+from text2vec import Word2Vec, SBert
+import numpy as np
+
+pwd_path = os.path.abspath(os.path.dirname(__file__))
+
+sts_test_path = os.path.join(pwd_path, '../text2vec/data/STS-B/STS-B.test.data')
+
+
+def load_test_data(path):
+    sents1, sents2, labels = [], [], []
+    with open(path, 'r', encoding='utf8') as f:
+        for line in f:
+            line = line.strip().split('\t')
+            if len(line) != 3:
+                continue
+            sents1.append(line[0])
+            sents2.append(line[1])
+            score = int(line[2])
+            labels.append(score)
+    return sents1, sents2, labels
+
+
+class QPSTestCase(unittest.TestCase):
+    def test_cosent_speed(self):
+        """测试cosent_speed"""
+        model_path = os.path.join(pwd_path, '../text2vec/cosent/text2vec-base-chinese-stsb')
+        sents1, sents2, labels = load_test_data(sts_test_path)
+        m = SBert(model_path)
+        sents = sents1 + sents2
+        print('sente size:', len(sents))
+        t1 = time()
+        m.encode(sents)
+        spend_time = time() - t1
+        print('spend time:', spend_time, ' seconds')
+        print('cosent_sbert qps:', len(sents) / spend_time)
+
+    def test_cosent_origin_speed(self):
+        """测试cosent_origin_speed"""
+        from text2vec.cosent.train import evaluate, get_sent_id_tensor
+        from text2vec.cosent.model import Model
+        import torch
+        from tqdm import tqdm
+        from transformers import BertTokenizer
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+        model_path = os.path.join(pwd_path, '../text2vec/cosent/text2vec-base-chinese-stsb')
+        sents1, sents2, labels = load_test_data(sts_test_path)
+        sents = sents1 + sents2
+        print('sente size:', len(sents))
+        tokenizer = BertTokenizer.from_pretrained(model_path)
+        model = Model(model_path)
+        model.to(device)
+        model.eval()
+        t1 = time()
+        for s1, s2, lab in tqdm(zip(sents1, sents2, labels)):
+            input_ids, input_mask, token_type_ids = get_sent_id_tensor(tokenizer, [s1, s2], 64)
+            with torch.no_grad():
+                output = model(input_ids, input_mask, token_type_ids)
+        t2 = time()
+        spend_time = t2 - t1
+        print('spend time:', spend_time, ' seconds')
+        print('cosent_single qps:', len(sents) / spend_time)
+        input_ids, input_mask, token_type_ids = get_sent_id_tensor(tokenizer, sents, 64)
+        with torch.no_grad():
+            output = model(input_ids, input_mask, token_type_ids)
+        t3 = time()
+        spend_time = t3 - t2
+        print('spend time:', spend_time, ' seconds')
+        print('cosent_batch qps:', len(sents) / spend_time)
+
+    def test_sbert_speed(self):
+        """测试sbert_speed"""
+        sents1, sents2, labels = load_test_data(sts_test_path)
+        m = SBert()
+        sents = sents1 + sents2
+        print('sente size:', len(sents))
+        t1 = time()
+        m.encode(sents)
+        spend_time = time() - t1
+        print('spend time:', spend_time, ' seconds')
+        print('sbert qps:', len(sents) / spend_time)
+
+    def test_w2v_speed(self):
+        """测试w2v_speed"""
+        sents1, sents2, labels = load_test_data(sts_test_path)
+        m = Word2Vec()
+        sents = sents1 + sents2
+        print('sente size:', len(sents))
+        t1 = time()
+        m.encode(sents)
+        spend_time = time() - t1
+        print('spend time:', spend_time, ' seconds')
+        print('w2v qps:', len(sents) / spend_time)
+
+
+if __name__ == '__main__':
+    unittest.main()

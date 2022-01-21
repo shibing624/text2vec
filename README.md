@@ -105,37 +105,40 @@ Cross-Encoder适用于向量检索精排。
 
 # Evaluate
 
-#### 文本匹配
+## 文本匹配
 
-- Sentence-BERT模型
+### Sentence-BERT模型
 
-对Sentence-BERT系列模型经过fine-tune和多语言迁移，可以embedding表示多语言的，长达128个字符的句子。
+英文匹配数据集的评测结果：
 
-`paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L6-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec默认使用transformers库调用该模型`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`。
-
-大家也可以通过sentence-transformers库调用以下SentenceBERT系列模型，具体见[https://github.com/UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
-
-结果均使用spearman系数评估：
-
-| Model Name | STSb | DupQ | TwitterP | SciDocs | Clustering |  Avg. Performance | Speed |
+| Model Name | STSb | DupQ | TwitterP | SciDocs | Clustering |  Avg | Speed |
 | :------- | :--------- | :--------- | :---------: | :---------: | :---------: | :---------: | :---------: |
-| paraphrase-distilroberta-base-v2 | 85.37 | 86.97 | 73.96 | 80.25 | 49.18 | 75.15 | 4000 |
 | paraphrase-MiniLM-L12-v2 | 84.41 | 87.28 | 75.34 | 80.08 | 46.95 | 74.81 | 7500 |
-| paraphrase-MiniLM-L6-v2 | 84.12 | 87.23 | 76.32 | 78.91 | 45.34 | 74.38 | 14200 |
 | paraphrase-multilingual-MiniLM-L12-v2 | 84.42 | 87.52 | 74.94 | 78.27 | 43.87 | 73.80 | 7500 |
 | average_word_embeddings_glove.6B.300d | 61.77 | 78.07 | 68.60 | 63.69 | 30.46 | 60.52 | 34000 |
 
-- CoSENT模型
+- `paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec默认使用transformers库调用该模型`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`
+- 大家也可以通过sentence-transformers库调用Sentence-BERT系列模型，具体见[https://github.com/UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
 
-| Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg |
-| :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | 79.33 | **68.54**  |
-| Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | **80.15** | 58.90 |
-| BERT+CoSENT | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 |
-| Sentence-BERT | 46.36 | 70.36 | **78.72** | 46.86 | 66.41 | 61.74 |
-| RoBERTa+CoSENT | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** |
-| Sentence-RoBERTa | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 |
 
+### CoSENT模型
+
+中文匹配数据集的评测结果：
+
+| Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
+| :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | 79.33 | **68.54**  | - |
+| Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | **80.15** | 58.90 | - |
+| BERT+CoSENT | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | - |
+| Sentence-BERT | 46.36 | 70.36 | **78.72** | 46.86 | 66.41 | 61.74 | - |
+| RoBERTa+CoSENT | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
+| Sentence-RoBERTa | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
+| Word2Vec+Cosine | - | - | - | - | - | - | 10283 |
+
+- 结果值均使用spearman系数
+- `MacBERT+CoSENT`模型达到SOTA效果，运行本项目[text2vec/cosent](text2vec/cosent)文件夹下代码可以直接复现该结果
+- 各预训练模型均可以通过transformers调用，如MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
+- 中文匹配数据集下载[链接见下方](#数据集)
 
 # Demo
 
