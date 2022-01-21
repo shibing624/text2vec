@@ -19,8 +19,7 @@ from text2vec.sbert import SBert, cos_sim
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
-def sbert_cos(model_dir, data_path):
-    sents1, sents2, labels = load_test_data(data_path)
+def sbert_cos(model_dir, sents1, sents2, labels):
     m = SBert(model_dir)
     t1 = time.time()
     e1 = m.encode(sents1)
@@ -45,8 +44,12 @@ if __name__ == '__main__':
     logger.info(args)
     tokenizer = BertTokenizer.from_pretrained(args.output_dir)
     model = Model(args.output_dir)
+    t1 = time.time()
     corr = evaluate(model, tokenizer, args.test_path)
     print(corr)
+    spend_time = time.time() - t1
+    sents1, sents2, labels = load_test_data(args.test_path)
+    logger.debug(f'spend time: {spend_time}, count:{len(sents1 + sents2)}, qps: {len(sents1 + sents2) / spend_time}')
 
-    corr = sbert_cos(args.output_dir, args.test_path)
+    corr = sbert_cos(args.output_dir, sents1, sents2, labels)
     print(corr)
