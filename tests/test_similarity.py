@@ -35,8 +35,13 @@ class SimTestCase(unittest.TestCase):
         """测试w2v_sim"""
         m = Similarity(similarity_type=SimType.COSINE, embedding_type=EmbType.W2V)
         sents1, sents2, labels = load_test_data(sts_test_path)
-        scores = m.batch_sim_score(sents1, sents2)
+        scores = []
+        for s1,s2 in zip(sents1, sents2):
+            s = m.get_score(s1, s2)
+            scores.append(s)
         corr = compute_corrcoef(scores, labels)
+        print('scores:', scores[:10])
+        print('labels:', labels[:10])
         print('w2v_sim spearman corr:', corr)
 
     def test_sbert_sim(self):
@@ -44,8 +49,21 @@ class SimTestCase(unittest.TestCase):
         m = Similarity(similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT)
         sents1, sents2, labels = load_test_data(sts_test_path)
         scores = m.batch_sim_score(sents1, sents2)
+        sims = []
+        for i in range(len(sents1)):
+            sims.append(scores[i][i])
+        corr = compute_corrcoef(sims, labels)
+        print('scores:', scores[:10])
+        print('labels:', labels[:10])
+        print('sbert_batch_sim spearman corr:', corr)
+        scores = []
+        for s1, s2 in zip(sents1, sents2):
+            s = m.get_score(s1, s2)
+            scores.append(s)
         corr = compute_corrcoef(scores, labels)
-        print('sbert_sim spearman corr:', corr)
+        print('scores:', scores[:10])
+        print('labels:', labels[:10])
+        print('sbert_each_sim spearman corr:', corr)
 
 
 if __name__ == '__main__':

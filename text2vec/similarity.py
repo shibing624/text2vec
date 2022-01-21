@@ -82,8 +82,8 @@ class Similarity(object):
         self.load_model()
         embs1 = self.model.encode(texts1)
         embs2 = self.model.encode(texts2)
-        sims = cos_sim(embs1, embs2)
-        scores = [float(s) for s in sims]
+        sims = cos_sim(embs1, embs2)[0]
+        scores = sims.numpy()
         return scores
 
 
