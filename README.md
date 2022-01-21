@@ -66,9 +66,9 @@ BM25算法，通过候选句子的字段对qurey字段的覆盖程度来计算�
 - [ConSERT(2021)](https://aclanthology.org/2021.acl-long.393/)
 - [CoSENT(2022)](https://kexue.fm/archives/8847)
 
-由于2018年BERT模型在NLP界带来了翻天覆地的变化，我们此处不讨论和比较2018年之前的模型（如果有兴趣考古的同学，可以参考中科院开源的[MatchZoo](https://github.com/NTMC-Community/MatchZoo) 和[MatchZoo-py](https://github.com/NTMC-Community/MatchZoo-py)）。
+由于2018年BERT模型在NLP界带来了翻天覆地的变化，此处不讨论和比较2018年之前的模型（如果有兴趣了解的同学，可以参考中科院开源的[MatchZoo](https://github.com/NTMC-Community/MatchZoo) 和[MatchZoo-py](https://github.com/NTMC-Community/MatchZoo-py)）。
 
-所以，本项目主要调研对比以下比原生BERT更优、适合文本匹配的向量表示模型：Sentence-BERT(2019)、BERT-flow(2020)、SimCSE(2021)、CoSENT(2022)。
+所以，本项目主要调研以下比原生BERT更优、适合文本匹配的向量表示模型：Sentence-BERT(2019)、BERT-flow(2020)、SimCSE(2021)、CoSENT(2022)。
 
 ### 深度方法：基于交互的匹配
 
@@ -91,17 +91,17 @@ Cross-Encoder适用于向量检索精排。
 
 # Feature
 ### 文本向量表示模型
-- Word2Vec：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe），实现了词汇和句子（词向量求平均）的word2vec向量表示。
-- SBert(Sentence-BERT)：使用transformers调用Sentence-BERT系列release在huggingface上的模型，如[sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)。
-- CoSENT(Cosine Sentence)：基于PyTorch实现了CoSENT模型的训练和预测，提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好。
+- Word2Vec：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe），实现了词汇和句子（词向量求平均）的word2vec向量表示
+- SBert(Sentence-BERT)：使用transformers调用Sentence-BERT系列release在huggingface上的模型，如多语言释义识别的匹配模型[sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)
+- CoSENT(Cosine Sentence)：基于PyTorch实现了CoSENT模型的训练和预测，该模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好
 
 ### 文本相似度比较方法
 
-- 余弦相似（Cosine Similarity）：两向量求余弦。
-- 点积（Dot Product）：两向量归一化后求内积。
-- 词移距离（Word Mover’s Distance）：词移距离使用两文本间的词向量，测量其中一文本中的单词在语义空间中移动到另一文本单词所需要的最短距离。
-- RankBM25：BM25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序。
-- SemanticSearch：向量相似检索，使用Cosine Similarty + topk高效计算，比一对一暴力计算快一个数量级。
+- 余弦相似（Cosine Similarity）：两向量求余弦
+- 点积（Dot Product）：两向量归一化后求内积
+- 词移距离（Word Mover’s Distance）：词移距离使用两文本间的词向量，测量其中一文本中的单词在语义空间中移动到另一文本单词所需要的最短距离
+- RankBM25：BM25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序
+- SemanticSearch：向量相似检索，使用Cosine Similarty + topk高效计算，比一对一暴力计算快一个数量级
 
 # Evaluate
 
