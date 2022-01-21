@@ -127,18 +127,20 @@ Cross-Encoder适用于向量检索精排。
 
 | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | 79.33 | **68.54**  | - |
-| Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | **80.15** | 58.90 | - |
-| BERT+CoSENT | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | - |
+| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | 79.33 | **68.54**  | 666 |
+| Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | **80.15** | 58.90 | 672 |
+| BERT+CoSENT | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | 680 |
 | Sentence-BERT | 46.36 | 70.36 | **78.72** | 46.86 | 66.41 | 61.74 | - |
 | RoBERTa+CoSENT | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
 | Sentence-RoBERTa | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
 | Word2Vec+Cosine | - | - | - | - | - | - | 10283 |
+| paraphrase-multilingual-MiniLM-L12-v2 | - | - | - | - | - | - | 2371 |
 
 - 结果值均使用spearman系数
 - `MacBERT+CoSENT`模型达到SOTA效果，运行本项目[text2vec/cosent](text2vec/cosent)文件夹下代码可以直接复现该结果
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
 - 中文匹配数据集下载[链接见下方](#数据集)
+- QPS的GPU测试环境是Tesla V100，显存32GB
 
 # Demo
 

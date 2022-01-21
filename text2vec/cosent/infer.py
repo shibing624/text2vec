@@ -5,33 +5,38 @@
 """
 import os
 import sys
+import time
 import numpy as np
 from loguru import logger
 from transformers import BertTokenizer
+
 sys.path.append('../..')
 from text2vec.cosent.data_helper import load_test_data
 from text2vec.cosent.model import Model
 from text2vec.cosent.train import set_args, compute_corrcoef, evaluate
+from text2vec.sbert import SBert, cos_sim
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 def sbert_cos(model_dir, data_path):
-    from sentence_transformers import SentenceTransformer, util
     sents1, sents2, labels = load_test_data(data_path)
-    m = SentenceTransformer(model_dir)
+    m = SBert(model_dir)
+    t1 = time.time()
     e1 = m.encode(sents1)
     e2 = m.encode(sents2)
-    s = util.cos_sim(e1, e2)
+    s = cos_sim(e1, e2)
     sims = []
     for i in range(len(sents1)):
         sims.append(s[i][i])
     sims = np.array(sims)
+    spend_time = time.time() - t1
     labels = np.array(labels)
     corrcoef = compute_corrcoef(labels, sims)
     logger.debug(f'labels: {labels[:10]}')
     logger.debug(f'sims: {sims[:10]}')
     logger.debug(f'Spearman corr: {corrcoef}')
+    logger.debug(f'spend time: {spend_time}, count:{len(sents1 + sents2)}, qps: {len(sents1 + sents2) / spend_time}')
     return corrcoef
 
 
