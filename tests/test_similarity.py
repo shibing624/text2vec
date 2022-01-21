@@ -76,7 +76,7 @@ class SimTestCase(unittest.TestCase):
         for i in range(len(sents1)):
             sims.append(scores[i][i])
         corr = compute_corrcoef(sims, labels)
-        print('scores:', scores[:10])
+        print('scores:', sims[:10])
         print('labels:', labels[:10])
         print('sbert_batch_sim spearman corr:', corr)
 
