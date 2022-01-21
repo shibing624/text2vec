@@ -28,7 +28,7 @@ def set_args():
     """
     参数
     """
-    parser = argparse.ArgumentParser('--text2vec进行相似性判断')
+    parser = argparse.ArgumentParser('--CoSENT进行相似性判断')
     # ./data/ATEC/ATEC.train.data
     # ./data/BQ/BQ.train.data
     # ./data/LCQMC/LCQMC.train.data

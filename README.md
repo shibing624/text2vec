@@ -1,4 +1,3 @@
-# text2vec
 [![PyPI version](https://badge.fury.io/py/text2vec.svg)](https://badge.fury.io/py/text2vec)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![GitHub contributors](https://img.shields.io/github/contributors/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/graphs/contributors)
@@ -7,34 +6,98 @@
 [![GitHub issues](https://img.shields.io/github/issues/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/issues)
 [![Wechat Group](http://vlog.sfyc.ltd/wechat_everyday/wxgroup_logo.png?imageView2/0/w/60/h/20)](#Contact)
 
-text2vec, chinese text to vector.(文本向量化表示工具，包括：词向量化表示，句子向量化表示，长文本向量化表示，文本相似度计算。)
+# text2vec
+text2vec, text to vector.
+
+文本向量表征工具，把文本转化为向量矩阵，是文本进行计算机处理的第一步。
+
+**text2vec**实现了Word2Vec、RankBM25、BERT、CoSENT等多种文本有效表征模型，并在文本语义匹配（相似度计算）任务上比较了各模型的效果性能。
 
 
 **Guide**
-
+- [Question](#Question)
+- [Solution](#Solution)
 - [Feature](#Feature)
+- [Evaluate](#Evaluate)
 - [Install](#install)
 - [Usage](#usage)
 - [Contact](#Contact)
-- [Cite](#Cite)
+- [Citation](#Citation)
 - [Reference](#reference)
 
+# Question
+文本向量表示咋做？文本匹配任务用哪个模型效果好？
+
+文本向量表示学习在自然语言处理（NLP）领域占据重要地位，需多NLP任务的成功离不开训练优质有效的文本表示向量。特别是文本语义匹配（Semantic Textual Similarity，如paraphrase检测、QA的问题对匹配）、文本向量检索（Dense Text Retrieval）等任务。
+# Solution
+### 传统方法：基于特征的匹配
+
+基于TF-IDF、BM25、Jaccord、SimHash、LDA等算法抽取两个文本的词汇、篇章主题等层面的特征，然后使用机器学习模型（LR, xgboost）等训练分类模型。
+虽然基于特征的方法可解释性较好，但依赖人工寻找特征，泛化能力一般，而且由于特征数量的限制，模型的效果比较一般。
+
+> 如BM25算法通过候选句子的字段对qurey字段的覆盖程度来计算两者间的匹配得分，得分越高的候选项与query的匹配度更好，主要解决词汇层面的相似度问题。
+### 深度方法：基于表征的匹配
+
+基于表征的匹配方式，初始阶段对两个文本各自单独处理，通过深层的神经网络进行编码，得到文本的表征，然后基于得到的文本表征，采用相似度计算的函数得到两个文本的相似度。
+
+代表模型：
+
+- [DSSM(2013)](https://posenhuang.github.io/papers/cikm2013_DSSM_fullversion.pdf)
+- [CDSSM(2014)](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/www2014_cdssm_p07.pdf)
+- [ARC I(2014)](https://arxiv.org/pdf/1503.03244.pdf)
+- [Siamese Network(2016)](https://www.aclweb.org/anthology/W16-1617.pdf)
+- [BERT(2018)](https://arxiv.org/pdf/1810.04805.pdf)
+- [Sentence-BERT(2019)](https://arxiv.org/abs/1908.10084)
+- [BERT-flow(2020)](https://arxiv.org/abs/2011.05864)
+- [SimCSE(2021)](https://arxiv.org/abs/2104.08821)
+- [ConSERT(2021)](https://aclanthology.org/2021.acl-long.393/)
+- [CoSENT(2022)](https://kexue.fm/archives/8847)
+
+由于2018年BERT模型在NLP界带来了翻天覆地的变化，我们此处不讨论和比较2018年之前的模型（如果有兴趣考古的同学，可以参考中科院开源的[MatchZoo](https://github.com/NTMC-Community/MatchZoo) 和[MatchZoo-py](https://github.com/NTMC-Community/MatchZoo-py)）。
+
+尽管基于BERT的模型通过有监督的Fine-tune在诸多NLP任务上取得了不错的性能，
+但其自身导出的句向量（不经过Fine-tune，对所有词向量求平均）质量较低，甚至比不上Glove的结果，因而难以反映出两个句子的语义相似度（具体分析见Sentence-BERT和BERT-flow的paper）。
+
+主要原因是：
+
+1.BERT对所有的句子都倾向于编码到一个较小的空间区域内，这使得大多数的句子对都具有较高的相似度分数，即使是那些语义上完全无关的句子对。
+2.BERT句向量表示的聚集现象和句子中的高频词有关。具体来说，当通过平均词向量的方式计算句向量时，那些高频词的词向量将会主导句向量，使之难以体现其原本的语义。当计算句向量时去除若干高频词时，聚集现象可以在一定程度上得到缓解，但表征能力会下降。
+
+所以，本项目主要调研对比以下比原生BERT更优、适合文本匹配的文本向量表示模型：Sentence-BERT(2019)、BERT-flow(2020)、SimCSE(2021)、CoSENT(2022)。
+
+### 深度方法：基于交互的匹配
+基于交互的匹配方式，则认为在最后阶段才计算文本的相似度会过于依赖文本表征的质量，同时也会丢失基础的文本特征（比如词法、句法等），所以提出尽可能早的对文本特征进行交互，捕获更基础的特征，最后在高层基于这些基础匹配特征计算匹配分数。
+
+代表模型：
+
+- [ARC II(2014)](https://arxiv.org/pdf/1503.03244.pdf)
+- [MV-LSTM(2015)](https://arxiv.org/pdf/1511.08277.pdf)
+- [MatchPyramid(2016)](https://arxiv.org/pdf/1602.06359.pdf)
+- [DRMM(2016)](https://www.bigdatalab.ac.cn/~gjf/papers/2016/CIKM2016a_guo.pdf)
+- [Conv-KNRM(2018)](https://www.cs.cmu.edu/~zhuyund/papers/WSDM_2018_Dai.pdf)
+- [RE2(2019)](https://www.aclweb.org/anthology/P19-1465.pdf)
+- [Keyword-BERT (2020)](https://arxiv.org/ftp/arxiv/papers/2003/2003.11516.pdf)
+
+尽管很多基于交互的匹配模型速度快，效果好，但这类模型（Cross-Encoder）的输入要求是两个句子，输出的是句子对的相似度值，模型不会产生句子嵌入（sentence embedding），
+我们也无法把单个句子输入给模型。因此，对于需要文本向量表示的任务来说，这类模型并不实用。
+
+PS: Cross-Encoder适用于向量检索精排。
+
 # Feature
-#### 文本向量表示
-- 字词粒度，通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe），获取字词的word2vec向量表示。
-- 句子粒度，通过求句子中所有单词词向量的平均值计算得到。
-- 篇章粒度，可以通过gensim库的doc2vec得到，应用较少，本项目不实现。
+### 文本向量表示模型
+- Word2Vec：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe），实现了词汇和句子（词向量求平均）的word2vec向量表示。
+- SBert(Sentence-BERT)：使用transformers调用Sentence-BERT系列release在huggingface上的模型，如[sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)。
+- CoSENT(Cosine Sentence)：基于PyTorch实现了CoSENT模型的训练和预测，提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好。
 
-#### 文本相似度计算
+### 文本相似度比较方法
 
-- 基准方法，估计两句子间语义相似度最简单的方法就是求句子中所有单词词向量的平均值，然后计算两句子词向量之间的余弦相似性。
-- 词移距离（Word Mover’s Distance），词移距离使用两文本间的词向量，测量其中一文本中的单词在语义空间中移动到另一文本单词所需要的最短距离。
+- 余弦相似（Cosine Similarity）：两向量求余弦。
+- 点积（Dot Product）：两向量归一化后求内积。
+- 词移距离（Word Mover’s Distance）：词移距离使用两文本间的词向量，测量其中一文本中的单词在语义空间中移动到另一文本单词所需要的最短距离。
+- RankBM25：BM25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序。
+- SemanticSearch：向量相似检索，使用Cosine Similarty + topk高效计算，比一对一暴力计算快一个数量级。
 
-#### query和docs的相似度比较
-- rank_bm25方法，使用bm25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序。
-- semantic_search方法，使用cosine similarty + topk高效计算，比一对一暴力计算快一个数量级。
-
-## 调研结论
+# Evaluate
 
 #### 文本相似度计算
 - 基准方法（Word2Vec + Cosine）
@@ -55,9 +118,9 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括：词向�
 
 ![词移距离的表现令人失望](./docs/move1.jpg)
 
-- 预训练语言模型（SentenceBERT）
+- Sentence-BERT模型
 
-对SentenceBERT系列模型经过fine-tune和多语言迁移，可以embedding表示多语言的，长达128个字符的句子。
+对Sentence-BERT系列模型经过fine-tune和多语言迁移，可以embedding表示多语言的，长达128个字符的句子。
 
 `paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L6-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec默认使用transformers库调用该模型`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`。
 
@@ -68,14 +131,22 @@ text2vec, chinese text to vector.(文本向量化表示工具，包括：词向�
 | :------- | :--------- | :--------- | :---------: | :---------: | :---------: | :---------: | :---------: |
 | paraphrase-mpnet-base-v2 | 86.99 | 87.80 | 76.05 | 80.57 | 52.81 | 76.84 | 2800 |
 | paraphrase-multilingual-mpnet-base-v2 | 86.82 | 87.50 | 76.52 | 78.66 | 47.46 | 75.39 | 2500 |
-| paraphrase-TinyBERT-L6-v2 | 84.91 | 86.93 | 75.39 | 81.51 | 48.04 | 75.36 | 4500 |
 | paraphrase-distilroberta-base-v2 | 85.37 | 86.97 | 73.96 | 80.25 | 49.18 | 75.15 | 4000 |
 | paraphrase-MiniLM-L12-v2 | 84.41 | 87.28 | 75.34 | 80.08 | 46.95 | 74.81 | 7500 |
 | paraphrase-MiniLM-L6-v2 | 84.12 | 87.23 | 76.32 | 78.91 | 45.34 | 74.38 | 14200 |
 | paraphrase-multilingual-MiniLM-L12-v2 | 84.42 | 87.52 | 74.94 | 78.27 | 43.87 | 73.80 | 7500 |
-| paraphrase-MiniLM-L3-v2 | 82.41 | 88.09 | 76.14 | 77.71 | 43.39 | 73.55 | 19000 |
-| distiluse-base-multilingual-cased-v2 | 80.75 | 83.52 | 76.26 | 70.39 | 37.03 | 69.59 | 4000 |
 | average_word_embeddings_glove.6B.300d | 61.77 | 78.07 | 68.60 | 63.69 | 30.46 | 60.52 | 34000 |
+
+- CoSENT模型
+
+| Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg |
+| :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | 79.33 | **68.54**  |
+| Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | **80.15** | 58.90 |
+| BERT+CoSENT | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 |
+| Sentence-BERT | 46.36 | 70.36 | **78.72** | 46.86 | 66.41 | 61.74 |
+| RoBERTa+CoSENT | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** |
+| Sentence-RoBERTa | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 |
 
 # Demo
 
@@ -307,12 +378,12 @@ A man is eating food. (Score: 0.0329)
 - Issue(建议)：[![GitHub issues](https://img.shields.io/github/issues/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/issues)
 - 邮件我：xuming: xuming624@qq.com
 - 微信我：
-加我*微信号：xuming624, 备注：个人名称-NLP* 进NLP交流群。
+加我*微信号：xuming624, 备注：个人名称-公司-NLP* 进NLP交流群。
 
 <img src="docs/wechat.jpeg" width="200" />
 
 
-# Cite
+# Citation
 
 如果你在研究中使用了text2vec，请按如下格式引用：
 
@@ -320,7 +391,7 @@ A man is eating food. (Score: 0.0329)
 @software{text2vec,
   author = {Xu Ming},
   title = {text2vec: A Tool for Text to Vector},
-  year = {2021},
+  year = {2022},
   url = {https://github.com/shibing624/text2vec},
 }
 ```
@@ -346,3 +417,4 @@ A man is eating food. (Score: 0.0329)
 - [四种计算文本相似度的方法对比[Yves Peirsman]](https://zhuanlan.zhihu.com/p/37104535)
 - [Improvements to BM25 and Language Models Examined](http://www.cs.otago.ac.nz/homepages/andrew/papers/2014-2.pdf)
 - [CoSENT：比Sentence-BERT更有效的句向量方案](https://kexue.fm/archives/8847)
+- [谈谈文本匹配和多轮检索](https://zhuanlan.zhihu.com/p/111769969)
