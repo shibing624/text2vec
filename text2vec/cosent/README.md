@@ -3,7 +3,7 @@
 CoSENT（Cosine Sentence），比Sentence-BERT更有效的句向量方案
 
 ## 实验结果
-预训练模型用的是孟子(MengZi), 只用了训练集训练，然后在测试集上给出一下评测结果。分别训练了5个epoch，使用斯皮尔曼系数（spearman）评测。
+预训练模型比较了孟子(Mengzi)、MacBERT、BERT等, 只用了训练集训练5个epoch，然后在测试集上给出斯皮尔曼系数（spearman）评测结果。
 
 指定不同数据集，只需在train.py文件中，修改`task_name`参数:  
 parser.add_argument('--task_name', default='STS-B', type=str, help='数据集')  
@@ -29,14 +29,15 @@ test测试的评估结果：
 ### 说明
 - 中文预训练模型
 以下可以用于中文的预训练语言模型，通过如下方式直接调用transformers下载并使用：
-1. MacBERT模型：`--pretrained_model_path "hfl/chinese-macbert-base"`
-2. Mengzi模型：`--pretrained_model_path "Langboat/mengzi-bert-base"`
-3. BERT模型：`--pretrained_model_path "bert-base-chinese"`
-4. RoBERTa模型：`--pretrained_model_path "hfl/chinese-roberta-wwm-ext"`
+1. MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
+2. Mengzi模型：`--pretrained_model_path Langboat/mengzi-bert-base`
+3. BERT模型：`--pretrained_model_path bert-base-chinese`
+4. RoBERTa模型：`--pretrained_model_path hfl/chinese-roberta-wwm-ext`
 
 - 复现脚本
 执行以下脚本，直接复现上表中`MacBERT+CoSENT`的模型效果：
 ```shell
+cd cosent
 sh train.sh 
 ```
 ## 使用说明

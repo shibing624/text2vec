@@ -9,9 +9,9 @@ import numpy as np
 from loguru import logger
 from transformers import BertTokenizer
 sys.path.append('../..')
-from text2vec.model.data_helper import load_test_data
-from text2vec.model.model import Model
-from text2vec.model.train import set_args, compute_corrcoef, evaluate
+from text2vec.cosent.data_helper import load_test_data
+from text2vec.cosent.model import Model
+from text2vec.cosent.train import set_args, compute_corrcoef, evaluate
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 

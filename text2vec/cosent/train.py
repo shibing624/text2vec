@@ -13,11 +13,10 @@ from tqdm import tqdm
 from loguru import logger
 import torch
 from torch.utils.data import DataLoader
-from transformers.models.bert import BertTokenizer
-from transformers import AdamW, get_linear_schedule_with_warmup
+from transformers import BertTokenizer, AdamW, get_linear_schedule_with_warmup
 sys.path.append('../..')
-from text2vec.model.model import Model
-from text2vec.model.data_helper import CustomDataset, collate_fn, pad_to_maxlen, load_data, load_test_data
+from text2vec.cosent.model import Model
+from text2vec.cosent.data_helper import CustomDataset, collate_fn, pad_to_maxlen, load_data, load_test_data
 
 pwd_path = os.path.abspath(os.path.dirname(__file__))
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"

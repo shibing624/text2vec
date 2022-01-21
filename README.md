@@ -85,23 +85,23 @@ BM25算法，通过候选句子的字段对qurey字段的覆盖程度来计算�
 - [DRMM(2016)](https://www.bigdatalab.ac.cn/~gjf/papers/2016/CIKM2016a_guo.pdf)
 - [Conv-KNRM(2018)](https://www.cs.cmu.edu/~zhuyund/papers/WSDM_2018_Dai.pdf)
 - [RE2(2019)](https://www.aclweb.org/anthology/P19-1465.pdf)
-- [Keyword-BERT (2020)](https://arxiv.org/ftp/arxiv/papers/2003/2003.11516.pdf)
+- [Keyword-BERT(2020)](https://arxiv.org/ftp/arxiv/papers/2003/2003.11516.pdf)
 
 Cross-Encoder适用于向量检索精排。
 
 # Feature
 ### 文本向量表示模型
-- Word2Vec：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe），实现了词汇和句子（词向量求平均）的word2vec向量表示
-- SBert(Sentence-BERT)：使用transformers调用Sentence-BERT系列release在huggingface上的模型，如多语言释义识别的匹配模型[sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)
-- CoSENT(Cosine Sentence)：基于PyTorch实现了CoSENT模型的训练和预测，该模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好
+- [Word2Vec](text2vec/word2vec.py)：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe），实现了词汇和句子（词向量求平均）的word2vec向量表示
+- [SBert(Sentence-BERT)](text2vec/sbert.py)：使用transformers调用Sentence-BERT系列release在huggingface上的模型，如多语言释义识别的匹配模型[sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)
+- [CoSENT(Cosine Sentence)](text2vec/cosent)：基于PyTorch实现了CoSENT模型的训练和预测，该模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好
 
 ### 文本相似度比较方法
 
 - 余弦相似（Cosine Similarity）：两向量求余弦
 - 点积（Dot Product）：两向量归一化后求内积
 - 词移距离（Word Mover’s Distance）：词移距离使用两文本间的词向量，测量其中一文本中的单词在语义空间中移动到另一文本单词所需要的最短距离
-- RankBM25：BM25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序
-- SemanticSearch：向量相似检索，使用Cosine Similarty + topk高效计算，比一对一暴力计算快一个数量级
+- [RankBM25](text2vec/bm25.py)：BM25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序
+- [SemanticSearch](https://github.com/shibing624/text2vec/blob/master/text2vec/sbert.py#L80)：向量相似检索，使用Cosine Similarty + topk高效计算，比一对一暴力计算快一个数量级
 
 # Evaluate
 
@@ -115,6 +115,7 @@ Cross-Encoder适用于向量检索精排。
 
 大家也可以通过sentence-transformers库调用以下SentenceBERT系列模型，具体见[https://github.com/UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
 
+结果均使用spearman系数评估：
 
 | Model Name | STSb | DupQ | TwitterP | SciDocs | Clustering |  Avg. Performance | Speed |
 | :------- | :--------- | :--------- | :---------: | :---------: | :---------: | :---------: | :---------: |
@@ -152,6 +153,12 @@ git clone https://github.com/shibing624/text2vec.git
 cd text2vec
 python3 setup.py install
 ```
+
+### 数据集
+常见中文语义匹配数据集，包含[ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)、[BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)、[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)、[PAWSX](https://arxiv.org/abs/1908.11828)、[STS-B](https://github.com/pluto-junzeng/CNSD)共5个任务。
+可以从数据集对应的链接自行下载，也可以从[百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ)下载。
+
+其中senteval_cn目录是评测数据集汇总，senteval_cn.zip是senteval目录的打包，两者下其一就好。
 
 # Usage
 
