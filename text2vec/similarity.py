@@ -69,6 +69,23 @@ class Similarity(object):
             res = 1. / (1. + self.model.w2v.wmdistance(token1, token2))
         return res
 
+    def batch_sim_score(self, texts1, texts2):
+        """
+        Get similarity scores between texts1 and texts2
+        :param texts1: list
+        :param texts2: list
+        :return: list, scores
+        """
+        scores = []
+        if not texts1 or not texts2:
+            return scores
+        self.load_model()
+        embs1 = self.model.encode(texts1)
+        embs2 = self.model.encode(texts2)
+        sims = cos_sim(embs1, embs2)
+        scores = [float(s) for s in sims]
+        return scores
+
 
 class SearchSimilarity(object):
     def __init__(self, corpus):
