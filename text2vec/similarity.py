@@ -9,6 +9,7 @@ from text2vec.utils.rank_bm25 import BM25Okapi
 from text2vec.utils.tokenizer import Tokenizer
 from text2vec.word2vec import Word2Vec
 from text2vec.sbert import SBert, cos_sim
+from text2vec.utils.distance import cosine_distance
 
 
 class EmbType(object):
@@ -61,7 +62,7 @@ class Similarity(object):
         if self.similarity_type == SimType.COSINE:
             emb1 = self.model.encode(text1)
             emb2 = self.model.encode(text2)
-            res = cos_sim(emb1, emb2)[0]
+            res = cos_sim(emb1, emb2)[0] if self.embedding_type == EmbType.SBERT else cosine_distance(emb1, emb2)
             res = float(res)
         elif self.similarity_type == SimType.WMD:
             token1 = self.tokenizer.tokenize(text1)
@@ -82,8 +83,13 @@ class Similarity(object):
         self.load_model()
         embs1 = self.model.encode(texts1)
         embs2 = self.model.encode(texts2)
-        sims = cos_sim(embs1, embs2)[0]
-        scores = sims.numpy()
+        if self.embedding_type == EmbType.SBERT:
+            scores = cos_sim(embs1, embs2)
+        else:
+            scores = []
+            for e1, e2 in zip(embs1, embs2):
+                s = cosine_distance(e1, e2)
+                scores.append(s)
         return scores
 
 
