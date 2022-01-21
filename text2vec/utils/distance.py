@@ -28,9 +28,6 @@ def cosine_distance(v1, v2):
     down = np.linalg.norm(v1) * np.linalg.norm(v2)
     return try_divide(up, down)
 
-def cos_sim(v1,v2):
-    return cosine_distance(v1,v2)
-
 def hamming_distance(v1, v2):
     n = int(v1, 2) ^ int(v2, 2)
     return bin(n & 0xffffffff).count('1')
