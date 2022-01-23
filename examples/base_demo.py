@@ -36,6 +36,7 @@ if __name__ == '__main__':
     for sentence, embedding in zip(corpus, corpus_embeddings):
         print("Sentence:", sentence)
         print("Embedding size:", len(embedding))
+        print("Embedding shape:", embedding.shape)
         print()
 
     # 2. Compute cosine-similarities for sentence1 and sentence2
