@@ -34,11 +34,11 @@ def compute_emb(model):
 
 
 if __name__ == "__main__":
-    sbert_model = SBert("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+    t2v_model = SBert("shibing624/text2vec-base-chinese")  # 中文句向量模型(CoSENT)
+    compute_emb(t2v_model)
+
+    sbert_model = SBert("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")  # 支持多语言的句向量模型（Sentence-BERT）
     compute_emb(sbert_model)
 
-    sbert_model2 = SBert("shibing624/text2vec-base-chinese")
-    compute_emb(sbert_model2)
-
-    w2v_model = Word2Vec("w2v-light-tencent-chinese")
+    w2v_model = Word2Vec("w2v-light-tencent-chinese")  # 中文词向量模型(word2vec)
     compute_emb(w2v_model)

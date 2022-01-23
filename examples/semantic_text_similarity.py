@@ -19,7 +19,8 @@ sentences2 = ['花呗更改绑定银行卡',
               'A woman watches TV',
               'The new movie is so great']
 
-sim_model = Similarity(similarity_type='cosine', embedding_type='sbert')
+sim_model = Similarity(model_name_or_path='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2',
+                       similarity_type='cosine', embedding_type='sbert')
 scores = sim_model.get_scores(sentences1, sentences2)
 print('1:\n')
 for i in range(len(sentences1)):

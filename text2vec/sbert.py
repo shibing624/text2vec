@@ -13,7 +13,7 @@ import numpy as np
 from numpy import ndarray
 import torch
 from torch import Tensor
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel, BertTokenizer, BertModel
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -30,9 +30,13 @@ def mean_pooling(model_output, attention_mask):
 
 
 class SBert:
-    def __init__(self, model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModel.from_pretrained(model_name)
+    def __init__(self, model_name_or_path="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"):
+        if 'sentence-transformers' in model_name_or_path:
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
+            self.model = AutoModel.from_pretrained(model_name_or_path)
+        else:
+            self.tokenizer = BertTokenizer.from_pretrained(model_name_or_path)
+            self.model = BertModel.from_pretrained(model_name_or_path)
         self.model.to(device)
 
     def encode(self, sentences: Union[str, List[str], List[int]],

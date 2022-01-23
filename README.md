@@ -120,9 +120,9 @@ Cross-Encoder适用于向量检索精排。
 
 | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | 79.33 | **68.54**  | 689 |
-| Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | **80.15** | 58.90 | 672 |
-| BERT+CoSENT | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | 680 |
+| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | 79.33 | **68.54**  | 2572 |
+| Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | **80.15** | 58.90 | 2502 |
+| BERT+CoSENT | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | 2653 |
 | Sentence-BERT | 46.36 | 70.36 | **78.72** | 46.86 | 66.41 | 61.74 | 1365 |
 | RoBERTa+CoSENT | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
 | Sentence-RoBERTa | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
@@ -136,11 +136,10 @@ Cross-Encoder适用于向量检索精排。
 | text2vec-base-chinese | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | **48.25** | 2572 |
 
 说明：
-- `paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec的SBert类默认加载使用该模型`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`
-- 大家也可以通过sentence-transformers库调用Sentence-BERT系列模型，具体见[https://github.com/UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
+- `paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文
 - 结果值均使用spearman系数
 - `MacBERT+CoSENT`模型达到SOTA效果，运行本项目[text2vec/cosent](text2vec/cosent)文件夹下代码可以直接复现该结果
-- `text2vec-base-chinese`模型已经release到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，可以通过text2vec的SBert类调用，或者直接用transformers库调用。该模型是使用[text2vec/cosent](text2vec/cosent)方法在中文STS-B数据训练得到。
+- `text2vec-base-chinese`模型是使用MacBERT+CoSENT方法仅用中文STS-B数据训练得到
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
 - 中文匹配数据集下载[链接见下方](#数据集)
 - QPS的GPU测试环境是Tesla V100，显存32GB
@@ -170,13 +169,10 @@ python3 setup.py install
 
 # Usage
 
-1. 计算文本向量
+### 1. 计算文本向量
 
-- 基于`pretrained model`计算文本向量
+基于`pretrained model`计算文本向量
 
-> `SBert`通过预训练的`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`模型计算句子向量
-
-> `Word2Vec`通过腾讯词向量`Tencent_AILab_ChineseEmbedding.tar.gz`计算各字词的词向量，句子向量通过单词词向量取平均值得到
 
 示例[computing_embeddings.py](./examples/computing_embeddings.py)
 
@@ -184,7 +180,7 @@ python3 setup.py install
 import sys
 
 sys.path.append('..')
-from text2vec import SBert
+from text2vec import SBert, Word2Vec
 
 def compute_emb(model):
     # Embed a list of sentences
@@ -205,11 +201,14 @@ def compute_emb(model):
         print("Embedding:", embedding)
         print("")
 
-sbert_model = SBert("shibing624/text2vec-base-chinese")
+t2v_model = SBert("shibing624/text2vec-base-chinese") # 中文句向量模型(CoSENT)
+compute_emb(t2v_model)
+
+sbert_model = SBert("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2") # 支持多语言的句向量模型（Sentence-BERT）
 compute_emb(sbert_model)
 
-sbert_model = SBert("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2") # 支持多语言
-compute_emb(sbert_model)
+w2v_model = Word2Vec("w2v-light-tencent-chinese") # 中文词向量模型(word2vec)
+compute_emb(w2v_model)
 ```
 
 output:
@@ -221,18 +220,42 @@ Sentence: 银行卡
 Embedding: [ 0.06216322  0.2731747  -0.6912158 ... ]
 ```
 
-返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentence_size, model_embedding_size)`
+返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentences_size, model_embedding_size)`
 
-> `paraphrase-multilingual-MiniLM-L12-v2`是`sentence-bert`预训练模型，Multilingual knowledge distilled version of multilingual 
-Universal Sentence Encoder. Supports 50+ languages: Arabic, Chinese, Dutch, English, French, German, Italian, Korean, Polish, 
-Portuguese, Russian, Spanish, Turkish.
-模型自动下载到本机路径：`~/.cache/torch/sentence_transformers/`
+模型说明：
 
-> `w2v-light-tencent-chinese`是`Word2Vec`的轻量版腾讯词向量模型，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+- `shibing624/text2vec-base-chinese`模型是CoSENT方法在中文STS-B数据集训练得到的，模型已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，可以通过上面示例方法text2vec的SBert类调用，或者直接用transformers库调用，模型自动下载到本机路径：`~/.cache/huggingface/transformers`
 
+#### Usage (HuggingFace Transformers)
+Without [text2vec](https://github.com/shibing624/text2vec), you can use the model like this: First, you pass your input through the transformer model, then you have to apply the right pooling-operation on-top of the contextualized word embeddings.
+```python
+from transformers import BertTokenizer, BertModel
+import torch
 
+# Mean Pooling - Take attention mask into account for correct averaging
+def mean_pooling(model_output, attention_mask):
+    token_embeddings = model_output[0]  # First element of model_output contains all token embeddings
+    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+    return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
-- 预训练词向量模型
+# Load model from HuggingFace Hub
+tokenizer = BertTokenizer.from_pretrained('shibing624/text2vec-base-chinese')
+model = BertModel.from_pretrained('shibing624/text2vec-base-chinese')
+sentences = ['如何更换花呗绑定银行卡', '花呗更改绑定银行卡']
+# Tokenize sentences
+encoded_input = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
+
+# Compute token embeddings
+with torch.no_grad():
+    model_output = model(**encoded_input)
+# Perform pooling. In this case, max pooling.
+sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
+print("Sentence embeddings:")
+print(sentence_embeddings)
+```
+
+- `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`模型是Sentence-BERT的多语言句向量模型，适用于释义（paraphrase）识别，文本匹配。text2vec的SBert类默认加载使用该模型。大家也可以通过sentence-transformers库调用该模型，具体见[https://github.com/UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
+- `w2v-light-tencent-chinese`是通过gensim加载的Word2Vec模型，使用腾讯词向量`Tencent_AILab_ChineseEmbedding.tar.gz`计算各字词的词向量，句子向量通过单词词向量取平均值得到，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
 
 以下提供两种`Word2Vec`词向量，任选一个：
 
@@ -241,7 +264,7 @@ Portuguese, Russian, Spanish, Turkish.
 
 
 
-2. 计算句子之间的相似度值
+### 2. 计算句子之间的相似度值
 
 示例[semantic_text_similarity.py](./examples/semantic_text_similarity.py)
 
@@ -291,7 +314,7 @@ The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 
 > 句子余弦相似度值`score`范围在-1到1之间，值越大越相似。
 
-3. 计算句子与文档集之间的相似度值
+### 3. 计算句子与文档集之间的相似度值
 
 一般在文档候选集中找与query最相似的文本，常用于QA场景的问句相似匹配、文本相似检索等任务。
 
