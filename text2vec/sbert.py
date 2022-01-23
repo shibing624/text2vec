@@ -7,10 +7,13 @@ from sentence_transformers import SentenceTransformer
 model = SentenceTransformer(paraphrase-multilingual-MiniLM-L12-v2)
 """
 import os
-from transformers import AutoTokenizer, AutoModel
+from typing import List, Dict, Tuple, Iterable, Type, Union, Callable, Optional
+from tqdm.autonotebook import trange
+import numpy as np
+from numpy import ndarray
 import torch
 from torch import Tensor
-import numpy as np
+from transformers import AutoTokenizer, AutoModel
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -32,23 +35,35 @@ class SBert:
         self.model = AutoModel.from_pretrained(model_name)
         self.model.to(device)
 
-    def encode(self, sentences):
+    def encode(self, sentences: Union[str, List[str], List[int]],
+               batch_size: int = 32) -> Union[List[Tensor], ndarray, Tensor]:
+        self.model.eval()
         input_is_string = False
         if isinstance(sentences, str) or not hasattr(sentences, '__len__'):
             sentences = [sentences]
             input_is_string = True
 
-        # Tokenize sentences
-        encoded_input = self.tokenizer(sentences, padding=True, truncation=True, return_tensors='pt').to(device)
+        all_embeddings = []
+        length_sorted_idx = np.argsort([-len(s) for s in sentences])
+        sentences_sorted = [sentences[idx] for idx in length_sorted_idx]
+        for start_index in trange(0, len(sentences), batch_size, desc="Batches", disable=True):
+            sentences_batch = sentences_sorted[start_index: start_index + batch_size]
+            # Tokenize sentences
+            features = self.tokenizer(sentences_batch, padding=True, truncation=True, return_tensors='pt')
+            for key in features:
+                if isinstance(features[key], Tensor):
+                    features[key] = features[key].to(device)
 
-        # Compute token embeddings
-        with torch.no_grad():
-            model_output = self.model(**encoded_input)
+            # Compute sentences embeddings
+            with torch.no_grad():
+                model_output = self.model(**features)
 
-        # Perform pooling
-        all_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
-        all_embeddings = np.asarray([emb.cpu().numpy() for emb in all_embeddings])
-
+            # Perform pooling
+            embeddings = mean_pooling(model_output, features['attention_mask'])
+            embeddings = embeddings.detach().cpu()
+            all_embeddings.extend(embeddings)
+        all_embeddings = [all_embeddings[idx] for idx in np.argsort(length_sorted_idx)]
+        all_embeddings = np.asarray([emb.numpy() for emb in all_embeddings])
         if input_is_string:
             all_embeddings = all_embeddings[0]
 

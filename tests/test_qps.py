@@ -10,31 +10,18 @@ from time import time
 
 sys.path.append('..')
 from text2vec import Word2Vec, SBert
-import numpy as np
+from text2vec.cosent.data_helper import load_test_data
 
 pwd_path = os.path.abspath(os.path.dirname(__file__))
-
 sts_test_path = os.path.join(pwd_path, '../text2vec/data/STS-B/STS-B.test.data')
 
 
-def load_test_data(path):
-    sents1, sents2, labels = [], [], []
-    with open(path, 'r', encoding='utf8') as f:
-        for line in f:
-            line = line.strip().split('\t')
-            if len(line) != 3:
-                continue
-            sents1.append(line[0])
-            sents2.append(line[1])
-            score = int(line[2])
-            labels.append(score)
-    return sents1, sents2, labels
-
-
-class QPSTestCase(unittest.TestCase):
+class QPSEncoderTestCase(unittest.TestCase):
     def test_cosent_speed(self):
         """测试cosent_speed"""
         model_path = os.path.join(pwd_path, '../text2vec/cosent/text2vec-base-chinese-stsb')
+        if not os.path.exists(os.path.join(model_path, 'vocab.txt')):
+            return
         sents1, sents2, labels = load_test_data(sts_test_path)
         m = SBert(model_path)
         sents = sents1 + sents2
@@ -55,6 +42,8 @@ class QPSTestCase(unittest.TestCase):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         model_path = os.path.join(pwd_path, '../text2vec/cosent/text2vec-base-chinese-stsb')
+        if not os.path.exists(os.path.join(model_path, 'vocab.txt')):
+            return
         sents1, sents2, labels = load_test_data(sts_test_path)
         sents = sents1 + sents2
         print('sente size:', len(sents))

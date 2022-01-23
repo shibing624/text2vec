@@ -6,7 +6,7 @@
 import numpy as np
 from loguru import logger
 from text2vec.utils.rank_bm25 import BM25Okapi
-from text2vec.utils.tokenizer import Tokenizer
+from text2vec.utils.tokenizer import JiebaTokenizer
 from text2vec.word2vec import Word2Vec
 from text2vec.sbert import SBert, cos_sim
 from text2vec.utils.distance import cosine_distance
@@ -23,73 +23,83 @@ class SimType(object):
 
 
 class Similarity(object):
-    def __init__(self, similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT):
+    def __init__(self, model_name_or_path='', similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT):
         """
         Cal text similarity
         :param similarity_type:
         :param embedding_type:
         """
+        if embedding_type not in [EmbType.SBERT, EmbType.W2V]:
+            logger.warning('embedding_type set error, use default sbert')
+            embedding_type = EmbType.SBERT
+        if similarity_type not in [SimType.COSINE, SimType.WMD]:
+            logger.warning('similarity_type set error, use default cosine')
+            similarity_type = SimType.COSINE
         if similarity_type == SimType.WMD and embedding_type != EmbType.W2V:
             logger.warning('wmd sim type, emb type must be w2v')
             embedding_type = EmbType.W2V
         self.similarity_type = similarity_type
         self.embedding_type = embedding_type
-        self.tokenizer = Tokenizer()
+        self.model_name_or_path = model_name_or_path
+        self.jieba_tokenizer = JiebaTokenizer()
         self.model = None
 
     def load_model(self):
         if self.model is None:
             if self.embedding_type == EmbType.W2V:
-                self.model = Word2Vec()
-            elif self.embedding_type == EmbType.SBERT:
-                self.model = SBert()
-            else:
-                raise ValueError('model not found.')
+                if self.model_name_or_path:
+                    self.model = Word2Vec(self.model_name_or_path)
+                else:
+                    self.model = Word2Vec()
+            if self.embedding_type == EmbType.SBERT:
+                if self.model_name_or_path:
+                    self.model = SBert(self.model_name_or_path)
+                else:
+                    self.model = SBert()
 
-    def get_score(self, text1, text2):
+    def get_score(self, sentence1, sentence2):
         """
         Get score between text1 and text2
-        :param text1: str
-        :param text2: str
+        :param sentence1: str
+        :param sentence2: str
         :return: float, score
         """
         res = 0.0
-        text1 = text1.strip()
-        text2 = text2.strip()
-        if not text1 or not text2:
+        sentence1 = sentence1.strip()
+        sentence2 = sentence2.strip()
+        if not sentence1 or not sentence2:
             return res
         self.load_model()
         if self.similarity_type == SimType.COSINE:
-            emb1 = self.model.encode(text1)
-            emb2 = self.model.encode(text2)
+            emb1 = self.model.encode(sentence1)
+            emb2 = self.model.encode(sentence2)
             res = cos_sim(emb1, emb2)[0] if self.embedding_type == EmbType.SBERT else cosine_distance(emb1, emb2)
             res = float(res)
         elif self.similarity_type == SimType.WMD:
-            token1 = self.tokenizer.tokenize(text1)
-            token2 = self.tokenizer.tokenize(text2)
+            token1 = self.jieba_tokenizer.tokenize(sentence1)
+            token2 = self.jieba_tokenizer.tokenize(sentence2)
             res = 1. / (1. + self.model.w2v.wmdistance(token1, token2))
         return res
 
-    def batch_sim_score(self, texts1, texts2):
+    def get_scores(self, sentences1, sentences2):
         """
         Get similarity scores between texts1 and texts2
-        :param texts1: list
-        :param texts2: list
-        :return: list, scores
+        :param sentences1: list
+        :param sentences2: list
+        :return: return: Matrix with res[i][j]  = cos_sim(a[i], b[j])
         """
-        scores = []
-        if not texts1 or not texts2:
-            return scores
+        if not sentences1 or not sentences2:
+            return None
         self.load_model()
-        embs1 = self.model.encode(texts1)
-        embs2 = self.model.encode(texts2)
+        embs1 = self.model.encode(sentences1)
+        embs2 = self.model.encode(sentences2)
         if self.embedding_type == EmbType.SBERT:
             scores = cos_sim(embs1, embs2)
         else:
-            scores = []
-            for e1, e2 in zip(embs1, embs2):
-                s = cosine_distance(e1, e2)
-                scores.append(s)
+            scores = np.zeros((len(sentences1), len(sentences2)), dtype=np.float)
+            for i, e1 in enumerate(embs1):
+                for j, e2 in enumerate(embs2):
+                    scores[i][j] = cosine_distance(e1, e2)
         return scores
 
 
@@ -103,7 +113,7 @@ class SearchSimilarity(object):
         self.corpus = corpus
         self.corpus_seg = None
         self.bm25_instance = None
-        self.tokenizer = Tokenizer()
+        self.jieba_tokenizer = JiebaTokenizer()
 
     def init(self):
         if not self.bm25_instance:
@@ -113,7 +123,7 @@ class SearchSimilarity(object):
             if isinstance(self.corpus, str):
                 self.corpus = [self.corpus]
 
-            self.corpus_seg = {k: self.tokenizer.tokenize(k) for k in self.corpus}
+            self.corpus_seg = {k: self.jieba_tokenizer.tokenize(k) for k in self.corpus}
             self.bm25_instance = BM25Okapi(corpus=list(self.corpus_seg.values()))
 
     def get_similarities(self, query, n=5):
@@ -136,5 +146,5 @@ class SearchSimilarity(object):
         :return: numpy array, scores for query between docs
         """
         self.init()
-        tokens = self.tokenizer.tokenize(query)
+        tokens = self.jieba_tokenizer.tokenize(query)
         return self.bm25_instance.get_scores(query=tokens)

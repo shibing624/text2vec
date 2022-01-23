@@ -10,7 +10,7 @@ from loguru import logger
 import numpy as np
 from gensim.models import KeyedVectors
 from text2vec.utils.get_file import get_file
-from text2vec.utils.tokenizer import Tokenizer
+from text2vec.utils.tokenizer import JiebaTokenizer
 
 USER_DATA_DIR = os.path.expanduser('~/.text2vec/datasets/')
 os.makedirs(USER_DATA_DIR, exist_ok=True)
@@ -81,7 +81,7 @@ class Word2Vec:
         logger.debug('Load w2v from {}, spend {:.2f} sec'.format(model_name_or_path, time.time() - t0))
         self.stopwords = load_stopwords(stopwords_file)
         self.w2v = w2v
-        self.tokenizer = Tokenizer()
+        self.jieba_tokenizer = JiebaTokenizer()
         logger.debug('Word count: {}, emb size: {}'.format(len(w2v.key_to_index), w2v.vector_size))
         logger.debug('Set stopwords: {}, count: {}'.format(sorted(list(self.stopwords))[:10], len(self.stopwords)))
 
@@ -118,7 +118,7 @@ class Word2Vec:
                     if len(word) == 1:
                         continue
                     # 再切分，eg 特价机票
-                    ws = self.tokenizer.tokenize(word, cut_all=True)
+                    ws = self.jieba_tokenizer.tokenize(word, cut_all=True)
                     for w in ws:
                         if w in self.w2v.key_to_index:
                             emb.append(self.w2v.get_vector(w, norm=True))

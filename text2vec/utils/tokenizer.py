@@ -42,7 +42,7 @@ def segment(sentence, cut_type='word', pos=False):
             return list(sentence)
 
 
-class Tokenizer(object):
+class JiebaTokenizer(object):
     def __init__(self, dict_path='', custom_word_freq_dict=None):
         self.model = jieba
         self.model.default_logger.setLevel(logging.ERROR)
