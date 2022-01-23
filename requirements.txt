@@ -10,5 +10,4 @@ scikit-learn
 transformers>=4.6.0,<5.0.0
 numpy
 #sentence-transformers
-colorlog
 #pyemd
