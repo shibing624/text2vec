@@ -47,8 +47,8 @@ if __name__ == '__main__':
     cosine_scores = cos_sim(corpus_embeddings[0], corpus_embeddings[1])
     print('{} vs {} cos score: {:.4f}'.format(corpus[0], corpus[1], float(cosine_scores[0])))
 
-    # 3. Use semantic_search to perform cosine similarty + topk
     print('#' * 42)
+    # 3. Use semantic_search to perform cosine similarty + topk
     # Query sentences:
     queries = [
         '如何更换花呗绑定银行卡',
