@@ -11,7 +11,7 @@ text2vec, text to vector.
 
 文本向量表征工具，把文本转化为向量矩阵，是文本进行计算机处理的第一步。
 
-**text2vec**实现了Word2Vec、RankBM25、BERT、CoSENT等多种文本表征模型，并在文本语义匹配（相似度计算）任务上比较了各模型的效果。
+**text2vec**实现了Word2Vec、RankBM25、BERT、Sentence-BERT、CoSENT等多种文本表征模型，并在文本语义匹配（相似度计算）任务上比较了各模型的效果。
 
 
 **Guide**
@@ -138,8 +138,8 @@ Cross-Encoder适用于向量检索精排。
 说明：
 - 结果值均使用spearman系数
 - `paraphrase-multilingual-MiniLM-L12-v2`模型名称是`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文
-- `MacBERT+CoSENT`模型在达到同级别参数量SOTA效果，运行本项目[text2vec/cosent](text2vec/cosent)文件夹下代码可以直接复现该结果
-- `text2vec-base-chinese`模型名称是`shibing624/text2vec-base-chinese`，是使用MacBERT+CoSENT方法仅用中文STS-B数据训练得到
+- `MacBERT+CoSENT`模型达到同级别参数量SOTA效果，运行[text2vec/cosent](text2vec/cosent)文件夹下代码可以复现结果
+- `text2vec-base-chinese`模型名称是`shibing624/text2vec-base-chinese`，是使用MacBERT+CoSENT方法用中文STS-B数据训练得到
 - `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
 - 中文匹配数据集下载[链接见下方](#数据集)
