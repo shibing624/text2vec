@@ -26,7 +26,7 @@ class SimModelTestCase(unittest.TestCase):
         test_path = os.path.join(pwd_path, '../text2vec/data/STS-B/STS-B.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()
-        scores = m.get_scores(sents1, sents2)
+        scores = m.get_scores(sents1, sents2, only_aligned=True)
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
@@ -41,7 +41,7 @@ class SimModelTestCase(unittest.TestCase):
         test_path = os.path.join(pwd_path, '../text2vec/data/ATEC/ATEC.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()
-        scores = m.get_scores(sents1, sents2)
+        scores = m.get_scores(sents1, sents2, only_aligned=True)
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
@@ -56,7 +56,7 @@ class SimModelTestCase(unittest.TestCase):
         test_path = os.path.join(pwd_path, '../text2vec/data/BQ/BQ.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()
-        scores = m.get_scores(sents1, sents2)
+        scores = m.get_scores(sents1, sents2, only_aligned=True)
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
@@ -71,7 +71,7 @@ class SimModelTestCase(unittest.TestCase):
         test_path = os.path.join(pwd_path, '../text2vec/data/LCQMC/LCQMC.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()
-        scores = m.get_scores(sents1, sents2)
+        scores = m.get_scores(sents1, sents2, only_aligned=True)
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
@@ -86,7 +86,7 @@ class SimModelTestCase(unittest.TestCase):
         test_path = os.path.join(pwd_path, '../text2vec/data/PAWSX/PAWSX.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()
-        scores = m.get_scores(sents1, sents2)
+        scores = m.get_scores(sents1, sents2, only_aligned=True)
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
