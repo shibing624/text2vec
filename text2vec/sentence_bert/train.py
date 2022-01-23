@@ -46,7 +46,7 @@ def set_args():
     parser.add_argument('--pretrained_model_path', default='hfl/chinese-macbert-base', type=str, help='预训练模型的路径')
     parser.add_argument('--output_dir', default='./outputs', type=str, help='模型输出')
     parser.add_argument('--max_len', default=64, type=int, help='句子最大长度')
-    parser.add_argument('--num_train_epochs', default=5, type=int, help='训练几轮')
+    parser.add_argument('--num_train_epochs', default=1, type=int, help='训练几轮')
     parser.add_argument('--train_batch_size', default=64, type=int, help='训练批次大小')
     parser.add_argument('--gradient_accumulation_steps', default=1, type=int, help='梯度积累几次更新')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='学习率大小')
@@ -126,12 +126,12 @@ def calc_loss(sentence_emb1, sentence_emb2, y_true):
     Calc MSE loss with two sentence embeddings
     """
     y_true = y_true.to(torch.float32)
-    loss_fct = nn.MSELoss()
-    sim = F.cosine_similarity(sentence_emb1, sentence_emb2, dim=-1)
-    # # 相似度矩阵除以温度系数
-    # sim = sim / 0.05
+    sim = torch.cosine_similarity(sentence_emb1, sentence_emb2)
+    # 相似度矩阵除以温度系数
+    sim = sim / 0.1
     # # 计算相似度矩阵与y_true的交叉熵损失
     # loss = F.cross_entropy(sim, y_true)
+    loss_fct = nn.MSELoss()
     loss = loss_fct(sim, y_true)
     return loss
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
 
     # 加载数据集
     train_data = load_data(args.train_path)
-    train_data = train_data[:200]
+    # train_data = train_data[:200]
     train_dataset = CustomDataset(train_data, tokenizer=tokenizer, max_len=args.max_len)
     train_dataloader = DataLoader(dataset=train_dataset, shuffle=False, batch_size=args.train_batch_size)
     valid_dataloader = DataLoader(dataset=CustomDataset(load_data(args.valid_path), tokenizer, args.max_len),
@@ -176,6 +176,7 @@ if __name__ == '__main__':
         model.train()
         for step, batch in enumerate(tqdm(train_dataloader)):
             source, target, labels = batch
+            labels = labels.to(device)
             # source        [batch, 1, seq_len] -> [batch, seq_len]
             source_input_ids = source.get('input_ids').squeeze(1).to(device)
             source_attention_mask = source.get('attention_mask').squeeze(1).to(device)

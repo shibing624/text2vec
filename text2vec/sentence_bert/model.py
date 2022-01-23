@@ -19,6 +19,8 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.bert = BertModel.from_pretrained(model_name)
         self.encoder_type = encoder_type
+        self.fc = nn.Linear(768, out_features=256)
+        self.activation_function = nn.Tanh()
 
     def get_output_layer(self, output):
         if self.encoder_type == 'first-last-avg':
@@ -68,4 +70,5 @@ class Model(nn.Module):
                                   output_hidden_states=True)
         source_emb = self.get_output_layer(source_output)
         target_emb = self.get_output_layer(target_output)
-        return source_emb, target_emb
+        
+        return self.activation_function(self.fc(source_emb)), self.activation_function(self.fc(target_emb))
