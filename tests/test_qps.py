@@ -19,11 +19,8 @@ sts_test_path = os.path.join(pwd_path, '../text2vec/data/STS-B/STS-B.test.data')
 class QPSEncoderTestCase(unittest.TestCase):
     def test_cosent_speed(self):
         """测试cosent_speed"""
-        model_path = os.path.join(pwd_path, '../text2vec/cosent/text2vec-base-chinese-stsb')
-        if not os.path.exists(os.path.join(model_path, 'vocab.txt')):
-            return
         sents1, sents2, labels = load_test_data(sts_test_path)
-        m = SBert(model_path)
+        m = SBert('shibing624/text2vec-base-chinese')
         sents = sents1 + sents2
         print('sente size:', len(sents))
         t1 = time()
@@ -41,14 +38,12 @@ class QPSEncoderTestCase(unittest.TestCase):
         from transformers import BertTokenizer
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        model_path = os.path.join(pwd_path, '../text2vec/cosent/text2vec-base-chinese-stsb')
-        if not os.path.exists(os.path.join(model_path, 'vocab.txt')):
-            return
         sents1, sents2, labels = load_test_data(sts_test_path)
         sents = sents1 + sents2
         print('sente size:', len(sents))
-        tokenizer = BertTokenizer.from_pretrained(model_path)
-        model = Model(model_path)
+        model_name = 'shibing624/text2vec-base-chinese'
+        tokenizer = BertTokenizer.from_pretrained(model_name)
+        model = Model(model_name)
         model.to(device)
         model.eval()
         t1 = time()

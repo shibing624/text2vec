@@ -29,13 +29,16 @@ def compute_emb(model):
     # The result is a list of sentence embeddings as numpy arrays
     for sentence, embedding in zip(sentences, sentence_embeddings):
         print("Sentence:", sentence)
-        print("Embedding:", embedding)
+        print("Embedding shape:", embedding.shape)
         print()
 
 
-if __name__ == '__main__':
-    sbert_model = SBert()
+if __name__ == "__main__":
+    sbert_model = SBert("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     compute_emb(sbert_model)
 
-    w2v_model = Word2Vec()
+    sbert_model2 = SBert("shibing624/text2vec-base-chinese")
+    compute_emb(sbert_model2)
+
+    w2v_model = Word2Vec("w2v-light-tencent-chinese")
     compute_emb(w2v_model)

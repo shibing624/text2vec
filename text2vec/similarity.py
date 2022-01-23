@@ -23,7 +23,7 @@ class SimType(object):
 
 
 class Similarity(object):
-    def __init__(self, model_name_or_path='', similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT):
+    def __init__(self, model_name_or_path="", similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT):
         """
         Cal text similarity
         :param similarity_type:

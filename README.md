@@ -109,14 +109,11 @@ Cross-Encoder适用于向量检索精排。
 
 - 英文匹配数据集的评测结果：
 
-| Model Name | STSb | DupQ | TwitterP | SciDocs | Clustering |  Avg | Speed |
-| :------- | :--------- | :--------- | :---------: | :---------: | :---------: | :---------: | :---------: |
+| Model Name | STSb | DupQ | TwitterP | SciDocs | Clustering |  Avg | QPS |
+| :--: | :---: | :--: | :---------: | :---------: | :---------: | :---------: | :---------: |
 | paraphrase-MiniLM-L12-v2 | 84.41 | 87.28 | 75.34 | 80.08 | 46.95 | 74.81 | 7500 |
 | paraphrase-multilingual-MiniLM-L12-v2 | 84.42 | 87.52 | 74.94 | 78.27 | 43.87 | 73.80 | 7500 |
 | average_word_embeddings_glove.6B.300d | 61.77 | 78.07 | 68.60 | 63.69 | 30.46 | 60.52 | 34000 |
-
-- `paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec默认使用transformers库调用该模型`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`
-- 大家也可以通过sentence-transformers库调用Sentence-BERT系列模型，具体见[https://github.com/UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
 
 
 - 中文匹配数据集的评测结果：
@@ -134,12 +131,16 @@ Cross-Encoder适用于向量检索精排。
 
 | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| w2v-light-tencent-chinese | - | - | - | - | 55.77 | - | 10283 |
+| w2v-light-tencent-chinese | 20.00 | 31.49 | 59.46 | 2.57 | 55.78 | 33.86 | 10283 |
 | paraphrase-multilingual-MiniLM-L12-v2 | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 | 41.99 | 2371 |
-| text2vec-base-chinese | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | 48.25 | 2572 |
+| text2vec-base-chinese | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | **48.25** | 2572 |
 
+说明：
+- `paraphrase-multilingual-MiniLM-L12-v2`是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文，text2vec的SBert类默认加载使用该模型`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`
+- 大家也可以通过sentence-transformers库调用Sentence-BERT系列模型，具体见[https://github.com/UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
 - 结果值均使用spearman系数
 - `MacBERT+CoSENT`模型达到SOTA效果，运行本项目[text2vec/cosent](text2vec/cosent)文件夹下代码可以直接复现该结果
+- `text2vec-base-chinese`模型已经release到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，可以通过text2vec的SBert类调用，或者直接用transformers库调用。该模型是使用[text2vec/cosent](text2vec/cosent)方法在中文STS-B数据训练得到。
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
 - 中文匹配数据集下载[链接见下方](#数据集)
 - QPS的GPU测试环境是Tesla V100，显存32GB
@@ -204,8 +205,10 @@ def compute_emb(model):
         print("Embedding:", embedding)
         print("")
 
+sbert_model = SBert("shibing624/text2vec-base-chinese")
+compute_emb(sbert_model)
 
-sbert_model = SBert('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+sbert_model = SBert("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2") # 支持多语言
 compute_emb(sbert_model)
 ```
 

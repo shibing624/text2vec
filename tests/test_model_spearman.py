@@ -178,11 +178,7 @@ class SimModelTestCase(unittest.TestCase):
 
     def test_set_sim_model_batch(self):
         """测试test_set_sim_model_batch"""
-        model_path = os.path.join(pwd_path, '../text2vec/cosent/text2vec-base-chinese-stsb')
-        print(model_path)
-        if not os.path.exists(os.path.join(model_path, 'vocab.txt')):
-            return
-        m = Similarity(model_path, similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT)
+        m = Similarity('shibing624/text2vec-base-chinese', similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT)
         test_path = os.path.join(pwd_path, '../text2vec/data/STS-B/STS-B.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()
