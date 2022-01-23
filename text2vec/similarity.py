@@ -81,11 +81,12 @@ class Similarity(object):
             res = 1. / (1. + self.model.w2v.wmdistance(token1, token2))
         return res
 
-    def get_scores(self, sentences1, sentences2):
+    def get_scores(self, sentences1, sentences2, is_aligned=True):
         """
         Get similarity scores between texts1 and texts2
         :param sentences1: list
         :param sentences2: list
+        :param is_aligned: bool, sentences1和sentences2是否为size对齐的数据，默认为是，仅计算scores[i][i]的结果
         :return: return: Matrix with res[i][j]  = cos_sim(a[i], b[j])
         """
         if not sentences1 or not sentences2:
@@ -97,9 +98,13 @@ class Similarity(object):
             scores = cos_sim(embs1, embs2).numpy()
         else:
             scores = np.zeros((len(sentences1), len(sentences2)), dtype=np.float32)
-            for i, e1 in enumerate(embs1):
-                for j, e2 in enumerate(embs2):
-                    scores[i][j] = cosine_distance(e1, e2)
+            if is_aligned:
+                for i, e1, e2 in enumerate(zip(embs1, embs2)):
+                    scores[i][i] = cosine_distance(e1, e2)
+            else:
+                for i, e1 in enumerate(embs1):
+                    for j, e2 in enumerate(embs2):
+                        scores[i][j] = cosine_distance(e1, e2)
         return scores
 
 

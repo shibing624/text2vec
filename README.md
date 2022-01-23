@@ -135,8 +135,8 @@ Cross-Encoder适用于向量检索精排。
 | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | w2v-light-tencent-chinese | - | - | - | - | 55.77 | - | 10283 |
-| paraphrase-multilingual-MiniLM-L12-v2 | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 | - | 2371 |
-| text2vec-base-chinese | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | - | 2572 |
+| paraphrase-multilingual-MiniLM-L12-v2 | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 | 41.99 | 2371 |
+| text2vec-base-chinese | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | 48.25 | 2572 |
 
 - 结果值均使用spearman系数
 - `MacBERT+CoSENT`模型达到SOTA效果，运行本项目[text2vec/cosent](text2vec/cosent)文件夹下代码可以直接复现该结果
