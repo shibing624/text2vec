@@ -105,11 +105,9 @@ Cross-Encoder适用于向量检索精排。
 
 # Evaluate
 
-## 文本匹配
+### 文本匹配
 
-### Sentence-BERT模型
-
-英文匹配数据集的评测结果：
+- 英文匹配数据集的评测结果：
 
 | Model Name | STSb | DupQ | TwitterP | SciDocs | Clustering |  Avg | Speed |
 | :------- | :--------- | :--------- | :---------: | :---------: | :---------: | :---------: | :---------: |
@@ -121,9 +119,7 @@ Cross-Encoder适用于向量检索精排。
 - 大家也可以通过sentence-transformers库调用Sentence-BERT系列模型，具体见[https://github.com/UKPLab/sentence-transformers](https://github.com/UKPLab/sentence-transformers)
 
 
-### CoSENT模型
-
-中文匹配数据集的评测结果：
+- 中文匹配数据集的评测结果：
 
 | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
@@ -133,8 +129,14 @@ Cross-Encoder适用于向量检索精排。
 | Sentence-BERT | 46.36 | 70.36 | **78.72** | 46.86 | 66.41 | 61.74 | 1365 |
 | RoBERTa+CoSENT | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
 | Sentence-RoBERTa | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
-| Word2Vec+Cosine | - | - | - | - | 55.77 | - | 10283 |
-| paraphrase-multilingual-MiniLM-L12-v2 | - | - | - | - | 78.90 | - | 2371 |
+
+- 本项目release模型的中文匹配评测结果：
+
+| Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
+| :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| w2v-light-tencent-chinese | - | - | - | - | 55.77 | - | 10283 |
+| paraphrase-multilingual-MiniLM-L12-v2 | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 | - | 2371 |
+| text2vec-base-chinese | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | - | 2572 |
 
 - 结果值均使用spearman系数
 - `MacBERT+CoSENT`模型达到SOTA效果，运行本项目[text2vec/cosent](text2vec/cosent)文件夹下代码可以直接复现该结果

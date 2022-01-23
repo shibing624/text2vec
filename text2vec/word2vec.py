@@ -129,7 +129,7 @@ class Word2Vec:
             else:
                 avg_tensor_x = 0.0
             all_embeddings.append(avg_tensor_x)
-        all_embeddings = np.array(all_embeddings)
+        all_embeddings = np.array(all_embeddings, dtype=object)
         if input_is_string:
             all_embeddings = all_embeddings[0]
 
