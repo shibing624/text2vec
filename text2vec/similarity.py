@@ -94,9 +94,9 @@ class Similarity(object):
         embs1 = self.model.encode(sentences1)
         embs2 = self.model.encode(sentences2)
         if self.embedding_type == EmbType.SBERT:
-            scores = cos_sim(embs1, embs2)
+            scores = cos_sim(embs1, embs2).numpy()
         else:
-            scores = np.zeros((len(sentences1), len(sentences2)), dtype=np.float)
+            scores = np.zeros((len(sentences1), len(sentences2)), dtype=np.float32)
             for i, e1 in enumerate(embs1):
                 for j, e2 in enumerate(embs2):
                     scores[i][j] = cosine_distance(e1, e2)
