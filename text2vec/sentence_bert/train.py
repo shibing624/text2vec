@@ -46,7 +46,7 @@ def set_args():
     parser.add_argument('--pretrained_model_path', default='hfl/chinese-macbert-base', type=str, help='预训练模型的路径')
     parser.add_argument('--output_dir', default='./outputs', type=str, help='模型输出')
     parser.add_argument('--max_len', default=64, type=int, help='句子最大长度')
-    parser.add_argument('--num_train_epochs', default=1, type=int, help='训练几轮')
+    parser.add_argument('--num_train_epochs', default=5, type=int, help='训练几轮')
     parser.add_argument('--train_batch_size', default=64, type=int, help='训练批次大小')
     parser.add_argument('--gradient_accumulation_steps', default=1, type=int, help='梯度积累几次更新')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='学习率大小')
@@ -113,9 +113,9 @@ def evaluate(model, dataloader):
                             target_input_ids, target_attention_mask, target_token_type_ids)
             _, preds = torch.max(outputs, dim=1)
             correct_preds += torch.sum(preds == label)
-            label_array = np.append(label_array, np.array(label))
-            pred_array = np.append(pred_array, np.array(preds))
-    acc = correct_preds / len(label_array)
+            label_array = np.append(label_array, np.array(label.cpu().numpy()))
+            pred_array = np.append(pred_array, np.array(preds.cpu().numpy()))
+    acc = correct_preds.double() / len(label_array)
     logger.debug(f'labels: {label_array[:10]}')
     logger.debug(f'preds: {pred_array[:10]}')
     logger.debug(f'acc: {acc}')
@@ -139,7 +139,7 @@ if __name__ == '__main__':
 
     # 加载数据集
     train_data = load_data(args.train_path)
-    train_data = train_data[:200]
+    # train_data = train_data[:200]
     train_dataset = CustomDataset(train_data, tokenizer=tokenizer, max_len=args.max_len)
     train_dataloader = DataLoader(dataset=train_dataset, shuffle=False, batch_size=args.train_batch_size)
     valid_dataloader = DataLoader(dataset=CustomDataset(load_data(args.valid_path), tokenizer, args.max_len),
