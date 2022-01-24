@@ -48,8 +48,8 @@ if __name__ == '__main__':
     test_dataloader = DataLoader(dataset=CustomDataset(load_data(args.test_path), tokenizer, args.max_len),
                                  batch_size=args.train_batch_size)
     t1 = time.time()
-    corr = evaluate(model, test_dataloader)
-    print(corr)
+    acc = evaluate(model, test_dataloader)
+    print(acc)
     spend_time = time.time() - t1
     data = load_data(args.test_path)
     sents1, sents2, labels = [i[0] for i in data], [i[1] for i in data], [int(i[2]) for i in data]

@@ -10,7 +10,7 @@ from transformers import BertModel
 
 
 class Model(nn.Module):
-    def __init__(self, model_name='bert-base-chinese', encoder_type='first-last-avg'):
+    def __init__(self, model_name='bert-base-chinese', encoder_type='first-last-avg', num_classes=2):
         """
         Init model
         :param model_name:
@@ -19,8 +19,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.bert = BertModel.from_pretrained(model_name)
         self.encoder_type = encoder_type
-        self.fc = nn.Linear(768, out_features=256)
-        self.activation_function = nn.Tanh()
+        self.fc = nn.Linear(self.bert.config.hidden_size * 3, num_classes)
 
     def get_output_layer(self, output):
         if self.encoder_type == 'first-last-avg':
@@ -37,25 +36,28 @@ class Model(nn.Module):
                 kernel_size=2).squeeze(-1)
             return final_encoding
 
-        if self.encoder_type == 'last-avg':
+        elif self.encoder_type == 'last-avg':
             sequence_output = output.last_hidden_state  # (batch_size, max_len, hidden_size)
             seq_length = sequence_output.size(1)
             final_encoding = torch.avg_pool1d(sequence_output.transpose(1, 2), kernel_size=seq_length).squeeze(-1)
             return final_encoding
 
-        if self.encoder_type == "cls":
+        elif self.encoder_type == "cls":
             sequence_output = output.last_hidden_state
             cls = sequence_output[:, 0]  # [batch_size, 768]
             return cls
 
-        if self.encoder_type == "pooler":
+        elif self.encoder_type == "pooler":
             pooler_output = output.pooler_output  # [batch_size, 768]
             return pooler_output
+        else:
+            return output.pooler_output
 
     def forward(self, source_input_ids, source_attention_mask, source_token_type_ids,
                 target_input_ids, target_attention_mask, target_token_type_ids):
         """
-        Forward
+        Output the bert sentence embeddings, pass to classifier module. Applies different
+        concats and finally the linear layer to produce class scores
         :param source_input_ids:
         :param source_attention_mask:
         :param source_token_type_ids:
@@ -70,5 +72,9 @@ class Model(nn.Module):
                                   output_hidden_states=True)
         source_emb = self.get_output_layer(source_output)
         target_emb = self.get_output_layer(target_output)
-        
-        return self.activation_function(self.fc(source_emb)), self.activation_function(self.fc(target_emb))
+        # (u, v, |u - v|)
+        embs = [source_emb, target_emb, torch.abs(source_emb - target_emb)]
+        input_embs = torch.cat(embs, 1)
+        # softmax
+        output = self.fc(input_embs)
+        return output

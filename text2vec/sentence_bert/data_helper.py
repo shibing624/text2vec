@@ -15,12 +15,15 @@ def load_data(path):
             if len(line) != 3:
                 logger.warning(f'line size not match, pass: {line}')
                 continue
-            data.append((line[0], line[1], line[2]))
+            score = int(line[2])
+            if 'STS' in path:
+                score = int(score > 2.5)
+            data.append((line[0], line[1], score))
     return data
 
 
 class CustomDataset(Dataset):
-    """测试数据集, 重写__getitem__和__len__方法"""
+    """数据集, 重写__getitem__和__len__方法"""
 
     def __init__(self, data, tokenizer, max_len=128):
         self.data = data
@@ -35,4 +38,4 @@ class CustomDataset(Dataset):
 
     def __getitem__(self, index: int):
         line = self.data[index]
-        return self.text_2_id([line[0]]), self.text_2_id([line[1]]), int(line[2])
+        return self.text_2_id([line[0]]), self.text_2_id([line[1]]), line[2]
