@@ -95,8 +95,7 @@ def evaluate(model, dataloader):
     批量预测, batch结果拼接, 一次性求spearman相关度
     """
     all_labels = []
-    source_vecs = []
-    target_vecs = []
+    all_preds = []
     model.to(device)
     model.eval()
     with torch.no_grad():
@@ -113,16 +112,11 @@ def evaluate(model, dataloader):
             target_token_type_ids = target.get('token_type_ids').squeeze(1).to(device)
             outputs = model(source_input_ids, source_attention_mask, source_token_type_ids,
                             target_input_ids, target_attention_mask, target_token_type_ids, is_train=False)
-            source_vecs.append(outputs[0].cpu().numpy())
-            target_vecs.append(outputs[1].cpu().numpy())
-    all_labels = np.array(all_labels)
-    source_vecs = np.array(source_vecs)
-    target_vecs = np.array(target_vecs)
-    # 计算cos相似度，句子向量l2归一化，对应相乘得到
-    sims = (l2_normalize(source_vecs) * l2_normalize(target_vecs)).sum(axis=1)
-    corrcoef = compute_corrcoef(all_labels, sims)
+            preds = torch.cosine_similarity(outputs[0], outputs[1])
+            all_preds.extend(preds.cpu().numpy())
+    corrcoef = compute_corrcoef(all_labels, all_preds)
     logger.debug(f'labels: {all_labels[:10]}')
-    logger.debug(f'preds:  {sims[:10]}')
+    logger.debug(f'preds:  {all_preds[:10]}')
     logger.debug(f'Spearman corr: {corrcoef}')
     return corrcoef
 

@@ -38,17 +38,17 @@ class Model(nn.Module):
                 kernel_size=2).squeeze(-1)
             return final_encoding
 
-        if self.encoder_type == 'last-avg':
+        elif self.encoder_type == 'last-avg':
             sequence_output = output.last_hidden_state  # (batch_size, max_len, hidden_size)
             seq_length = sequence_output.size(1)
             final_encoding = torch.avg_pool1d(sequence_output.transpose(1, 2), kernel_size=seq_length).squeeze(-1)
             return final_encoding
 
-        if self.encoder_type == "cls":
+        elif self.encoder_type == "cls":
             sequence_output = output.last_hidden_state
-            cls = sequence_output[:, 0]  # [batch_size, 768]
-            return cls
+            return sequence_output[:, 0]  # [batch_size, 768]
 
-        if self.encoder_type == "pooler":
-            pooler_output = output.pooler_output  # [batch_size, 768]
-            return pooler_output
+        elif self.encoder_type == "pooler":
+            return output.pooler_output  # [batch_size, 768]
+        else:
+            return output.pooler_output

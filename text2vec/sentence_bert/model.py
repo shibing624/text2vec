@@ -44,12 +44,10 @@ class Model(nn.Module):
 
         elif self.encoder_type == "cls":
             sequence_output = output.last_hidden_state
-            cls = sequence_output[:, 0]  # [batch_size, 768]
-            return cls
+            return sequence_output[:, 0]  # [batch_size, 768]
 
         elif self.encoder_type == "pooler":
-            pooler_output = output.pooler_output  # [batch_size, 768]
-            return pooler_output
+            return output.pooler_output  # [batch_size, 768]
         else:
             return output.pooler_output
 
