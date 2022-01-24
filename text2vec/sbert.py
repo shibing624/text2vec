@@ -7,7 +7,7 @@ from sentence_transformers import SentenceTransformer
 model = SentenceTransformer(paraphrase-multilingual-MiniLM-L12-v2)
 """
 import os
-from typing import List, Dict, Tuple, Iterable, Type, Union, Callable, Optional
+from typing import List, Union
 from tqdm.autonotebook import trange
 import numpy as np
 from numpy import ndarray
@@ -53,10 +53,7 @@ class SBert:
         for start_index in trange(0, len(sentences), batch_size, desc="Batches", disable=True):
             sentences_batch = sentences_sorted[start_index: start_index + batch_size]
             # Tokenize sentences
-            features = self.tokenizer(sentences_batch, padding=True, truncation=True, return_tensors='pt')
-            for key in features:
-                if isinstance(features[key], Tensor):
-                    features[key] = features[key].to(device)
+            features = self.tokenizer(sentences_batch, padding=True, truncation=True, return_tensors='pt').to(device)
 
             # Compute sentences embeddings
             with torch.no_grad():

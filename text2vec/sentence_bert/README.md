@@ -13,9 +13,10 @@ test测试集的评估结果：
 
 | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | **80.51** | **68.77**  |
+| MacBERT+CoSENT | 50.39 | **72.93** | 79.17 | **60.86** | **80.51** | **68.77**  |
 | Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | 80.15 | 58.90 |
 | Sentence-BERT | 46.36 | 70.36 | **78.72** | 46.86 | 66.41 | 61.74 |
+| Sentence-MacBERT | 47.28 | 68.63 | **79.42** | 55.59 | 64.82 | 63.15 |
 | Sentence-RoBERTa | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 |
 
 ### 说明
@@ -27,7 +28,7 @@ test测试集的评估结果：
 4. RoBERTa模型：`--pretrained_model_path hfl/chinese-roberta-wwm-ext`
 
 - 复现脚本
-执行以下脚本，直接复现上表中`Sentence-BERT`的模型效果：
+执行以下脚本，直接复现上表中`Sentence-MacBERT`的模型效果：
 ```shell
 cd sentence_bert
 sh train.sh 
