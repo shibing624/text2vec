@@ -11,10 +11,10 @@ parser.add_argument('--task_name', default='STS-B', type=str, help='数据集')
 ### 本项目实验结果
 test测试集的评估结果：
 
-| | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg |
+| Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | 79.33 | **68.54**  |
-| Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | **80.15** | 58.90 |
+| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | **80.51** | **68.77**  |
+| Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | 80.15 | 58.90 |
 | Sentence-BERT | 46.36 | 70.36 | **78.72** | 46.86 | 66.41 | 61.74 |
 | Sentence-RoBERTa | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 |
 
