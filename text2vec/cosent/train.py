@@ -193,8 +193,8 @@ if __name__ == '__main__':
             input_ids, attention_mask, token_type_ids = input_ids.to(device), attention_mask.to(
                 device), token_type_ids.to(device)
             labels = labels.to(device)
-            output = model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-            loss = calc_loss(labels, output)
+            outputs = model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+            loss = calc_loss(labels, outputs)
             loss.backward()
             logger.info(f"Epoch:{epoch}, Batch:{step}/{len(train_dataloader)}, Loss:{loss.item():.6f}")
             # nn.utils.clip_grad_norm_(model.parameters(), max_norm=20, norm_type=2)
