@@ -11,7 +11,7 @@ text2vec, text to vector.
 
 文本向量表征工具，把文本转化为向量矩阵，是文本进行计算机处理的第一步。
 
-**text2vec**实现了Word2Vec、RankBM25、BERT、Sentence-BERT、CoSENT等多种文本表征模型，并在文本语义匹配（相似度计算）任务上比较了各模型的效果。
+**text2vec**实现了Word2Vec、RankBM25、BERT、Sentence-BERT、CoSENT等多种文本表征、文本相似度计算模型，并在文本语义匹配（相似度计算）任务上比较了各模型的效果。
 
 
 **Guide**
