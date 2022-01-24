@@ -34,7 +34,7 @@ def sbert_cos(model_dir, sents1, sents2, labels):
     labels = np.array(labels)
     corrcoef = compute_corrcoef(labels, sims)
     logger.debug(f'labels: {labels[:10]}')
-    logger.debug(f'sims: {sims[:10]}')
+    logger.debug(f'preds:  {sims[:10]}')
     logger.debug(f'Spearman corr: {corrcoef}')
     logger.debug(f'spend time: {spend_time}, count:{len(sents1 + sents2)}, qps: {len(sents1 + sents2) / spend_time}')
     return corrcoef
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     acc = evaluate(model, test_dataloader)
     print(acc)
     spend_time = time.time() - t1
-    data = load_data(args.test_path)
+    data = load_data(args.test_path, is_train=False)
     sents1, sents2, labels = [i[0] for i in data], [i[1] for i in data], [int(i[2]) for i in data]
     logger.debug(f'spend time: {spend_time}, count:{len(sents1 + sents2)}, qps: {len(sents1 + sents2) / spend_time}')
 

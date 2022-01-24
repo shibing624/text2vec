@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from loguru import logger
 
 
-def load_data(path):
+def load_data(path, is_train=True):
     data = []
     with open(path, 'r', encoding='utf8') as f:
         for line in f:
@@ -16,7 +16,7 @@ def load_data(path):
                 logger.warning(f'line size not match, pass: {line}')
                 continue
             score = int(line[2])
-            if 'STS' in path:
+            if 'STS' in path and is_train:
                 score = int(score > 2.5)
             data.append((line[0], line[1], score))
     return data

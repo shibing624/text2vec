@@ -14,6 +14,7 @@ from loguru import logger
 import torch
 from torch.utils.data import DataLoader
 from transformers import BertTokenizer, AdamW, get_linear_schedule_with_warmup
+
 sys.path.append('../..')
 from text2vec.cosent.model import Model
 from text2vec.cosent.data_helper import CustomDataset, collate_fn, pad_to_maxlen, load_data, load_test_data
@@ -124,7 +125,7 @@ def evaluate(model, tokenizer, data_path, max_len=64):
     sims = (l2_normalize(source_vecs) * l2_normalize(target_vecs)).sum(axis=1)
     corrcoef = compute_corrcoef(all_labels, sims)
     logger.debug(f'labels: {all_labels[:10]}')
-    logger.debug(f'sims: {sims[:10]}')
+    logger.debug(f'preds:  {sims[:10]}')
     logger.debug(f'Spearman corr: {corrcoef}')
     return corrcoef
 
