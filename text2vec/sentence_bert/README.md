@@ -27,7 +27,7 @@ test测试集的评估结果：
 4. RoBERTa模型：`--pretrained_model_path hfl/chinese-roberta-wwm-ext`
 
 - 复现脚本
-执行以下脚本，直接复现上表中`MacBERT+CoSENT`的模型效果：
+执行以下脚本，直接复现上表中`Sentence-BERT`的模型效果：
 ```shell
 cd sentence_bert
 sh train.sh 
