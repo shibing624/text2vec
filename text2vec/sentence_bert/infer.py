@@ -45,7 +45,7 @@ if __name__ == '__main__':
     logger.info(args)
     tokenizer = BertTokenizer.from_pretrained(args.output_dir)
     model = Model(args.output_dir)
-    test_dataloader = DataLoader(dataset=CustomDataset(load_data(args.test_path), tokenizer, args.max_len),
+    test_dataloader = DataLoader(dataset=CustomDataset(load_data(args.test_path, is_train=False), tokenizer, args.max_len),
                                  batch_size=args.train_batch_size)
     t1 = time.time()
     acc = evaluate(model, test_dataloader)

@@ -91,9 +91,9 @@ Cross-Encoder适用于向量检索精排。
 
 # Feature
 ### 文本向量表示模型
-- [Word2Vec](text2vec/word2vec.py)：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe），实现了词汇和句子（词向量求平均）的word2vec向量表示
-- [SBert(Sentence-BERT)](text2vec/sbert.py)：使用transformers调用Sentence-BERT系列release在huggingface上的模型，如多语言释义识别的匹配模型[sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)
-- [CoSENT(Cosine Sentence)](text2vec/cosent)：基于PyTorch实现了CoSENT模型的训练和预测，该模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好
+- [Word2Vec](text2vec/word2vec.py)：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe）实现词向量检索，本项目实现了句子（词向量求平均）的word2vec向量表示
+- [SBert(Sentence-BERT)](text2vec/sentence_bert)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
+- [CoSENT(Cosine Sentence)](text2vec/cosent)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
 
 ### 文本相似度比较方法
 
@@ -139,6 +139,7 @@ Cross-Encoder适用于向量检索精排。
 - 结果值均使用spearman系数
 - `paraphrase-multilingual-MiniLM-L12-v2`模型名称是`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文
 - `MacBERT+CoSENT`模型达到同级别参数量SOTA效果，运行[text2vec/cosent](text2vec/cosent)文件夹下代码可以复现结果
+- `Sentence-BERT`模型，运行[text2vec/sentence_bert](text2vec/sentence_bert)文件夹下代码可以复现结果
 - `text2vec-base-chinese`模型名称是`shibing624/text2vec-base-chinese`，是使用MacBERT+CoSENT方法用中文STS-B数据训练得到
 - `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`

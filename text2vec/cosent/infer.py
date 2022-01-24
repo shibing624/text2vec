@@ -51,7 +51,8 @@ if __name__ == '__main__':
     corr = evaluate(model, test_dataloader)
     print(corr)
     spend_time = time.time() - t1
-    sents1, sents2, labels = load_test_data(args.test_path)
+    data = load_test_data(args.test_path)
+    sents1, sents2, labels = [i[0] for i in data], [i[1] for i in data], [int(i[2]) for i in data]
     logger.debug(f'spend time: {spend_time}, count:{len(sents1 + sents2)}, qps: {len(sents1 + sents2) / spend_time}')
 
     corr = sbert_cos(args.output_dir, sents1, sents2, labels)
