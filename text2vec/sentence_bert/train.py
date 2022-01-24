@@ -47,6 +47,7 @@ def set_args():
     parser.add_argument('--output_dir', default='./outputs', type=str, help='模型输出')
     parser.add_argument('--max_len', default=64, type=int, help='句子最大长度')
     parser.add_argument('--num_train_epochs', default=5, type=int, help='训练几轮')
+    parser.add_argument('--num_classes', default=2, type=int, help='类别数')
     parser.add_argument('--train_batch_size', default=64, type=int, help='训练批次大小')
     parser.add_argument('--gradient_accumulation_steps', default=1, type=int, help='梯度积累几次更新')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='学习率大小')
@@ -93,14 +94,15 @@ def evaluate(model, dataloader):
     """模型评估函数
     批量预测, batch结果拼接, 一次性求spearman相关度
     """
-    label_array = np.array([])
-    pred_array = np.array([])
-    correct_preds = 0
+    all_labels = []
+    source_vecs = []
+    target_vecs = []
     model.to(device)
     model.eval()
     with torch.no_grad():
-        for source, target, label in tqdm(dataloader):
-            label = label.to(device)
+        for source, target, labels in tqdm(dataloader):
+            labels = labels.to(device)
+            all_labels.extend(labels.cpu().numpy())
             # source        [batch, 1, seq_len] -> [batch, seq_len]
             source_input_ids = source.get('input_ids').squeeze(1).to(device)
             source_attention_mask = source.get('attention_mask').squeeze(1).to(device)
@@ -110,16 +112,19 @@ def evaluate(model, dataloader):
             target_attention_mask = target.get('attention_mask').squeeze(1).to(device)
             target_token_type_ids = target.get('token_type_ids').squeeze(1).to(device)
             outputs = model(source_input_ids, source_attention_mask, source_token_type_ids,
-                            target_input_ids, target_attention_mask, target_token_type_ids)
-            _, preds = torch.max(outputs, dim=1)
-            correct_preds += torch.sum(preds == label)
-            label_array = np.append(label_array, np.array(label.cpu().numpy()))
-            pred_array = np.append(pred_array, np.array(preds.cpu().numpy()))
-    acc = correct_preds.double() / len(label_array)
-    logger.debug(f'labels: {label_array[:10]}')
-    logger.debug(f'preds: {pred_array[:10]}')
-    logger.debug(f'acc: {acc}')
-    return acc
+                            target_input_ids, target_attention_mask, target_token_type_ids, is_train=False)
+            source_vecs.append(outputs[0].cpu().numpy())
+            target_vecs.append(outputs[1].cpu().numpy())
+    all_labels = np.array(all_labels)
+    source_vecs = np.array(source_vecs)
+    target_vecs = np.array(target_vecs)
+    # 计算cos相似度，句子向量l2归一化，对应相乘得到
+    sims = (l2_normalize(source_vecs) * l2_normalize(target_vecs)).sum(axis=1)
+    corrcoef = compute_corrcoef(all_labels, sims)
+    logger.debug(f'labels: {all_labels[:10]}')
+    logger.debug(f'preds:  {sims[:10]}')
+    logger.debug(f'Spearman corr: {corrcoef}')
+    return corrcoef
 
 
 def calc_loss(y_pred, y_true):
@@ -142,14 +147,16 @@ if __name__ == '__main__':
     # train_data = train_data[:200]
     train_dataset = CustomDataset(train_data, tokenizer=tokenizer, max_len=args.max_len)
     train_dataloader = DataLoader(dataset=train_dataset, shuffle=False, batch_size=args.train_batch_size)
-    valid_dataloader = DataLoader(dataset=CustomDataset(load_data(args.valid_path), tokenizer, args.max_len),
-                                  batch_size=args.train_batch_size)
-    test_dataloader = DataLoader(dataset=CustomDataset(load_data(args.test_path), tokenizer, args.max_len),
-                                 batch_size=args.train_batch_size)
+    valid_dataloader = DataLoader(
+        dataset=CustomDataset(load_data(args.valid_path, is_train=False), tokenizer, args.max_len),
+        batch_size=args.train_batch_size)
+    test_dataloader = DataLoader(
+        dataset=CustomDataset(load_data(args.test_path, is_train=False), tokenizer, args.max_len),
+        batch_size=args.train_batch_size)
     total_steps = len(train_dataloader) * args.num_train_epochs
     num_train_optimization_steps = int(
         len(train_dataset) / args.train_batch_size / args.gradient_accumulation_steps) * args.num_train_epochs
-    model = Model(args.pretrained_model_path, encoder_type='first-last-avg', num_classes=2)
+    model = Model(args.pretrained_model_path, encoder_type='first-last-avg', num_classes=args.num_classes)
     model.to(device)
     param_optimizer = list(model.named_parameters())
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
@@ -169,8 +176,8 @@ if __name__ == '__main__':
     for epoch in range(args.num_train_epochs):
         model.train()
         for step, batch in enumerate(tqdm(train_dataloader)):
-            source, target, label = batch
-            label = label.to(device)
+            source, target, labels = batch
+            labels = labels.to(device)
             # source        [batch, 1, seq_len] -> [batch, seq_len]
             source_input_ids = source.get('input_ids').squeeze(1).to(device)
             source_attention_mask = source.get('attention_mask').squeeze(1).to(device)
@@ -179,9 +186,9 @@ if __name__ == '__main__':
             target_input_ids = target.get('input_ids').squeeze(1).to(device)
             target_attention_mask = target.get('attention_mask').squeeze(1).to(device)
             target_token_type_ids = target.get('token_type_ids').squeeze(1).to(device)
-            output = model(source_input_ids, source_attention_mask, source_token_type_ids,
-                           target_input_ids, target_attention_mask, target_token_type_ids)
-            loss = calc_loss(output, label)
+            outputs = model(source_input_ids, source_attention_mask, source_token_type_ids,
+                            target_input_ids, target_attention_mask, target_token_type_ids)
+            loss = calc_loss(outputs, labels)
             loss.backward()
             logger.info(f"Epoch:{epoch}, Batch:{step}/{len(train_dataloader)}, Loss:{loss.item():.6f}")
             if (step + 1) % args.gradient_accumulation_steps == 0:
@@ -189,12 +196,12 @@ if __name__ == '__main__':
                 scheduler.step()
                 optimizer.zero_grad()
 
-        acc = evaluate(model, valid_dataloader)
+        corr = evaluate(model, valid_dataloader)
         with open(logs_path, 'a+') as f:
-            f.write(f'Task:{args.task_name}, Epoch:{epoch}, Valid, Acc: {acc:.6f}\n')
+            f.write(f'Task:{args.task_name}, Epoch:{epoch}, Valid, Spearman corr: {corr:.6f}\n')
         model.train()
-        if best < acc:
-            best = acc
+        if best < corr:
+            best = corr
             # 先保存原始transformer bert model
             tokenizer.save_pretrained(args.output_dir)
             model.bert.save_pretrained(args.output_dir)
@@ -203,6 +210,6 @@ if __name__ == '__main__':
             torch.save(model_to_save.state_dict(), output_model_file)
             logger.info(f"higher corrcoef: {best:.6f} in epoch: {epoch}, save model")
     model = Model(args.output_dir, encoder_type='first-last-avg')
-    acc = evaluate(model, test_dataloader)
+    corr = evaluate(model, test_dataloader)
     with open(logs_path, 'a+') as f:
-        f.write(f'Task:{args.task_name}, Test, Acc: {acc:.6f}\n')
+        f.write(f'Task:{args.task_name}, Test, Spearman corr: {corr:.6f}\n')

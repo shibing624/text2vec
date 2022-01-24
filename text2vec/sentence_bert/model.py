@@ -54,7 +54,7 @@ class Model(nn.Module):
             return output.pooler_output
 
     def forward(self, source_input_ids, source_attention_mask, source_token_type_ids,
-                target_input_ids, target_attention_mask, target_token_type_ids):
+                target_input_ids, target_attention_mask, target_token_type_ids, is_train=True):
         """
         Output the bert sentence embeddings, pass to classifier module. Applies different
         concats and finally the linear layer to produce class scores
@@ -72,9 +72,12 @@ class Model(nn.Module):
                                   output_hidden_states=True)
         source_emb = self.get_output_layer(source_output)
         target_emb = self.get_output_layer(target_output)
-        # (u, v, |u - v|)
-        embs = [source_emb, target_emb, torch.abs(source_emb - target_emb)]
-        input_embs = torch.cat(embs, 1)
-        # softmax
-        output = self.fc(input_embs)
-        return output
+        if is_train:
+            # (u, v, |u - v|)
+            embs = [source_emb, target_emb, torch.abs(source_emb - target_emb)]
+            input_embs = torch.cat(embs, 1)
+            # softmax
+            outputs = self.fc(input_embs)
+        else:
+            outputs = source_emb, target_emb
+        return outputs

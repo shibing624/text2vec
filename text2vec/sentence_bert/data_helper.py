@@ -25,7 +25,7 @@ def load_data(path, is_train=True):
 class CustomDataset(Dataset):
     """数据集, 重写__getitem__和__len__方法"""
 
-    def __init__(self, data, tokenizer, max_len=128):
+    def __init__(self, data, tokenizer, max_len=64):
         self.data = data
         self.tokenizer = tokenizer
         self.max_len = max_len

@@ -17,7 +17,7 @@ from transformers import BertTokenizer, AdamW, get_linear_schedule_with_warmup
 
 sys.path.append('../..')
 from text2vec.cosent.model import Model
-from text2vec.cosent.data_helper import CustomDataset, collate_fn, pad_to_maxlen, load_data, load_test_data
+from text2vec.cosent.data_helper import TrainDataset, TestDataset, load_train_data, load_test_data
 
 pwd_path = os.path.abspath(os.path.dirname(__file__))
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -87,37 +87,31 @@ def compute_pearsonr(x, y):
     return scipy.stats.perasonr(x, y)[0]
 
 
-def get_sent_id_tensor(tokenizer, sents, max_len):
-    input_ids, attention_mask, token_type_ids = [], [], []
-    for s in sents:
-        inputs = tokenizer.encode_plus(text=s, text_pair=None, add_special_tokens=True, return_token_type_ids=True)
-        input_ids.append(pad_to_maxlen(inputs['input_ids'], max_len=max_len))
-        attention_mask.append(pad_to_maxlen(inputs['attention_mask'], max_len=max_len))
-        token_type_ids.append(pad_to_maxlen(inputs['token_type_ids'], max_len=max_len))
-    input_ids = torch.tensor(input_ids, dtype=torch.long, device=device)
-    attention_mask = torch.tensor(attention_mask, dtype=torch.long, device=device)
-    token_type_ids = torch.tensor(token_type_ids, dtype=torch.long, device=device)
-    return input_ids, attention_mask, token_type_ids
-
-
-def evaluate(model, tokenizer, data_path, max_len=64):
+def evaluate(model, dataloader):
     """模型评估函数
     批量预测, batch结果拼接, 一次性求spearman相关度
     """
-    sents1, sents2, labels = load_test_data(data_path)
     all_labels = []
     source_vecs = []
     target_vecs = []
     model.to(device)
     model.eval()
-    for s1, s2, lab in tqdm(zip(sents1, sents2, labels)):
-        lab = torch.tensor([lab], dtype=torch.float, device=device)
-        all_labels.extend(lab.cpu().numpy())
-        input_ids, input_mask, token_type_ids = get_sent_id_tensor(tokenizer, [s1, s2], max_len)
-        with torch.no_grad():
-            output = model(input_ids, input_mask, token_type_ids)
-        source_vecs.append(output[0].cpu().numpy())
-        target_vecs.append(output[1].cpu().numpy())
+    with torch.no_grad():
+        for source, target, labels in tqdm(dataloader):
+            labels = labels.to(device)
+            all_labels.extend(labels.cpu().numpy())
+            # source        [batch, 1, seq_len] -> [batch, seq_len]
+            source_input_ids = source.get('input_ids').squeeze(1).to(device)
+            source_attention_mask = source.get('attention_mask').squeeze(1).to(device)
+            source_token_type_ids = source.get('token_type_ids').squeeze(1).to(device)
+            source_outputs = model(source_input_ids, source_attention_mask, source_token_type_ids)
+            # target        [batch, 1, seq_len] -> [batch, seq_len]
+            target_input_ids = target.get('input_ids').squeeze(1).to(device)
+            target_attention_mask = target.get('attention_mask').squeeze(1).to(device)
+            target_token_type_ids = target.get('token_type_ids').squeeze(1).to(device)
+            target_outputs = model(target_input_ids, target_attention_mask, target_token_type_ids)
+            source_vecs.append(source_outputs.cpu().numpy())
+            target_vecs.append(target_outputs.cpu().numpy())
     all_labels = np.array(all_labels)
     source_vecs = np.array(source_vecs)
     target_vecs = np.array(target_vecs)
@@ -161,11 +155,14 @@ if __name__ == '__main__':
     tokenizer = BertTokenizer.from_pretrained(args.pretrained_model_path)
 
     # 加载数据集
-    train_sentences, train_labels = load_data(args.train_path)
-    # train_sentences, train_labels = train_sentences[:200], train_labels[:200]
-    train_dataset = CustomDataset(sentences=train_sentences, labels=train_labels, tokenizer=tokenizer)
-    train_dataloader = DataLoader(dataset=train_dataset, shuffle=False, batch_size=args.train_batch_size,
-                                  collate_fn=collate_fn, num_workers=1)
+    train_data = load_train_data(args.train_path)
+    # train_data = train_data[:200]
+    train_dataset = TrainDataset(train_data, tokenizer=tokenizer, max_len=args.max_len)
+    train_dataloader = DataLoader(dataset=train_dataset, shuffle=False, batch_size=args.train_batch_size)
+    valid_dataloader = DataLoader(dataset=TestDataset(load_test_data(args.valid_path), tokenizer, args.max_len),
+                                  batch_size=args.train_batch_size)
+    test_dataloader = DataLoader(dataset=TestDataset(load_test_data(args.test_path), tokenizer, args.max_len),
+                                 batch_size=args.train_batch_size)
     total_steps = len(train_dataloader) * args.num_train_epochs
     num_train_optimization_steps = int(
         len(train_dataset) / args.train_batch_size / args.gradient_accumulation_steps) * args.num_train_epochs
@@ -189,11 +186,13 @@ if __name__ == '__main__':
     for epoch in range(args.num_train_epochs):
         model.train()
         for step, batch in enumerate(tqdm(train_dataloader)):
-            input_ids, attention_mask, token_type_ids, labels = batch
-            input_ids, attention_mask, token_type_ids = input_ids.to(device), attention_mask.to(
-                device), token_type_ids.to(device)
+            source, labels = batch
             labels = labels.to(device)
-            outputs = model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+            # source        [batch, 1, seq_len] -> [batch, seq_len]
+            source_input_ids = source.get('input_ids').squeeze(1).to(device)
+            source_attention_mask = source.get('attention_mask').squeeze(1).to(device)
+            source_token_type_ids = source.get('token_type_ids').squeeze(1).to(device)
+            outputs = model(source_input_ids, source_attention_mask, source_token_type_ids)
             loss = calc_loss(labels, outputs)
             loss.backward()
             logger.info(f"Epoch:{epoch}, Batch:{step}/{len(train_dataloader)}, Loss:{loss.item():.6f}")
@@ -204,7 +203,7 @@ if __name__ == '__main__':
                 scheduler.step()
                 optimizer.zero_grad()
 
-        corr = evaluate(model, tokenizer, args.valid_path, args.max_len)
+        corr = evaluate(model, valid_dataloader)
         with open(logs_path, 'a+') as f:
             f.write(f'Task:{args.task_name}, Epoch:{epoch}, Valid, Spearman corr: {corr:.6f}\n')
         model.train()
@@ -218,6 +217,6 @@ if __name__ == '__main__':
             torch.save(model_to_save.state_dict(), output_model_file)
             logger.info(f"higher corrcoef: {best:.6f} in epoch: {epoch}, save model")
     model = Model(args.output_dir, encoder_type='first-last-avg')
-    corr = evaluate(model, tokenizer, args.test_path, args.max_len)
+    corr = evaluate(model, test_dataloader)
     with open(logs_path, 'a+') as f:
         f.write(f'Task:{args.task_name}, Test, Spearman corr: {corr:.6f}\n')
