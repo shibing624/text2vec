@@ -8,27 +8,32 @@ CoSENT（Cosine Sentence），比Sentence-BERT更有效的句向量方案
 指定不同数据集，只需在train.py文件中，修改`task_name`参数:  
 parser.add_argument('--task_name', default='STS-B', type=str, help='数据集')  
 
-### 中文匹配数据集测评
+- 英文匹配数据集的评测结果：
 
-| Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg |
-| :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| MacBERT+CoSENT | 50.39 | **72.93** | **79.17** | **60.86** | **80.51** | **68.77**  |
-| Mengzi+CoSENT | **50.52** | 72.27 | 78.69 | 12.89 | 80.15 | 58.90 |
-| BERT+CoSENT | **49.74** | **72.38** | 78.69 | **60.00** | **80.14** | **68.19** |
-| Sentence-BERT | 46.36 | 70.36 | **78.72** | 46.86 | 66.41 | 61.74 |
-| RoBERTa+CoSENT | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** |
-| Sentence-RoBERTa | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 |
-
-### 英文匹配数据集测评
 | Arch | Backbone | Model Name | English-STS-B | 
 | :-: | :-: | :-: | :-: |
+| GloVe | glove | Avg_word_embeddings_glove_6B_300d | 61.77 |
 | BERT | bert-base-uncased | BERT-base-cls | 20.29 |
 | BERT | bert-base-uncased | BERT-base-first_last_avg | 59.04 |
 | BERT | bert-base-uncased | BERT-base-first_last_avg-whiten(NLI) | 63.65 |
-| SBERT | bert-base-nli-mean-tokens | SBERT-base-nli-cls | 73.65 |
-| SBERT | bert-base-nli-mean-tokens | SBERT-base-nli-first_last_avg | 77.96 |
+| SBERT | sentence-transformers/bert-base-nli-mean-tokens | SBERT-base-nli-cls | 73.65 |
+| SBERT | sentence-transformers/bert-base-nli-mean-tokens | SBERT-base-nli-first_last_avg | 77.96 |
+| SBERT | xlm-roberta-base | paraphrase-multilingual-MiniLM-L12-v2 | 84.42 |
 | CoSENT | bert-base-uncased | CoSENT-base-first_last_avg | 69.93 |
-| CoSENT | bert-base-nli-mean-tokens | CoSENT-base-nli-first_last_avg | 79.68 |
+| CoSENT | sentence-transformers/bert-base-nli-mean-tokens | CoSENT-base-nli-first_last_avg | 79.68 |
+
+- 中文匹配数据集的评测结果：
+
+| Arch | Backbone | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
+| :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| CoSENT | hfl/chinese-macbert-base | CoSENT-macbert-base-first_last_avg | 50.39 | **72.93** | **79.17** | **60.86** | **80.51** | **68.77**  | 2572 |
+| CoSENT | Langboat/mengzi-bert-base | CoSENT-mengzi-base-first_last_avg | **50.52** | 72.27 | 78.69 | 12.89 | 80.15 | 58.90 | 2502 |
+| CoSENT | bert-base-chinese | CoSENT-bert-base-first_last_avg | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | 2653 |
+| SBERT | bert-base-chinese | SBERT-bert-base-first_last_avg | 46.36 | 70.36 | 78.72 | 46.86 | 66.41 | 61.74 | 1365 |
+| SBERT | hfl/chinese-macbert-base | SBERT-macbert-base-first_last_avg | 47.28 | 68.63 | **79.42** | 55.59 | 64.82 | 63.15 | 1948 |
+| CoSENT | hfl/chinese-roberta-wwm-ext | CoSENT-roberta-ext-first_last_avg | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
+| SBERT | hfl/chinese-roberta-wwm-ext | SBERT-roberta-ext-first_last_avg | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
+
 
 ### 说明
 - 中文预训练模型
