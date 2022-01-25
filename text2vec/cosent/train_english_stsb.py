@@ -20,7 +20,6 @@ sys.path.append('../..')
 from text2vec.cosent.model import Model
 from text2vec.cosent.train import set_args, set_seed, calc_loss, evaluate
 from text2vec.cosent.data_helper import TrainDataset, TestDataset
-from text2vec.utils.get_file import get_file
 
 pwd_path = os.path.abspath(os.path.dirname(__file__))
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -30,7 +29,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def main():
     args = set_args()
     # You can specify any huggingface/transformers pre-trained model here, for example, bert-base-uncased, roberta-base, xlm-roberta-base
-    args.pretrained_model_path = 'bert-base-uncased'
+    args.pretrained_model_path = 'bert-base-uncased'  # 'sentence-transformers/bert-base-nli-mean-tokens'
     args.output_dir = './outputs/train_english_stsb'
     logger.info(args)
     set_seed(args.seed)
