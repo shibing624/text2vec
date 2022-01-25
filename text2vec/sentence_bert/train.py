@@ -14,7 +14,6 @@ from loguru import logger
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
-import torch.nn.functional as F
 from transformers import BertTokenizer, AdamW, get_linear_schedule_with_warmup
 
 sys.path.append('../..')
@@ -60,12 +59,12 @@ def set_args():
     return args
 
 
-def set_seed():
-    random.seed(args.seed)
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
     if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
+        torch.cuda.manual_seed_all(seed)
 
 
 def l2_normalize(vecs):
@@ -132,7 +131,7 @@ def calc_loss(y_pred, y_true):
 if __name__ == '__main__':
     args = set_args()
     logger.info(args)
-    set_seed()
+    set_seed(args.seed)
     os.makedirs(args.output_dir, exist_ok=True)
     tokenizer = BertTokenizer.from_pretrained(args.pretrained_model_path)
 
