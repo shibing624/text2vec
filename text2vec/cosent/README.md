@@ -26,13 +26,13 @@ parser.add_argument('--task_name', default='STS-B', type=str, help='数据集')
 
 | Arch | Backbone | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| CoSENT | hfl/chinese-macbert-base | CoSENT-macbert-base-first_last_avg | 50.39 | **72.93** | **79.17** | **60.86** | **80.51** | **68.77**  | 2572 |
-| CoSENT | Langboat/mengzi-bert-base | CoSENT-mengzi-base-first_last_avg | **50.52** | 72.27 | 78.69 | 12.89 | 80.15 | 58.90 | 2502 |
-| CoSENT | bert-base-chinese | CoSENT-bert-base-first_last_avg | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | 2653 |
-| SBERT | bert-base-chinese | SBERT-bert-base-first_last_avg | 46.36 | 70.36 | 78.72 | 46.86 | 66.41 | 61.74 | 1365 |
-| SBERT | hfl/chinese-macbert-base | SBERT-macbert-base-first_last_avg | 47.28 | 68.63 | **79.42** | 55.59 | 64.82 | 63.15 | 1948 |
-| CoSENT | hfl/chinese-roberta-wwm-ext | CoSENT-roberta-ext-first_last_avg | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
-| SBERT | hfl/chinese-roberta-wwm-ext | SBERT-roberta-ext-first_last_avg | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
+| CoSENT | hfl/chinese-macbert-base | CoSENT-macbert-base | 50.39 | **72.93** | **79.17** | **60.86** | **80.51** | **68.77**  | 2572 |
+| CoSENT | Langboat/mengzi-bert-base | CoSENT-mengzi-base | **50.52** | 72.27 | 78.69 | 12.89 | 80.15 | 58.90 | 2502 |
+| CoSENT | bert-base-chinese | CoSENT-bert-base | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | 2653 |
+| SBERT | bert-base-chinese | SBERT-bert-base | 46.36 | 70.36 | 78.72 | 46.86 | 66.41 | 61.74 | 1365 |
+| SBERT | hfl/chinese-macbert-base | SBERT-macbert-base | 47.28 | 68.63 | **79.42** | 55.59 | 64.82 | 63.15 | 1948 |
+| CoSENT | hfl/chinese-roberta-wwm-ext | CoSENT-roberta-ext | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
+| SBERT | hfl/chinese-roberta-wwm-ext | SBERT-roberta-ext | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
 
 
 ### 说明
@@ -46,6 +46,7 @@ parser.add_argument('--task_name', default='STS-B', type=str, help='数据集')
 - SBERT指Sentence-BERT
 - bert-base-nli-mean-tokens是`--pretrained_model_path sentence-transformers/bert-base-nli-mean-tokens`
 - 以上结果均只用该数据集的train训练，在test上评估得到的结果，没用外部数据
+- 中文匹配模型的pooling方法都是用的`first_last_avg`
 
 - 复现脚本
 执行以下脚本，直接复现上表中`MacBERT+CoSENT`的模型效果：

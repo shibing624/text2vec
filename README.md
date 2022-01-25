@@ -110,7 +110,7 @@ Cross-Encoder适用于向量检索精排。
 - 英文匹配数据集的评测结果：
 
 | Arch | Backbone | Model Name | English-STS-B | 
-| :-: | :-: | :-: | :-: |
+| :-- | :--- | :--- | :-: |
 | GloVe | glove | Avg_word_embeddings_glove_6B_300d | 61.77 |
 | BERT | bert-base-uncased | BERT-base-cls | 20.29 |
 | BERT | bert-base-uncased | BERT-base-first_last_avg | 59.04 |
@@ -124,19 +124,19 @@ Cross-Encoder适用于向量检索精排。
 - 中文匹配数据集的评测结果：
 
 | Arch | Backbone | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
-| :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| CoSENT | hfl/chinese-macbert-base | CoSENT-macbert-base-first_last_avg | 50.39 | **72.93** | **79.17** | **60.86** | **80.51** | **68.77**  | 2572 |
-| CoSENT | Langboat/mengzi-bert-base | CoSENT-mengzi-base-first_last_avg | **50.52** | 72.27 | 78.69 | 12.89 | 80.15 | 58.90 | 2502 |
-| CoSENT | bert-base-chinese | CoSENT-bert-base-first_last_avg | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | 2653 |
-| SBERT | bert-base-chinese | SBERT-bert-base-first_last_avg | 46.36 | 70.36 | 78.72 | 46.86 | 66.41 | 61.74 | 1365 |
-| SBERT | hfl/chinese-macbert-base | SBERT-macbert-base-first_last_avg | 47.28 | 68.63 | **79.42** | 55.59 | 64.82 | 63.15 | 1948 |
-| CoSENT | hfl/chinese-roberta-wwm-ext | CoSENT-roberta-ext-first_last_avg | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
-| SBERT | hfl/chinese-roberta-wwm-ext | SBERT-roberta-ext-first_last_avg | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
+| :-- | :--- | :--- | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| CoSENT | hfl/chinese-macbert-base | CoSENT-macbert-base | 50.39 | **72.93** | **79.17** | **60.86** | **80.51** | **68.77**  | 2572 |
+| CoSENT | Langboat/mengzi-bert-base | CoSENT-mengzi-base | **50.52** | 72.27 | 78.69 | 12.89 | 80.15 | 58.90 | 2502 |
+| CoSENT | bert-base-chinese | CoSENT-bert-base | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | 2653 |
+| SBERT | bert-base-chinese | SBERT-bert-base | 46.36 | 70.36 | 78.72 | 46.86 | 66.41 | 61.74 | 1365 |
+| SBERT | hfl/chinese-macbert-base | SBERT-macbert-base | 47.28 | 68.63 | **79.42** | 55.59 | 64.82 | 63.15 | 1948 |
+| CoSENT | hfl/chinese-roberta-wwm-ext | CoSENT-roberta-ext | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
+| SBERT | hfl/chinese-roberta-wwm-ext | SBERT-roberta-ext | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
 
 - 本项目release模型的中文匹配评测结果：
 
 | Arch | Backbone | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
-| :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| :-- | :--- | :---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | Word2Vec | word2vec | w2v-light-tencent-chinese | 20.00 | 31.49 | 59.46 | 2.57 | 55.78 | 33.86 | 10283 |
 | SBERT | xlm-roberta-base | paraphrase-multilingual-MiniLM-L12-v2 | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 | 41.99 | 2371 |
 | CoSENT | hfl/chinese-macbert-base | text2vec-base-chinese | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | **48.25** | 2572 |
@@ -150,6 +150,7 @@ Cross-Encoder适用于向量检索精排。
 - `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
 - 中文匹配数据集下载[链接见下方](#数据集)
+- 中文匹配模型的pooling方法都是用的`first_last_avg`，预测可以调用SBert的`mean pooling`方法，效果损失很小
 - QPS的GPU测试环境是Tesla V100，显存32GB
 
 # Demo
