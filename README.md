@@ -143,6 +143,7 @@ Cross-Encoder适用于向量检索精排。
 
 说明：
 - 结果值均使用spearman系数
+- 结果均只用该数据集的train训练，在test上评估得到的表现，没用外部数据
 - `paraphrase-multilingual-MiniLM-L12-v2`模型名称是`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文
 - `MacBERT+CoSENT`模型达到同级别参数量SOTA效果，运行[text2vec/cosent](text2vec/cosent)文件夹下代码可以复现结果
 - `Sentence-MacBERT`模型，运行[text2vec/sentence_bert](text2vec/sentence_bert)文件夹下代码可以复现结果
