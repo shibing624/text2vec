@@ -18,7 +18,7 @@ from transformers import BertTokenizer, AdamW, get_linear_schedule_with_warmup
 
 sys.path.append('../..')
 from text2vec.sentence_bert.model import Model
-from text2vec.sentence_bert.data_helper import CustomDataset, load_data
+from text2vec.sentence_bert.data_helper import TrainDataset, load_data
 
 pwd_path = os.path.abspath(os.path.dirname(__file__))
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
@@ -134,23 +134,24 @@ if __name__ == '__main__':
     set_seed(args.seed)
     os.makedirs(args.output_dir, exist_ok=True)
     tokenizer = BertTokenizer.from_pretrained(args.pretrained_model_path)
+    model = Model(args.pretrained_model_path, encoder_type='first-last-avg', num_classes=args.num_classes)
+    model.to(device)
 
     # 加载数据集
     train_data = load_data(args.train_path)
     # train_data = train_data[:200]
-    train_dataset = CustomDataset(train_data, tokenizer=tokenizer, max_len=args.max_len)
+    train_dataset = TrainDataset(train_data, tokenizer=tokenizer, max_len=args.max_len)
     train_dataloader = DataLoader(dataset=train_dataset, shuffle=False, batch_size=args.train_batch_size)
     valid_dataloader = DataLoader(
-        dataset=CustomDataset(load_data(args.valid_path, is_train=False), tokenizer, args.max_len),
+        dataset=TrainDataset(load_data(args.valid_path, is_train=False), tokenizer, args.max_len),
         batch_size=args.train_batch_size)
     test_dataloader = DataLoader(
-        dataset=CustomDataset(load_data(args.test_path, is_train=False), tokenizer, args.max_len),
+        dataset=TrainDataset(load_data(args.test_path, is_train=False), tokenizer, args.max_len),
         batch_size=args.train_batch_size)
     total_steps = len(train_dataloader) * args.num_train_epochs
     num_train_optimization_steps = int(
         len(train_dataset) / args.train_batch_size / args.gradient_accumulation_steps) * args.num_train_epochs
-    model = Model(args.pretrained_model_path, encoder_type='first-last-avg', num_classes=args.num_classes)
-    model.to(device)
+
     param_optimizer = list(model.named_parameters())
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [

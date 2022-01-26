@@ -12,7 +12,7 @@ from transformers import BertTokenizer
 from torch.utils.data import DataLoader
 
 sys.path.append('../..')
-from text2vec.sentence_bert.data_helper import load_data, CustomDataset
+from text2vec.sentence_bert.data_helper import load_data, TrainDataset
 from text2vec.sentence_bert.model import Model
 from text2vec.sentence_bert.train import set_args, compute_corrcoef, evaluate
 from text2vec.sbert import SBert, cos_sim
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     logger.info(args)
     tokenizer = BertTokenizer.from_pretrained(args.output_dir)
     model = Model(args.output_dir)
-    test_dataloader = DataLoader(dataset=CustomDataset(load_data(args.test_path, is_train=False), tokenizer, args.max_len),
+    test_dataloader = DataLoader(dataset=TrainDataset(load_data(args.test_path, is_train=False), tokenizer, args.max_len),
                                  batch_size=args.train_batch_size)
     t1 = time.time()
     acc = evaluate(model, test_dataloader)

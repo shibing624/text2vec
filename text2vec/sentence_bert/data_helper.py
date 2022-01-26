@@ -22,7 +22,7 @@ def load_data(path, is_train=True):
     return data
 
 
-class CustomDataset(Dataset):
+class TrainDataset(Dataset):
     """数据集, 重写__getitem__和__len__方法"""
 
     def __init__(self, data, tokenizer, max_len=64):
