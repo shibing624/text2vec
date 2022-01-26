@@ -50,7 +50,7 @@ def set_args():
 def train(model, train_dataloader, valid_dataloader, test_dataloader, args, tokenizer):
     total_steps = len(train_dataloader) * args.num_train_epochs
     num_train_optimization_steps = int(
-        len(train_dataloader) / args.train_batch_size / args.gradient_accumulation_steps) * args.num_train_epochs
+        len(train_dataloader.dataset) / args.train_batch_size / args.gradient_accumulation_steps) * args.num_train_epochs
 
     param_optimizer = list(model.named_parameters())
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
@@ -62,7 +62,7 @@ def train(model, train_dataloader, valid_dataloader, test_dataloader, args, toke
     scheduler = get_linear_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=0.05 * total_steps,
                                                 num_training_steps=total_steps)
     logger.info("***** Running training *****")
-    logger.info("  Num examples = %d" % len(train_dataloader))
+    logger.info("  Num examples = %d" % len(train_dataloader.dataset))
     logger.info("  Batch size = %d" % args.train_batch_size)
     logger.info("  Num steps = %d" % num_train_optimization_steps)
     logs_path = os.path.join(args.output_dir, 'logs.txt')
