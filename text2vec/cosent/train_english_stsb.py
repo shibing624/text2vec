@@ -160,9 +160,10 @@ def main():
                     nli_train_samples.append((row['sentence2'], label_id))
         nli_train_dataloader = DataLoader(dataset=TrainDataset(nli_train_samples, tokenizer, args.max_len),
                                           shuffle=True, batch_size=args.train_batch_size)
+        # 无监督实验，在NLI train数据上训练，评估模型在STS test上的表现
         train(model, nli_train_dataloader, valid_dataloader, test_dataloader, args, tokenizer)
-        train(model, sts_train_dataloader, valid_dataloader, test_dataloader, args, tokenizer)
     else:
+        # 有监督实验，在STS train数据上训练，评估模型在STS test上的表现
         train(model, sts_train_dataloader, valid_dataloader, test_dataloader, args, tokenizer)
 
 

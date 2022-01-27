@@ -59,6 +59,7 @@ BM25算法，通过候选句子的字段对qurey字段的覆盖程度来计算�
 - [CDSSM(2014)](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/www2014_cdssm_p07.pdf)
 - [ARC I(2014)](https://arxiv.org/pdf/1503.03244.pdf)
 - [Siamese Network(2016)](https://www.aclweb.org/anthology/W16-1617.pdf)
+- [InferSent(2017)](https://arxiv.org/pdf/1705.02364.pdf)
 - [BERT(2018)](https://arxiv.org/pdf/1810.04805.pdf)
 - [Sentence-BERT(2019)](https://arxiv.org/abs/1908.10084)
 - [BERT-flow(2020)](https://arxiv.org/abs/2011.05864)

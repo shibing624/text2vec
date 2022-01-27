@@ -159,18 +159,15 @@ def main():
             for row in reader:
                 if row['split'] == 'train':
                     label_id = label2int[row['label']]
-                    nli_train_samples.append((row['sentence1'], label_id))
-                    nli_train_samples.append((row['sentence2'], label_id))
+                    nli_train_samples.append((row['sentence1'], row['sentence2'], label_id))
         nli_train_dataloader = DataLoader(dataset=TrainDataset(nli_train_samples, tokenizer, args.max_len),
                                           shuffle=True, batch_size=args.train_batch_size)
-
+        # 无监督实验，在NLI train数据上训练，评估模型在STS test上的表现
         model = Model(args.pretrained_model_path, encoder_type='first-last-avg', num_classes=3)
         model.to(device)
         train(model, nli_train_dataloader, valid_dataloader, test_dataloader, args, tokenizer)
-        model = Model(args.output_dir, encoder_type='first-last-avg', num_classes=2)
-        model.to(device)
-        train(model, sts_train_dataloader, valid_dataloader, test_dataloader, args, tokenizer)
     else:
+        # 有监督实验，在STS train数据上训练，评估模型在STS test上的表现
         model = Model(args.output_dir, encoder_type='first-last-avg', num_classes=2)
         model.to(device)
         train(model, sts_train_dataloader, valid_dataloader, test_dataloader, args, tokenizer)
