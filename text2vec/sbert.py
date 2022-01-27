@@ -30,7 +30,7 @@ def mean_pooling(model_output, attention_mask):
 
 
 class SBert:
-    def __init__(self, model_name_or_path="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"):
+    def __init__(self, model_name_or_path='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'):
         if 'sentence-transformers' in model_name_or_path:
             self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
             self.model = AutoModel.from_pretrained(model_name_or_path)

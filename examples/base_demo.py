@@ -12,7 +12,7 @@ sys.path.append('..')
 from text2vec import SBert, cos_sim, semantic_search, Similarity
 
 if __name__ == '__main__':
-    sbert_model = SBert("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+    sbert_model = SBert('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
     # Corpus with example sentences
     corpus = [
         '花呗更改绑定银行卡',
