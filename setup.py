@@ -45,5 +45,6 @@ setup(
     install_requires=reqs.strip().split('\n'),
     packages=find_packages(exclude=['tests']),
     package_dir={'text2vec': 'text2vec'},
-    package_data={'text2vec': ['*.*', '../LICENSE', '../README.*', '../*.txt', 'data/*', 'utils/*']}
+    package_data={'text2vec': ['*.*', '../LICENSE', '../README.*', '../*.txt', 'utils/*',
+                               'data/*', 'data/STS-B/*', 'data/English-STS-B/stsbenchmark.tsv.gz', ]}
 )
