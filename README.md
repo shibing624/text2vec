@@ -148,7 +148,7 @@ Cross-Encoder适用于向量检索精排。
 - `paraphrase-multilingual-MiniLM-L12-v2`模型名称是`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文
 - `CoSENT-macbert-base`模型达到同级别参数量SOTA效果，是用CoSENT方法训练，运行[text2vec/cosent](text2vec/cosent)文件夹下代码可以复现结果
 - `SBERT-macbert-base`模型，是用SBERT方法训练，运行[text2vec/sentence_bert](text2vec/sentence_bert)文件夹下代码可以复现结果
-- `text2vec-base-chinese`模型名称是`shibing624/text2vec-base-chinese`，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到
+- `text2vec-base-chinese`模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)
 - `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
 - 中文匹配数据集下载[链接见下方](#数据集)
