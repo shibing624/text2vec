@@ -12,10 +12,10 @@ from gensim.models import KeyedVectors
 from text2vec.utils.get_file import get_file
 from text2vec.utils.tokenizer import JiebaTokenizer
 
+pwd_path = os.path.abspath(os.path.dirname(__file__))
+default_stopwords_file = os.path.join(pwd_path, 'data/stopwords.txt')
 USER_DATA_DIR = os.path.expanduser('~/.text2vec/datasets/')
 os.makedirs(USER_DATA_DIR, exist_ok=True)
-
-pwd_path = os.path.abspath(os.path.dirname(__file__))
 
 
 def load_stopwords(file_path):
@@ -46,20 +46,20 @@ class Word2Vec:
     }
 
     def __init__(self, model_name_or_path='w2v-light-tencent-chinese',
-                 w2v_kwargs={},
-                 stopwords_file=os.path.join(pwd_path, 'data/stopwords.txt'),
+                 w2v_kwargs=None,
+                 stopwords=None,
                  cache_folder=USER_DATA_DIR):
         """
         Init word2vec model
 
         Args:
             model_name_or_path: word2vec file path
-            w2v_kwargs: params pass to the ``load_word2vec_format()`` function of ``gensim.models.KeyedVectors`` -
+            w2v_kwargs: dict, params pass to the ``load_word2vec_format()`` function of ``gensim.models.KeyedVectors`` -
                 https://radimrehurek.com/gensim/models/keyedvectors.html#module-gensim.models.keyedvectors
-            stopwords_file: str, stopwords
-            cache_folder: str, save model
+            stopwords: list, stopwords
+            cache_folder: str, save model dir
         """
-        self.w2v_kwargs = w2v_kwargs
+        self.w2v_kwargs = w2v_kwargs if w2v_kwargs is not None else {}
         if model_name_or_path and os.path.exists(model_name_or_path):
             logger.info('Load pretrained model:{}'.format(model_name_or_path))
             model_path = model_name_or_path
@@ -79,7 +79,7 @@ class Word2Vec:
         w2v = KeyedVectors.load_word2vec_format(model_path, **self.w2v_kwargs)
         # w2v.init_sims(replace=True)
         logger.debug('Load w2v from {}, spend {:.2f} sec'.format(model_name_or_path, time.time() - t0))
-        self.stopwords = load_stopwords(stopwords_file)
+        self.stopwords = stopwords if stopwords else load_stopwords(default_stopwords_file)
         self.w2v = w2v
         self.jieba_tokenizer = JiebaTokenizer()
         logger.debug('Word count: {}, emb size: {}'.format(len(w2v.key_to_index), w2v.vector_size))

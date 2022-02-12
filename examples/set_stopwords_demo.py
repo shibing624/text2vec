@@ -19,8 +19,8 @@ if __name__ == '__main__':
     assert emb1 is not emb2
 
     # load custom stopwords
-    custom_stopwords_file = './my_stopwords.txt'
-    new_vec = Word2Vec(stopwords_file=custom_stopwords_file)
+    custom_stopwords = ['我', '去', '到', '了', '。']
+    new_vec = Word2Vec(stopwords=custom_stopwords)
     emb1 = new_vec.encode(sent1)
     emb2 = new_vec.encode(sent2)
     print('check is same:', emb1 == emb2)
