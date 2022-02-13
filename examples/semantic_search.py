@@ -42,6 +42,7 @@ queries = [
     'A cheetah chases prey on across a field.']
 
 # Find the closest 5 sentences of the corpus for each query sentence based on cosine similarity
+print('\nuse cos sim calc each query and corpus:')
 top_k = min(5, len(corpus))
 for query in queries:
     query_embedding = embedder.encode(query)
@@ -57,9 +58,10 @@ for query in queries:
     for score, idx in zip(top_results[0], top_results[1]):
         print(corpus[idx], "(Score: {:.4f})".format(score))
 
-########  use semantic_search to perform cosine similarty + topk
-print()
 print('#' * 42)
+########  use semantic_search to perform cosine similarty + topk
+print('\nuse semantic_search to perform cosine similarty + topk:')
+
 for query in queries:
     query_embedding = embedder.encode(query)
     hits = semantic_search(query_embedding, corpus_embeddings, top_k=5)
@@ -70,9 +72,9 @@ for query in queries:
     for hit in hits:
         print(corpus[hit['corpus_id']], "(Score: {:.4f})".format(hit['score']))
 
-######## use bm25 to rank search score
-print()
 print('#' * 42)
+######## use bm25 to rank search score
+print('\nuse bm25 to calc each score:')
 
 search_sim = BM25(corpus=corpus)
 for query in queries:
