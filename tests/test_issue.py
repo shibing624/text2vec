@@ -55,7 +55,6 @@ class IssueTestCase(unittest.TestCase):
         scores = search_sim.get_scores(query=query)
         print(scores)
         print(len(scores))
-        print('rank:', search_sim.get_similarities(query))
         self.assertEqual(len(scores), 23)
 
 

@@ -6,8 +6,10 @@
 
 import os
 import time
+from typing import List, Union, Optional, Dict
 from loguru import logger
 import numpy as np
+from numpy import ndarray
 from gensim.models import KeyedVectors
 from text2vec.utils.get_file import get_file
 from text2vec.utils.tokenizer import JiebaTokenizer
@@ -45,9 +47,9 @@ class Word2Vec:
             'untar_filename': 'light_Tencent_AILab_ChineseEmbedding.bin'},
     }
 
-    def __init__(self, model_name_or_path='w2v-light-tencent-chinese',
-                 w2v_kwargs=None,
-                 stopwords=None,
+    def __init__(self, model_name_or_path: str = 'w2v-light-tencent-chinese',
+                 w2v_kwargs: Optional[Dict] = None,
+                 stopwords: Optional[List[str]] = None,
                  cache_folder=USER_DATA_DIR):
         """
         Init word2vec model
@@ -85,7 +87,7 @@ class Word2Vec:
         logger.debug('Word count: {}, emb size: {}'.format(len(w2v.key_to_index), w2v.vector_size))
         logger.debug('Set stopwords: {}, count: {}'.format(sorted(list(self.stopwords))[:10], len(self.stopwords)))
 
-    def encode(self, sentences):
+    def encode(self, sentences: Union[List[str], str]) -> Union[List, ndarray]:
         """
         Encode embed sentences
 
@@ -95,7 +97,7 @@ class Word2Vec:
             vectorized sentence list
         """
         if self.w2v is None:
-            raise ValueError('need to build model for embed sentence')
+            raise ValueError('No model for embed sentence')
 
         input_is_string = False
         if isinstance(sentences, str) or not hasattr(sentences, '__len__'):

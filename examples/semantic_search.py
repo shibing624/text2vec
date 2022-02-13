@@ -76,5 +76,8 @@ print('#' * 42)
 
 search_sim = BM25(corpus=corpus)
 for query in queries:
-    print(query, 'scores:', search_sim.get_scores(query=query))
-    print(query, 'rank similarities:', search_sim.get_similarities(query))
+    print("\n\n======================\n\n")
+    print("Query:", query)
+    print("\nTop 5 most similar sentences in corpus:")
+    for i in search_sim.get_scores(query, top_k=5):
+        print(i[0], "(Score: {:.4f})".format(i[1]))

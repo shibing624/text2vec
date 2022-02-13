@@ -30,8 +30,8 @@ def mean_pooling(model_output, attention_mask):
 
 
 class SBert:
-    def __init__(self, model_name_or_path='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'):
-        if 'sentence-transformers' in model_name_or_path:
+    def __init__(self, model_name_or_path: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"):
+        if "sentence-transformers" in model_name_or_path:
             self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
             self.model = AutoModel.from_pretrained(model_name_or_path)
         else:
@@ -43,7 +43,7 @@ class SBert:
                batch_size: int = 32) -> Union[List[Tensor], ndarray, Tensor]:
         self.model.eval()
         input_is_string = False
-        if isinstance(sentences, str) or not hasattr(sentences, '__len__'):
+        if isinstance(sentences, str) or not hasattr(sentences, "__len__"):
             sentences = [sentences]
             input_is_string = True
 
@@ -60,7 +60,7 @@ class SBert:
                 model_output = self.model(**features)
 
             # Perform pooling
-            embeddings = mean_pooling(model_output, features['attention_mask'])
+            embeddings = mean_pooling(model_output, features["attention_mask"])
             embeddings = embeddings.detach().cpu()
             all_embeddings.extend(embeddings)
         all_embeddings = [all_embeddings[idx] for idx in np.argsort(length_sorted_idx)]
@@ -134,7 +134,7 @@ def semantic_search(query_embeddings: Tensor,
     for query_start_idx in range(0, len(query_embeddings), query_chunk_size):
         # Iterate over chunks of the corpus
         for corpus_start_idx in range(0, len(corpus_embeddings), corpus_chunk_size):
-            # Compute cosine similarites
+            # Compute cosine similarity
             cos_scores = score_function(query_embeddings[query_start_idx:query_start_idx + query_chunk_size],
                                         corpus_embeddings[corpus_start_idx:corpus_start_idx + corpus_chunk_size])
 

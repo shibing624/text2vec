@@ -3,9 +3,12 @@
 @author:XuMing(xuming624@qq.com)
 @description: 
 """
+
+from typing import List, Union, Optional
 import numpy as np
+from numpy import ndarray
+from torch import Tensor
 from loguru import logger
-from text2vec.utils.rank_bm25 import BM25Okapi
 from text2vec.utils.tokenizer import JiebaTokenizer
 from text2vec.word2vec import Word2Vec
 from text2vec.sbert import SBert, cos_sim
@@ -22,8 +25,8 @@ class SimType(object):
     WMD = 'wmd'
 
 
-class Similarity(object):
-    def __init__(self, model_name_or_path="", similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT):
+class Similarity:
+    def __init__(self, model_name_or_path='', similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT):
         """
         Cal text similarity
         :param similarity_type:
@@ -50,14 +53,14 @@ class Similarity(object):
                 if self.model_name_or_path:
                     self.model = Word2Vec(self.model_name_or_path)
                 else:
-                    self.model = Word2Vec()
+                    self.model = Word2Vec("w2v-light-tencent-chinese")
             if self.embedding_type == EmbType.SBERT:
                 if self.model_name_or_path:
                     self.model = SBert(self.model_name_or_path)
                 else:
-                    self.model = SBert()
+                    self.model = SBert("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 
-    def get_score(self, sentence1, sentence2):
+    def get_score(self, sentence1: str, sentence2: str) -> float:
         """
         Get score between text1 and text2
         :param sentence1: str
@@ -81,12 +84,14 @@ class Similarity(object):
             res = 1. / (1. + self.model.w2v.wmdistance(token1, token2))
         return res
 
-    def get_scores(self, sentences1, sentences2, only_aligned=False):
+    def get_scores(
+            self, sentences1: List[str], sentences2: List[str], only_aligned: Optional[bool] = False
+    ) -> Union[List[Tensor], ndarray, Tensor, None]:
         """
-        Get similarity scores between texts1 and texts2
-        :param sentences1: list
-        :param sentences2: list
-        :param only_aligned: bool, default False，如果sentences1和sentences2为size对齐的数据，是否仅计算scores[i][i]的结果
+        Get similarity scores between sentences1 and sentences2
+        :param sentences1: list, sentence1 list
+        :param sentences2: list, sentence2 list
+        :param only_aligned: bool, default False return all scores, if True only return scores[i][i]
         :return: return: Matrix with res[i][j]  = cos_sim(a[i], b[j])
         """
         if not sentences1 or not sentences2:
@@ -109,50 +114,3 @@ class Similarity(object):
                     for j, e2 in enumerate(embs2):
                         scores[i][j] = cosine_distance(e1, e2)
         return scores
-
-
-class SearchSimilarity(object):
-    def __init__(self, corpus):
-        """
-        Search sim doc with rank bm25
-        :param corpus: list of str.
-            A list of doc.(no need segment, do it in init)
-        """
-        self.corpus = corpus
-        self.corpus_seg = None
-        self.bm25_instance = None
-        self.jieba_tokenizer = JiebaTokenizer()
-
-    def init(self):
-        if not self.bm25_instance:
-            if not self.corpus:
-                raise ValueError("must set corpus, which is documents, list of str")
-
-            if isinstance(self.corpus, str):
-                self.corpus = [self.corpus]
-
-            self.corpus_seg = {k: self.jieba_tokenizer.tokenize(k) for k in self.corpus}
-            self.bm25_instance = BM25Okapi(corpus=list(self.corpus_seg.values()))
-
-    def get_similarities(self, query, n=5):
-        """
-        Get similarity between `query` and this docs.
-        :param query: str
-        :param n: int, num_best
-        :return: result, dict, float scores, docs rank
-        """
-        scores = self.get_scores(query)
-        rank_n = np.argsort(scores)[::-1]
-        if n > 0:
-            rank_n = rank_n[:n]
-        return [self.corpus[i] for i in rank_n]
-
-    def get_scores(self, query):
-        """
-        Get scores between query and docs
-        :param query: input str
-        :return: numpy array, scores for query between docs
-        """
-        self.init()
-        tokens = self.jieba_tokenizer.tokenize(query)
-        return self.bm25_instance.get_scores(query=tokens)

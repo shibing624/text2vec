@@ -105,16 +105,16 @@ class BM25Okapi(BM25):
         The ATIRE BM25 variant uses an idf function which uses a log(idf) score. To prevent negative idf scores,
         this algorithm also adds a floor to the idf value of epsilon.
         See [Trotman, A., X. Jia, M. Crane, Towards an Efficient and Effective Search Engine] for more info
-        :param query:
-        :return:
+        :param query: str
+        :return: array
         """
-        score = np.zeros(self.corpus_size)
+        scores = np.zeros(self.corpus_size)
         doc_len = np.array(self.doc_len)
         for q in query:
             q_freq = np.array([(doc.get(q) or 0) for doc in self.doc_freqs])
-            score += (self.idf.get(q) or 0) * (q_freq * (self.k1 + 1) /
+            scores += (self.idf.get(q) or 0) * (q_freq * (self.k1 + 1) /
                                                (q_freq + self.k1 * (1 - self.b + self.b * doc_len / self.avgdl)))
-        return score
+        return scores
 
 
 class BM25L(BM25):
@@ -131,14 +131,14 @@ class BM25L(BM25):
             self.idf[word] = idf
 
     def get_scores(self, query):
-        score = np.zeros(self.corpus_size)
+        scores = np.zeros(self.corpus_size)
         doc_len = np.array(self.doc_len)
         for q in query:
             q_freq = np.array([(doc.get(q) or 0) for doc in self.doc_freqs])
             ctd = q_freq / (1 - self.b + self.b * doc_len / self.avgdl)
-            score += (self.idf.get(q) or 0) * q_freq * (self.k1 + 1) * (ctd + self.delta) / \
+            scores += (self.idf.get(q) or 0) * q_freq * (self.k1 + 1) * (ctd + self.delta) / \
                      (self.k1 + ctd + self.delta)
-        return score
+        return scores
 
 
 class BM25Plus(BM25):
@@ -155,10 +155,10 @@ class BM25Plus(BM25):
             self.idf[word] = idf
 
     def get_scores(self, query):
-        score = np.zeros(self.corpus_size)
+        scores = np.zeros(self.corpus_size)
         doc_len = np.array(self.doc_len)
         for q in query:
             q_freq = np.array([(doc.get(q) or 0) for doc in self.doc_freqs])
-            score += (self.idf.get(q) or 0) * (self.delta + (q_freq * (self.k1 + 1)) /
+            scores += (self.idf.get(q) or 0) * (self.delta + (q_freq * (self.k1 + 1)) /
                                                (self.k1 * (1 - self.b + self.b * doc_len / self.avgdl) + q_freq))
-        return score
+        return scores
