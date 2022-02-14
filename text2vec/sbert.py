@@ -39,7 +39,7 @@ class SBert:
             self.model = BertModel.from_pretrained(model_name_or_path)
         self.model.to(device)
 
-    def encode(self, sentences: Union[str, List[str], List[int]],
+    def encode(self, sentences: Union[str, List[str]],
                batch_size: int = 32) -> Union[List[Tensor], ndarray, Tensor]:
         self.model.eval()
         input_is_string = False

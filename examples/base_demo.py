@@ -35,7 +35,6 @@ if __name__ == '__main__':
     # The result is a list of sentence embeddings as numpy arrays
     for sentence, embedding in zip(corpus, corpus_embeddings):
         print("Sentence:", sentence)
-        print("Embedding size:", len(embedding))
         print("Embedding shape:", embedding.shape)
         print()
 

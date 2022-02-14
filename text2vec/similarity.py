@@ -85,7 +85,7 @@ class Similarity:
         return res
 
     def get_scores(
-            self, sentences1: List[str], sentences2: List[str], only_aligned: Optional[bool] = False
+            self, sentences1: List[str], sentences2: List[str], only_aligned: bool = False
     ) -> Union[List[Tensor], ndarray, Tensor, None]:
         """
         Get similarity scores between sentences1 and sentences2
@@ -97,7 +97,7 @@ class Similarity:
         if not sentences1 or not sentences2:
             return None
         if only_aligned and len(sentences1) != len(sentences2):
-            logger.warning('sentences size not equal, auto set is_aligned=False')
+            logger.warning('Sentences size not equal, auto set is_aligned=False')
             only_aligned = False
         self.load_model()
         embs1 = self.model.encode(sentences1)
