@@ -17,7 +17,6 @@ from text2vec.utils.tokenizer import JiebaTokenizer
 pwd_path = os.path.abspath(os.path.dirname(__file__))
 default_stopwords_file = os.path.join(pwd_path, 'data/stopwords.txt')
 USER_DATA_DIR = os.path.expanduser('~/.text2vec/datasets/')
-os.makedirs(USER_DATA_DIR, exist_ok=True)
 
 
 def load_stopwords(file_path):
@@ -73,9 +72,10 @@ class Word2Vec:
             untar_filename = model_dict.get('untar_filename')
             model_path = os.path.join(cache_folder, untar_filename)
             if not os.path.exists(model_path):
+                os.makedirs(cache_folder, exist_ok=True)
                 get_file(tar_filename, url, extract=True,
-                         cache_dir=USER_DATA_DIR,
-                         cache_subdir=USER_DATA_DIR,
+                         cache_dir=cache_folder,
+                         cache_subdir=cache_folder,
                          verbose=1)
         t0 = time.time()
         w2v = KeyedVectors.load_word2vec_format(model_path, **self.w2v_kwargs)
