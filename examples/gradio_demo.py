@@ -33,7 +33,7 @@ if __name__ == '__main__':
     gr.Interface(ai_text,
                  inputs=[input1, input2],
                  outputs=[output_text],
-                 theme="grass",
+                 # theme="grass",
                  title="Chinese Text to Vector Model shibing624/text2vec-base-chinese",
                  description="Copy or input Chinese text here. Submit and the machine will calculate the cosine score.",
                  article="Link to <a href='https://github.com/shibing624/text2vec' style='color:blue;' target='_blank\'>Github REPO</a>",
