@@ -18,9 +18,7 @@ def compute_emb(model):
                  '花呗更改绑定银行卡',
                  ]
     sentence_embeddings = model.encode(sentences)
-
     print(type(sentence_embeddings), sentence_embeddings.shape)
-
     # The result is a list of sentence embeddings as numpy arrays
     for sentence, embedding in zip(sentences, sentence_embeddings):
         print("Sentence:", sentence)
@@ -32,5 +30,4 @@ if __name__ == "__main__":
     ngram_model = NGram()
     r = ngram_model.encode('兄弟们冲呀')
     print(type(r), r.shape, r)
-
     compute_emb(ngram_model)
