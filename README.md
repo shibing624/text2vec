@@ -433,11 +433,11 @@ A man is eating food. (Score: 0.0329)
 如果你在研究中使用了text2vec，请按如下格式引用：
 
 ```latex
-@software{text2vec,
-  author = {Xu Ming},
-  title = {text2vec: A Tool for Text to Vector},
-  year = {2022},
-  url = {https://github.com/shibing624/text2vec},
+@misc{text2vec,
+  title={text2vec: A Tool for Text to Vector},
+  author={Ming Xu},
+  howpublished={https://github.com/shibing624/text2vec},
+  year={2022}
 }
 ```
 
