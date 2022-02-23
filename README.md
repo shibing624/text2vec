@@ -189,7 +189,7 @@ python3 setup.py install
 
 基于`pretrained model`计算文本向量
 
-```python
+```shell
 >>> from text2vec import SBert
 >>> m = SBert()
 >>> m.encode("如何更换花呗绑定银行卡")
