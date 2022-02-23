@@ -188,6 +188,12 @@ python3 setup.py install
 
 基于`pretrained model`计算文本向量
 
+.. code-block:: python
+
+    >>> from text2vec import SBert
+    >>> m = SBert()
+    >>> m.encode("如何更换花呗绑定银行卡")
+    Embedding shape: (384,)
 
 示例[computing_embeddings.py](./examples/computing_embeddings.py)
 
@@ -213,7 +219,7 @@ def compute_emb(model):
     # The result is a list of sentence embeddings as numpy arrays
     for sentence, embedding in zip(sentences, sentence_embeddings):
         print("Sentence:", sentence)
-        print("Embedding:", embedding)
+        print("Embedding shape:", embedding.shape)
         print("")
 
 t2v_model = SBert("shibing624/text2vec-base-chinese") # 中文句向量模型(CoSENT)
