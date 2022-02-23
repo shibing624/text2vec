@@ -1,5 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/text2vec.svg)](https://badge.fury.io/py/text2vec)
-[![Download](https://img.shields.io/github/downloads/shibing624/text2vec/total.svg)](https://github.com/shibing624/text2vec/releases)
+[![Downloads](https://pepy.tech/badge/text2vec)](https://pepy.tech/project/text2vec)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![GitHub contributors](https://img.shields.io/github/contributors/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/graphs/contributors)
 [![License Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
