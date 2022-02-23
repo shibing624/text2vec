@@ -188,12 +188,12 @@ python3 setup.py install
 
 基于`pretrained model`计算文本向量
 
-.. code-block:: python
-
-    >>> from text2vec import SBert
-    >>> m = SBert()
-    >>> m.encode("如何更换花呗绑定银行卡")
-    Embedding shape: (384,)
+```python
+>>> from text2vec import SBert
+>>> m = SBert()
+>>> m.encode("如何更换花呗绑定银行卡")
+Embedding shape: (384,)
+```
 
 示例[computing_embeddings.py](./examples/computing_embeddings.py)
 
