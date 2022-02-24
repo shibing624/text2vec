@@ -3,7 +3,7 @@ loguru
 transformers>=4.6.0
 tokenizers>=0.10.3
 tqdm
-torch
-numpy
+#torch #or pytorch
 scikit-learn
 gensim>=4.0.0
+numpy
