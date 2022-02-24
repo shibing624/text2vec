@@ -166,6 +166,7 @@ HuggingFace Demo: https://huggingface.co/spaces/shibing624/text2vec
 
 # Install
 ```
+pip3 install torch # conda install pytorch
 pip3 install -U text2vec
 ```
 
