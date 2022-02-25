@@ -5,11 +5,11 @@
 """
 
 import gradio as gr
-from text2vec import Similarity
+from text2vec import Similarity, EncoderType
 
 # 中文句向量模型(CoSENT)
 sim_model = Similarity(model_name_or_path='shibing624/text2vec-base-chinese',
-                       similarity_type='cosine', embedding_type='sbert')
+                       encoder_type=EncoderType.FIRST_LAST_AVG)
 
 
 def ai_text(sentence1, sentence2):

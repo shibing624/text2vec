@@ -19,7 +19,9 @@ sentences2 = ['花呗更改绑定银行卡',
               'A woman watches TV',
               'The new movie is so great']
 
-sim_model = Similarity(model_name_or_path='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+sim_model = Similarity()
+# 模型名称为空时，默认使用的是多语言文本匹配模型，
+# 中文可以替换为"shibing624/text2vec-base-chinese", encoder_type=EncoderType.FIRST_LAST_AVG，也改为自己训练的模型路径
 scores = sim_model.get_scores(sentences1, sentences2)
 print('1:use Similarity compute cos scores\n')
 for i in range(len(sentences1)):
@@ -48,7 +50,9 @@ print()
 print('-' * 42)
 print('3:use Word2Vec compute wmd similarity scores\n')
 # 使用Word2Vec计算wmd相似度
-sim2 = Similarity(similarity_type=SimilarityType.WMD, embedding_type=EmbeddingType.WORD2VEC)
+sim2 = Similarity("w2v-light-tencent-chinese",
+                  similarity_type=SimilarityType.WMD,
+                  embedding_type=EmbeddingType.WORD2VEC)
 scores = sim2.get_scores(sentences1, sentences2)
 for i in range(len(sentences1)):
     for j in range(len(sentences2)):

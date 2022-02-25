@@ -197,41 +197,53 @@ python3 setup.py install
 Embedding shape: (384,)
 ```
 
-example: [examples/computing_embeddings.py](examples/computing_embeddings.py)
+example: [examples/computing_embeddings_demo.py](examples/computing_embeddings_demo.py)
 
 ```python
+
 import sys
 
 sys.path.append('..')
-from text2vec import SentenceModel, Word2Vec
+from text2vec import SentenceModel, EncoderType
+from text2vec import Word2Vec
 
 
 def compute_emb(model):
     # Embed a list of sentences
-    sentences = ['卡',
-                 '银行卡',
-                 '如何更换花呗绑定银行卡',
-                 '花呗更改绑定银行卡',
-                 'This framework generates embeddings for each input sentence',
-                 'Sentences are passed as a list of string.',
-                 'The quick brown fox jumps over the lazy dog.']
+    sentences = [
+        '卡',
+        '银行卡',
+        '如何更换花呗绑定银行卡',
+        '花呗更改绑定银行卡',
+        'This framework generates embeddings for each input sentence',
+        'Sentences are passed as a list of string.',
+        'The quick brown fox jumps over the lazy dog.'
+    ]
     sentence_embeddings = model.encode(sentences)
     print(type(sentence_embeddings), sentence_embeddings.shape)
+
     # The result is a list of sentence embeddings as numpy arrays
     for sentence, embedding in zip(sentences, sentence_embeddings):
         print("Sentence:", sentence)
         print("Embedding shape:", embedding.shape)
-        print("")
+        print("Embedding head:", embedding[:10])
+        print()
 
 
-t2v_model = SentenceModel("shibing624/text2vec-base-chinese")  # 中文句向量模型(CoSENT)
-compute_emb(t2v_model)
+if __name__ == "__main__":
+    # 中文句向量模型(CoSENT)
+    t2v_model = SentenceModel("shibing624/text2vec-base-chinese",
+                              encoder_type=EncoderType.FIRST_LAST_AVG)
+    compute_emb(t2v_model)
 
-sbert_model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")  # 支持多语言的句向量模型（Sentence-BERT）
-compute_emb(sbert_model)
+    # 支持多语言的句向量模型（Sentence-BERT）
+    sbert_model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+                                encoder_type=EncoderType.POOLER)
+    compute_emb(sbert_model)
 
-w2v_model = Word2Vec("w2v-light-tencent-chinese")  # 中文词向量模型(word2vec)
-compute_emb(w2v_model)
+    # 中文词向量模型(word2vec)
+    w2v_model = Word2Vec("w2v-light-tencent-chinese")
+    compute_emb(w2v_model)
 ```
 
 output:
@@ -248,7 +260,7 @@ Embedding shape: (768,)
 - 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentences_size, model_embedding_size)`
 - 模型说明：`shibing624/text2vec-base-chinese`模型是CoSENT方法在中文STS-B数据集训练得到的，模型已经上传到huggingface的
 模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，
-可以通过上面示例方法text2vec的SBert类调用，或者直接用transformers库调用，模型自动下载到本机路径：`~/.cache/huggingface/transformers`
+可以通过上面示例方法text2vec的 SentenceModel 类调用，或者直接用transformers库调用，模型自动下载到本机路径：`~/.cache/huggingface/transformers`
 
 #### Usage (HuggingFace Transformers)
 Without [text2vec](https://github.com/shibing624/text2vec), you can use the model like this: 
@@ -328,22 +340,22 @@ for i in range(len(sentences1)):
 
 output:
 ```shell
-如何更换花呗绑定银行卡 		 花呗更改绑定银行卡 		 Score: 0.9816
-如何更换花呗绑定银行卡 		 The dog plays in the garden 		 Score: 0.0045
-如何更换花呗绑定银行卡 		 A woman watches TV 		 Score: 0.1182
-如何更换花呗绑定银行卡 		 The new movie is so great 		 Score: 0.3477
-The cat sits outside 		 花呗更改绑定银行卡 		 Score: 0.2565
-The cat sits outside 		 The dog plays in the garden 		 Score: 0.2908
-The cat sits outside 		 A woman watches TV 		 Score: 0.0062
-The cat sits outside 		 The new movie is so great 		 Score: 0.1860
-A man is playing guitar 		 花呗更改绑定银行卡 		 Score: 0.3274
-A man is playing guitar 		 The dog plays in the garden 		 Score: 0.2775
-A man is playing guitar 		 A woman watches TV 		 Score: 0.2480
-A man is playing guitar 		 The new movie is so great 		 Score: 0.2803
-The new movie is awesome 		 花呗更改绑定银行卡 		 Score: 0.3129
-The new movie is awesome 		 The dog plays in the garden 		 Score: 0.1660
-The new movie is awesome 		 A woman watches TV 		 Score: 0.2698
-The new movie is awesome 		 The new movie is so great 		 Score: 0.9698
+如何更换花呗绑定银行卡 		 花呗更改绑定银行卡 		 Score: 0.9477
+如何更换花呗绑定银行卡 		 The dog plays in the garden 		 Score: -0.1748
+如何更换花呗绑定银行卡 		 A woman watches TV 		 Score: -0.0839
+如何更换花呗绑定银行卡 		 The new movie is so great 		 Score: -0.0044
+The cat sits outside 		 花呗更改绑定银行卡 		 Score: -0.0097
+The cat sits outside 		 The dog plays in the garden 		 Score: 0.1908
+The cat sits outside 		 A woman watches TV 		 Score: -0.0203
+The cat sits outside 		 The new movie is so great 		 Score: 0.0302
+A man is playing guitar 		 花呗更改绑定银行卡 		 Score: -0.0010
+A man is playing guitar 		 The dog plays in the garden 		 Score: 0.1062
+A man is playing guitar 		 A woman watches TV 		 Score: 0.0055
+A man is playing guitar 		 The new movie is so great 		 Score: 0.0097
+The new movie is awesome 		 花呗更改绑定银行卡 		 Score: 0.0302
+The new movie is awesome 		 The dog plays in the garden 		 Score: -0.0160
+The new movie is awesome 		 A woman watches TV 		 Score: 0.1321
+The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 ```
 
 > 句子余弦相似度值`score`范围是[-1, 1]，值越大越相似。
@@ -400,40 +412,47 @@ output:
 ```shell
 Query: 如何更换花呗绑定银行卡
 Top 5 most similar sentences in corpus:
-花呗更改绑定银行卡 (Score: 0.9816)
-我什么时候开通了花呗 (Score: 0.7659)
-A man is eating food. (Score: 0.4724)
-...
+花呗更改绑定银行卡 (Score: 0.9477)
+我什么时候开通了花呗 (Score: 0.3635)
+A man is eating food. (Score: 0.0321)
+A man is riding a horse. (Score: 0.0228)
+Two men pushed carts through the woods. (Score: 0.0090)
+
 ======================
 Query: A man is eating pasta.
 Top 5 most similar sentences in corpus:
-A man is eating food. (Score: 0.5832)
-A man is eating a piece of bread. (Score: 0.3820)
-A man is riding a horse. (Score: 0.3288)
-...
+A man is eating food. (Score: 0.6734)
+A man is eating a piece of bread. (Score: 0.4269)
+A man is riding a horse. (Score: 0.2086)
+A man is riding a white horse on an enclosed ground. (Score: 0.1020)
+A cheetah is running behind its prey. (Score: 0.0566)
+
 ======================
 Query: Someone in a gorilla costume is playing a set of drums.
 Top 5 most similar sentences in corpus:
-A monkey is playing drums. (Score: 0.8042)
-A cheetah is running behind its prey. (Score: 0.4219)
-我什么时候开通了花呗 (Score: 0.2905)
-...
+A monkey is playing drums. (Score: 0.8167)
+A cheetah is running behind its prey. (Score: 0.2720)
+A woman is playing violin. (Score: 0.1721)
+A man is riding a horse. (Score: 0.1291)
+A man is riding a white horse on an enclosed ground. (Score: 0.1213)
+
 ======================
 Query: A cheetah chases prey on across a field.
 Top 5 most similar sentences in corpus:
-A cheetah is running behind its prey. (Score: 0.9317)
-A man is riding a horse. (Score: 0.4217)
-我什么时候开通了花呗 (Score: 0.3582)
-...
+A cheetah is running behind its prey. (Score: 0.9147)
+A monkey is playing drums. (Score: 0.2655)
+A man is riding a horse. (Score: 0.1933)
+A man is riding a white horse on an enclosed ground. (Score: 0.1733)
+A man is eating food. (Score: 0.0329)
 ```
 
-> `Score`的值范围[-1, 1]，值越大，表示该query与corpus相似度越近。
+> `Score`的值范围[-1, 1]，值越大，表示该query与corpus中的句子相似度越近。
 
 
 
 ## 模型训练和预测
 ### CoSENT 监督模型
-#### 在中文STS-B数据集训练和评估`MacBERT+CoSENT`的模型效果
+- 在中文STS-B数据集训练和评估`MacBERT+CoSENT`模型
 
 example: [examples/training_sup_cosent.py](examples/training_sup_cosent.py)
 
@@ -442,7 +461,7 @@ cd examples
 CUDA_VISIBLE_DEVICES=0 python3 training_sup_cosent.py --do_train --do_predict --num_epochs 20 --model_name hfl/chinese-macbert-base
 ```
 
-#### 在英文STS-B数据集训练和评估`BERT+CoSENT`的模型效果
+- 在英文STS-B数据集训练和评估`BERT+CoSENT`模型
 
 example: [examples/training_sup_cosent_en.py](examples/training_sup_cosent_en.py)
 
@@ -452,7 +471,7 @@ CUDA_VISIBLE_DEVICES=0 python3 training_sup_cosent.py --do_train --do_predict --
 ```
 
 ### CoSENT 无监督模型
-#### 在英文NLI数据集训练`BERT+CoSENT`模型，在STS-B测试集评估效果
+- 在英文NLI数据集训练`BERT+CoSENT`模型，在STS-B测试集评估效果
 
 example: [examples/training_unsup_cosent_en.py](examples/training_unsup_cosent_en.py)
 
@@ -462,7 +481,7 @@ CUDA_VISIBLE_DEVICES=0 python3 training_unsup_cosent_en.py --do_train --do_predi
 ```
 
 ### SentenceBERT 监督模型
-#### 在中文STS-B数据集训练和评估`MacBERT+SBERT`的模型效果
+- 在中文STS-B数据集训练和评估`MacBERT+SBERT`模型
 
 example: [examples/training_sup_sentencebert.py](examples/training_sup_sentencebert.py)
 
@@ -470,7 +489,7 @@ example: [examples/training_sup_sentencebert.py](examples/training_sup_sentenceb
 cd examples
 CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base
 ```
-#### 在英文STS-B数据集训练和评估`BERT+SBERT`的模型效果
+- 在英文STS-B数据集训练和评估`BERT+SBERT`模型
 
 example: [examples/training_sup_sentencebert_en.py](examples/training_sup_sentencebert_en.py)
 

@@ -12,15 +12,14 @@ from torch import Tensor
 from loguru import logger
 from text2vec.utils.tokenizer import JiebaTokenizer
 from text2vec.word2vec import Word2Vec
-from text2vec.sentence_model import SentenceModel, device
+from text2vec.sentence_model import SentenceModel, device, EncoderType
 from text2vec.utils.distance import cosine_distance
 
 
-
 class SimilarityType(Enum):
-    COSINE = 0
-    DOT_PRODUCT = 1
-    WMD = 2
+    WMD = 0
+    COSINE = 1
+    # DOT_PRODUCT = 2
 
 
 class EmbeddingType(Enum):
@@ -29,11 +28,20 @@ class EmbeddingType(Enum):
 
 
 class Similarity:
-    def __init__(self, model_name_or_path="", similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.BERT):
+    def __init__(
+            self,
+            model_name_or_path="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+            similarity_type=SimilarityType.COSINE,
+            embedding_type=EmbeddingType.BERT,
+            encoder_type=EncoderType.MEAN
+    ):
         """
         Cal text similarity
-        :param similarity_type:
-        :param embedding_type:
+        :param model_name_or_path: str, model path or name, default is None,
+            auto load paraphrase-multilingual-MiniLM-L12-v2
+        :param similarity_type: SimilarityType, similarity type, default is COSINE
+        :param embedding_type: EmbeddingType, embedding type, default is BERT
+        :param encoder_type: EncoderType, encoder type, adjust with model_name_or_path
         """
         if embedding_type not in [EmbeddingType.BERT, EmbeddingType.WORD2VEC]:
             logger.warning('embedding_type set error, use default bert')
@@ -46,6 +54,7 @@ class Similarity:
             embedding_type = EmbeddingType.WORD2VEC
         self.similarity_type = similarity_type
         self.embedding_type = embedding_type
+        self.encoder_type = encoder_type
         self.model_name_or_path = model_name_or_path
         self.jieba_tokenizer = JiebaTokenizer()
         self.model = None
@@ -53,15 +62,10 @@ class Similarity:
     def load_model(self):
         if self.model is None:
             if self.embedding_type == EmbeddingType.WORD2VEC:
-                if self.model_name_or_path:
-                    self.model = Word2Vec(self.model_name_or_path)
-                else:
-                    self.model = Word2Vec("w2v-light-tencent-chinese")
+                # Default: Word2Vec("w2v-light-tencent-chinese")
+                self.model = Word2Vec(self.model_name_or_path)
             if self.embedding_type == EmbeddingType.BERT:
-                if self.model_name_or_path:
-                    self.model = SentenceModel(self.model_name_or_path)
-                else:
-                    self.model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+                self.model = SentenceModel(self.model_name_or_path, encoder_type=self.encoder_type)
 
     def get_score(self, sentence1: str, sentence2: str) -> float:
         """

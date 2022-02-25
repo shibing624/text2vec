@@ -9,28 +9,21 @@ generate sentence embeddings for a given list of sentences.
 import sys
 
 sys.path.append('..')
-from text2vec import SentenceModel, cos_sim, semantic_search, Similarity
+from text2vec import SentenceModel, cos_sim, semantic_search, Similarity, EncoderType
 
 if __name__ == '__main__':
-    sbert_model = SentenceModel('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+    m = SentenceModel("shibing624/text2vec-base-chinese", encoder_type=EncoderType.FIRST_LAST_AVG)
     # Corpus with example sentences
     corpus = [
-        '卡',
-        '银行卡',
         '花呗更改绑定银行卡',
         '我什么时候开通了花呗',
-        'A man is eating food.',
-        'A man is eating a piece of bread.',
-        'The girl is carrying a baby.',
-        'A man is riding a horse.',
-        'A woman is playing violin.',
-        'Two men pushed carts through the woods.',
-        'A man is riding a white horse on an enclosed ground.',
-        'A monkey is playing drums.',
-        'A cheetah is running behind its prey.'
+        '俄罗斯警告乌克兰反对欧盟协议',
+        '暴风雨掩埋了东北部；新泽西16英寸的降雪',
+        '中央情报局局长访问以色列叙利亚会谈',
+        '人在巴基斯坦基地的炸弹袭击中丧生',
     ]
     # 1. Compute text embedding
-    corpus_embeddings = sbert_model.encode(corpus)
+    corpus_embeddings = m.encode(corpus)
     print(type(corpus_embeddings), corpus_embeddings.shape)
     # The result is a list of sentence embeddings as numpy arrays
     for sentence, embedding in zip(corpus, corpus_embeddings):
@@ -40,7 +33,7 @@ if __name__ == '__main__':
         print()
 
     # 2. Compute cosine-similarities for sentence1 and sentence2
-    sim_model = Similarity()
+    sim_model = Similarity("shibing624/text2vec-base-chinese", encoder_type=EncoderType.FIRST_LAST_AVG)
     cosine_scores = sim_model.get_score(corpus[0], corpus[1])
     print('{} vs {} cos score: {:.4f}'.format(corpus[0], corpus[1], cosine_scores))
     # 以上相似度计算的实质是对embedding结果求cos值，等同于：
@@ -52,12 +45,12 @@ if __name__ == '__main__':
     # Query sentences:
     queries = [
         '如何更换花呗绑定银行卡',
-        'A man is eating pasta.',
-        'Someone in a gorilla costume is playing a set of drums.',
-        'A cheetah chases prey on across a field.'
+        '叛军击落乌克兰直升机.',
+        '中央情报局局长在以色列讨论叙利亚局势',
+        '巴基斯坦西北部8名士兵在炸弹袭击中丧生',
     ]
     for query in queries:
-        query_embedding = sbert_model.encode(query)
+        query_embedding = m.encode(query)
         hits = semantic_search(query_embedding, corpus_embeddings, top_k=5)
         print("\n\n======================\n\n")
         print("Query:", query)

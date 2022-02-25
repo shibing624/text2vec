@@ -5,10 +5,8 @@
 """
 
 import os
-from typing import Dict, List, Union
 from loguru import logger
 import math
-import numpy as np
 import pandas as pd
 import torch
 from torch import nn
@@ -25,16 +23,16 @@ class SentenceBertModel(SentenceModel):
     def __init__(
             self,
             model_name_or_path: str = "hfl/chinese-macbert-base",
-            encoder_type: EncoderType = EncoderType.FIRST_LAST_AVG,
+            encoder_type: EncoderType = EncoderType.MEAN,
             max_seq_length: int = 128,
             num_classes: int = 2,
     ):
         """
-        Initializes a CoSENT Model.
+        Initializes a SentenceBert Model.
 
         Args:
             model_name_or_path: Default Transformer model name or path to a directory containing Transformer model file (pytorch_nodel.bin).
-            encoder_type: EncoderType.FIRST_LAST_AVG or EncoderType.LAST_AVG or EncoderType.POOLER
+            encoder_type: encoder type, set by model name
             max_seq_length: The maximum total input sequence length after tokenization.
             num_classes: Number of classes for classification.
         """
@@ -233,11 +231,13 @@ class SentenceBertModel(SentenceModel):
                 # get sentence embeddings of BERT encoder
                 source_embeddings = self.get_sentence_embeddings(
                     self.model(source_input_ids, source_attention_mask, source_token_type_ids,
-                               output_hidden_states=True)
+                               output_hidden_states=True),
+                    source_attention_mask
                 )
                 target_embeddings = self.get_sentence_embeddings(
                     self.model(target_input_ids, target_attention_mask, target_token_type_ids,
-                               output_hidden_states=True)
+                               output_hidden_states=True),
+                    target_attention_mask
                 )
                 outputs = self.concat_embeddings(source_embeddings, target_embeddings)
                 loss = self.calc_loss(labels, outputs)
@@ -322,11 +322,13 @@ class SentenceBertModel(SentenceModel):
             with torch.no_grad():
                 source_embeddings = self.get_sentence_embeddings(
                     self.model(source_input_ids, source_attention_mask, source_token_type_ids,
-                               output_hidden_states=True)
+                               output_hidden_states=True),
+                    source_attention_mask
                 )
                 target_embeddings = self.get_sentence_embeddings(
                     self.model(target_input_ids, target_attention_mask, target_token_type_ids,
-                               output_hidden_states=True)
+                               output_hidden_states=True),
+                    target_attention_mask
                 )
                 preds = torch.cosine_similarity(source_embeddings, target_embeddings)
             batch_preds.extend(preds.cpu().numpy())

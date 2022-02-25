@@ -218,7 +218,8 @@ class CosentModel(SentenceModel):
                 attention_mask = inputs.get('attention_mask').squeeze(1).to(device)
                 token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
                 output_embeddings = self.get_sentence_embeddings(
-                    self.model(input_ids, attention_mask, token_type_ids, output_hidden_states=True)
+                    self.model(input_ids, attention_mask, token_type_ids, output_hidden_states=True),
+                    attention_mask
                 )
                 loss = self.calc_loss(labels, output_embeddings)
                 current_loss = loss.item()
@@ -302,11 +303,13 @@ class CosentModel(SentenceModel):
             with torch.no_grad():
                 source_embeddings = self.get_sentence_embeddings(
                     self.model(source_input_ids, source_attention_mask, source_token_type_ids,
-                               output_hidden_states=True)
+                               output_hidden_states=True),
+                    source_attention_mask
                 )
                 target_embeddings = self.get_sentence_embeddings(
                     self.model(target_input_ids, target_attention_mask, target_token_type_ids,
-                               output_hidden_states=True)
+                               output_hidden_states=True),
+                    target_attention_mask
                 )
                 preds = torch.cosine_similarity(source_embeddings, target_embeddings)
             batch_preds.extend(preds.cpu().numpy())

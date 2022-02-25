@@ -19,7 +19,7 @@ from text2vec import cos_sim
 
 
 def calc_similarity_scores(args, sents1, sents2, labels):
-    m = SentenceBertModel(args.output_dir, encoder_type=EncoderType.FIRST_LAST_AVG, max_seq_length=args.max_seq_length)
+    m = SentenceBertModel(args.output_dir, encoder_type=EncoderType.MEAN, max_seq_length=args.max_seq_length)
     t1 = time.time()
     e1 = m.encode(sents1)
     e2 = m.encode(sents2)
@@ -56,7 +56,7 @@ def main():
 
     test_dataset = []
     if args.do_train:
-        model = SentenceBertModel(model_name_or_path=args.model_name, encoder_type=EncoderType.FIRST_LAST_AVG,
+        model = SentenceBertModel(model_name_or_path=args.model_name, encoder_type=EncoderType.MEAN,
                                   max_seq_length=args.max_seq_length)
 
         # Convert the dataset to a DataLoader ready for training
@@ -86,7 +86,7 @@ def main():
                     lr=args.learning_rate)
         logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:
-        model = SentenceBertModel(model_name_or_path=args.output_dir, encoder_type=EncoderType.FIRST_LAST_AVG,
+        model = SentenceBertModel(model_name_or_path=args.output_dir, encoder_type=EncoderType.MEAN,
                                   max_seq_length=args.max_seq_length)
         test_data = test_dataset
         test_data = test_data[:100]

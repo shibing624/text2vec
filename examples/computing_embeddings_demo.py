@@ -9,7 +9,7 @@ generate sentence embeddings for a given list of sentences.
 import sys
 
 sys.path.append('..')
-from text2vec import SentenceModel
+from text2vec import SentenceModel, EncoderType
 from text2vec import Word2Vec
 
 
@@ -36,12 +36,16 @@ def compute_emb(model):
 
 
 if __name__ == "__main__":
-    t2v_model = SentenceModel("shibing624/text2vec-base-chinese")  # 中文句向量模型(CoSENT)
+    # 中文句向量模型(CoSENT)
+    t2v_model = SentenceModel("shibing624/text2vec-base-chinese",
+                              encoder_type=EncoderType.FIRST_LAST_AVG)
     compute_emb(t2v_model)
 
-    sbert_model = SentenceModel(
-        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")  # 支持多语言的句向量模型（Sentence-BERT）
+    # 支持多语言的句向量模型（Sentence-BERT）
+    sbert_model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+                                encoder_type=EncoderType.MEAN)
     compute_emb(sbert_model)
 
-    w2v_model = Word2Vec("w2v-light-tencent-chinese")  # 中文词向量模型(word2vec)
+    # 中文词向量模型(word2vec)
+    w2v_model = Word2Vec("w2v-light-tencent-chinese")
     compute_emb(w2v_model)

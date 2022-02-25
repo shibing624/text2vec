@@ -6,7 +6,7 @@ refer: sentence_transformers.SentenceTransformer and simpletransformers
 """
 import os
 from enum import Enum
-from typing import List, Union
+from typing import List, Union, Optional
 from tqdm.autonotebook import trange
 import numpy as np
 import torch
@@ -29,7 +29,7 @@ class SentenceModel:
     def __init__(
             self,
             model_name_or_path: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-            encoder_type: EncoderType = EncoderType.POOLER,
+            encoder_type: EncoderType = EncoderType.MEAN,
             max_seq_length: int = 128
     ):
         """
@@ -44,7 +44,6 @@ class SentenceModel:
         BERT return: <last_hidden_state>, <pooler_output> [hidden_states, attentions]
         Note that: in doc, it says <last_hidden_state> is better semantic summery than <pooler_output>.
         thus, we use <last_hidden_state>.
-
         """
         self.model_name_or_path = model_name_or_path
         self.encoder_type = encoder_type
@@ -53,7 +52,7 @@ class SentenceModel:
         self.model = AutoModel.from_pretrained(model_name_or_path)
         self.model.to(device)
 
-    def get_sentence_embeddings(self, model_output):
+    def get_sentence_embeddings(self, model_output, attention_mask):
         """
         Returns the model layer output by encoder_type as embeddings.
 
@@ -87,8 +86,14 @@ class SentenceModel:
             return model_output.pooler_output  # [batch, hid_size]
 
         if self.encoder_type == EncoderType.MEAN:
-            mean_pooling = torch.mean(model_output.last_hidden_state, dim=1)
-            return mean_pooling  # [batch, hid_size]
+            """
+            Mean Pooling - Take attention mask into account for correct averaging
+            """
+            token_embeddings = model_output.last_hidden_state  # First element of model_output contains all token embeddings
+            input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+            final_encoding = torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(
+                input_mask_expanded.sum(1), min=1e-9)
+            return final_encoding  # [batch, hid_size]
 
     def encode(self, sentences: Union[str, List[str]], batch_size: int = 32):
         """
@@ -116,7 +121,8 @@ class SentenceModel:
             # Compute sentences embeddings
             with torch.no_grad():
                 embeddings = self.get_sentence_embeddings(
-                    self.model(input_ids, attention_mask, token_type_ids, output_hidden_states=True)
+                    self.model(input_ids, attention_mask, token_type_ids, output_hidden_states=True),
+                    attention_mask
                 )
             embeddings = embeddings.detach().cpu()
             all_embeddings.extend(embeddings)
