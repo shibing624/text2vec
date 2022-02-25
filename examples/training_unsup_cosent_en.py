@@ -39,6 +39,26 @@ def calc_similarity_scores(args, sents1, sents2, labels):
     return spearman
 
 
+def load_en_stsb_dataset(stsb_file):
+    # Convert the dataset to a DataLoader ready for training
+    logger.info("Read STSbenchmark dataset")
+    train_samples = []
+    valid_samples = []
+    test_samples = []
+    with gzip.open(stsb_file, 'rt', encoding='utf8') as f:
+        reader = csv.DictReader(f, delimiter='\t', quoting=csv.QUOTE_NONE)
+        for row in reader:
+            score = float(row['score'])
+            if row['split'] == 'dev':
+                valid_samples.append((row['sentence1'], row['sentence2'], score))
+            elif row['split'] == 'test':
+                test_samples.append((row['sentence1'], row['sentence2'], score))
+            else:
+                score = int(score > 2.5)
+                train_samples.append((row['sentence1'], row['sentence2'], score))
+    return train_samples, valid_samples, test_samples
+
+
 def main():
     parser = argparse.ArgumentParser('CoSENT Text Matching task')
     parser.add_argument('--model_name', default='bert-base-uncased', type=str, help='name of transformers model')
@@ -58,7 +78,8 @@ def main():
     args = parser.parse_args()
     logger.info(args)
 
-    test_samples = []
+    _, valid_samples, test_samples = load_en_stsb_dataset(args.stsb_file)
+
     if args.do_train:
         model = CosentModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
                             max_seq_length=args.max_seq_length)
@@ -82,21 +103,8 @@ def main():
                         break
 
         train_dataset = CosentTrainDataset(model.tokenizer, nli_train_samples, args.max_seq_length)
-
-        # Convert the dataset to a DataLoader ready for validation
-        logger.info("Read STSbenchmark dev and test dataset")
-        valid_samples = []
-        test_samples = []
-        with gzip.open(args.stsb_file, 'rt', encoding='utf8') as f:
-            reader = csv.DictReader(f, delimiter='\t', quoting=csv.QUOTE_NONE)
-            for row in reader:
-                score = float(row['score'])
-                if row['split'] == 'dev':
-                    valid_samples.append((row['sentence1'], row['sentence2'], score))
-                elif row['split'] == 'test':
-                    test_samples.append((row['sentence1'], row['sentence2'], score))
-
         valid_dataset = CosentTestDataset(model.tokenizer, valid_samples, args.max_seq_length)
+
         model.train(train_dataset,
                     args.output_dir,
                     eval_dataset=valid_dataset,
@@ -104,21 +112,20 @@ def main():
                     batch_size=args.batch_size,
                     lr=args.learning_rate)
         logger.info(f"Model saved to {args.output_dir}")
+
     if args.do_predict:
         model = CosentModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
                             max_seq_length=args.max_seq_length)
-        test_data = test_samples
-
         # Predict embeddings
         srcs = []
         trgs = []
         labels = []
-        for terms in test_data:
+        for terms in test_samples:
             src, trg, label = terms[0], terms[1], terms[2]
             srcs.append(src)
             trgs.append(trg)
             labels.append(label)
-        logger.debug(f'{test_data[0]}')
+        logger.debug(f'{test_samples[0]}')
         sentence_embeddings = model.encode(srcs)
         logger.debug(f"{type(sentence_embeddings)}, {sentence_embeddings.shape}, {sentence_embeddings[0].shape}")
         # Predict similarity scores
