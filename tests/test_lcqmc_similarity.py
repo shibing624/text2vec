@@ -8,9 +8,9 @@ import unittest
 
 sys.path.append('..')
 
-from text2vec import SBert, cos_sim
+from text2vec import SentenceModel, cos_sim
 
-sbert_model = SBert()
+sbert_model = SentenceModel()
 
 # query1 query2 matching?
 case_same_keywords = [['飞行员没钱买房怎么办？', '父母没钱买房子', False],

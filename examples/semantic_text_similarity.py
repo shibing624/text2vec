@@ -6,7 +6,7 @@
 import sys
 
 sys.path.append('..')
-from text2vec import SBert, cos_sim, Similarity
+from text2vec import SentenceModel, cos_sim, Similarity, SimilarityType, EmbeddingType
 
 # Two lists of sentences
 sentences1 = ['如何更换花呗绑定银行卡',
@@ -19,10 +19,9 @@ sentences2 = ['花呗更改绑定银行卡',
               'A woman watches TV',
               'The new movie is so great']
 
-sim_model = Similarity(model_name_or_path='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2',
-                       similarity_type='cosine', embedding_type='sbert')
+sim_model = Similarity(model_name_or_path='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
 scores = sim_model.get_scores(sentences1, sentences2)
-print('1:\n')
+print('1:use Similarity compute cos scores\n')
 for i in range(len(sentences1)):
     for j in range(len(sentences2)):
         print("{} \t\t {} \t\t Score: {:.4f}".format(sentences1[i], sentences2[j], scores[i][j]))
@@ -31,7 +30,7 @@ print()
 print('-' * 42)
 # 以上相似度计算的逻辑，分解为：
 # Load pre-trained Sentence Transformer Model (based on DistilBERT). It will be downloaded automatically
-model = SBert()
+model = SentenceModel()
 
 # Compute embedding for both lists
 embeddings1 = model.encode(sentences1)
@@ -39,7 +38,7 @@ embeddings2 = model.encode(sentences2)
 
 # Compute cosine-similarits
 cosine_scores = cos_sim(embeddings1, embeddings2)
-print('2:\n')
+print('2:same to 1, use cos_sim compute cos scores\n')
 # Output the pairs with their score
 for i in range(len(sentences1)):
     for j in range(len(sentences2)):
@@ -47,9 +46,9 @@ for i in range(len(sentences1)):
 print()
 
 print('-' * 42)
-print('3:\n')
+print('3:use Word2Vec compute wmd similarity scores\n')
 # 使用Word2Vec计算wmd相似度
-sim2 = Similarity(similarity_type='wmd', embedding_type='w2v')
+sim2 = Similarity(similarity_type=SimilarityType.WMD, embedding_type=EmbeddingType.WORD2VEC)
 scores = sim2.get_scores(sentences1, sentences2)
 for i in range(len(sentences1)):
     for j in range(len(sentences2)):
@@ -78,7 +77,7 @@ embeddings = model.encode(sentences)
 
 # Compute cosine-similarities for each sentence with each other sentence
 cosine_scores = cos_sim(embeddings, embeddings)
-print('4:\n')
+print('4:find out the pairs with the highest cosine similarity scores\n')
 # Find the pairs with the highest cosine similarity scores
 pairs = []
 for i in range(len(cosine_scores) - 1):

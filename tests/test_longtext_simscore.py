@@ -7,9 +7,9 @@ import sys
 import unittest
 
 sys.path.append('..')
-from text2vec import SBert, cos_sim
+from text2vec import SentenceModel, cos_sim
 
-sbert_model = SBert()
+sbert_model = SentenceModel()
 
 a = '你们都喜欢火影忍者里的谁啊，你说的到底是谁？看Bert里面extract_features.py这个文件，可以得到类似预训练的词向量组成的句子表示，' \
     '类似于Keras里面第一步Embedding层。以题主所说的句子相似度计算为例，只需要把两个句子用分隔符隔开送到bert的输入（首位加特殊标记符' \

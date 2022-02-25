@@ -18,9 +18,9 @@ from torch.utils.data import DataLoader
 from transformers import BertTokenizer, AdamW, get_linear_schedule_with_warmup
 
 sys.path.append('../..')
-from text2vec.sentence_bert.model import Model
-from text2vec.sentence_bert.train import set_seed, calc_loss, evaluate
-from text2vec.sentence_bert.data_helper import TrainDataset
+from text2vec.cosent.model import Model
+from text2vec.cosent.train import set_seed, calc_loss, evaluate
+from text2vec.cosent.data_helper import TrainDataset, TestDataset
 from text2vec.utils.get_file import http_get
 
 pwd_path = os.path.abspath(os.path.dirname(__file__))
@@ -32,7 +32,7 @@ def set_args():
     """
     参数
     """
-    parser = argparse.ArgumentParser('--SBERT进行相似性判断')
+    parser = argparse.ArgumentParser('--CoSENT进行相似性判断')
     parser.add_argument('--task_name', default='English-STS-B', type=str, help='数据名称')
     parser.add_argument('--is_nli_and_stsb', default=False, type=bool, help='Trained on NLI data + STSb data')
     # 'sentence-transformers/bert-base-nli-mean-tokens'
@@ -69,21 +69,16 @@ def train(model, train_dataloader, valid_dataloader, test_dataloader, args, toke
     logs_path = os.path.join(args.output_dir, 'logs.txt')
     best = 0
     for epoch in range(args.num_train_epochs):
-        model.train()
+        model._train()
         for step, batch in enumerate(tqdm(train_dataloader)):
-            source, target, labels = batch
+            source, labels = batch
             labels = labels.to(device)
             # source        [batch, 1, seq_len] -> [batch, seq_len]
             source_input_ids = source.get('input_ids').squeeze(1).to(device)
             source_attention_mask = source.get('attention_mask').squeeze(1).to(device)
             source_token_type_ids = source.get('token_type_ids').squeeze(1).to(device)
-            # target        [batch, 1, seq_len] -> [batch, seq_len]
-            target_input_ids = target.get('input_ids').squeeze(1).to(device)
-            target_attention_mask = target.get('attention_mask').squeeze(1).to(device)
-            target_token_type_ids = target.get('token_type_ids').squeeze(1).to(device)
-            outputs = model(source_input_ids, source_attention_mask, source_token_type_ids,
-                            target_input_ids, target_attention_mask, target_token_type_ids)
-            loss = calc_loss(outputs, labels)
+            outputs = model(source_input_ids, source_attention_mask, source_token_type_ids)
+            loss = calc_loss(labels, outputs)
             loss.backward()
             logger.info(f"Epoch:{epoch}, Batch:{step}/{len(train_dataloader)}, Loss:{loss.item():.6f}")
 
@@ -95,7 +90,7 @@ def train(model, train_dataloader, valid_dataloader, test_dataloader, args, toke
         corr = evaluate(model, valid_dataloader)
         with open(logs_path, 'a+') as f:
             f.write(f'Task:{args.task_name}, Epoch:{epoch}, Valid, Spearman corr: {corr:.6f}\n')
-        model.train()
+        model._train()
         if best < corr:
             best = corr
             # 先保存原始transformer bert model
@@ -118,6 +113,8 @@ def main():
     set_seed(args.seed)
     os.makedirs(args.output_dir, exist_ok=True)
     tokenizer = BertTokenizer.from_pretrained(args.pretrained_model_path)
+    model = Model(args.pretrained_model_path, encoder_type='first-last-avg')
+    model.to(device)
 
     # Check if dataset exsist. If not, download and extract it
     sts_dataset_path = os.path.join(pwd_path, '../data/English-STS-B/', 'stsbenchmark.tsv.gz')
@@ -125,7 +122,7 @@ def main():
         http_get('https://sbert.net/datasets/stsbenchmark.tsv.gz', sts_dataset_path)
 
     # Convert the dataset to a DataLoader ready for training
-    logger.info("Read STSbenchmark train dataset")
+    logger.info("Read STSbenchmark _train dataset")
     train_samples = []
     valid_samples = []
     test_samples = []
@@ -138,38 +135,35 @@ def main():
             elif row['split'] == 'test':
                 test_samples.append((row['sentence1'], row['sentence2'], score))
             else:
-                score = int(score > 2.5)
-                train_samples.append((row['sentence1'], row['sentence2'], score))
+                train_samples.append((row['sentence1'], score))
+                train_samples.append((row['sentence2'], score))
     sts_train_dataloader = DataLoader(dataset=TrainDataset(train_samples, tokenizer, args.max_len), shuffle=True,
                                       batch_size=args.train_batch_size)
-    valid_dataloader = DataLoader(dataset=TrainDataset(valid_samples, tokenizer, args.max_len),
+    valid_dataloader = DataLoader(dataset=TestDataset(valid_samples, tokenizer, args.max_len),
                                   batch_size=args.train_batch_size)
-    test_dataloader = DataLoader(dataset=TrainDataset(test_samples, tokenizer, args.max_len),
+    test_dataloader = DataLoader(dataset=TestDataset(test_samples, tokenizer, args.max_len),
                                  batch_size=args.train_batch_size)
     if args.is_nli_and_stsb:
         nli_dataset_path = os.path.join(pwd_path, '../data/English-STS-B/', 'AllNLI.tsv.gz')
         if not os.path.exists(nli_dataset_path):
             http_get('https://sbert.net/datasets/AllNLI.tsv.gz', nli_dataset_path)
         # Read the AllNLI.tsv.gz file and create the training dataset
-        logger.info("Read AllNLI train dataset")
+        logger.info("Read AllNLI _train dataset")
         nli_train_samples = []
         label2int = {"contradiction": 0, "entailment": 1, "neutral": 2}
         with gzip.open(nli_dataset_path, 'rt', encoding='utf8') as fIn:
             reader = csv.DictReader(fIn, delimiter='\t', quoting=csv.QUOTE_NONE)
             for row in reader:
-                if row['split'] == 'train':
+                if row['split'] == '_train':
                     label_id = label2int[row['label']]
-                    nli_train_samples.append((row['sentence1'], row['sentence2'], label_id))
+                    nli_train_samples.append((row['sentence1'], label_id))
+                    nli_train_samples.append((row['sentence2'], label_id))
         nli_train_dataloader = DataLoader(dataset=TrainDataset(nli_train_samples, tokenizer, args.max_len),
                                           shuffle=True, batch_size=args.train_batch_size)
         # 无监督实验，在NLI train数据上训练，评估模型在STS test上的表现
-        model = Model(args.pretrained_model_path, encoder_type='first-last-avg', num_classes=3)
-        model.to(device)
         train(model, nli_train_dataloader, valid_dataloader, test_dataloader, args, tokenizer)
     else:
         # 有监督实验，在STS train数据上训练，评估模型在STS test上的表现
-        model = Model(args.output_dir, encoder_type='first-last-avg', num_classes=2)
-        model.to(device)
         train(model, sts_train_dataloader, valid_dataloader, test_dataloader, args, tokenizer)
 
 

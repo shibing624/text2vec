@@ -9,10 +9,10 @@ generate sentence embeddings for a given list of sentences.
 import sys
 
 sys.path.append('..')
-from text2vec import SBert, cos_sim, semantic_search, Similarity
+from text2vec import SentenceModel, cos_sim, semantic_search, Similarity
 
 if __name__ == '__main__':
-    sbert_model = SBert('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+    sbert_model = SentenceModel('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
     # Corpus with example sentences
     corpus = [
         '花呗更改绑定银行卡',
@@ -36,6 +36,7 @@ if __name__ == '__main__':
     for sentence, embedding in zip(corpus, corpus_embeddings):
         print("Sentence:", sentence)
         print("Embedding shape:", embedding.shape)
+        print("Embedding head:", embedding[:10])
         print()
 
     # 2. Compute cosine-similarities for sentence1 and sentence2

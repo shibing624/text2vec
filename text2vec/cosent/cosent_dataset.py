@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 @author:XuMing(xuming624@qq.com)
-@description:
+@description: 
 """
+
+import os
 from torch.utils.data import Dataset
 from loguru import logger
+from transformers import PreTrainedTokenizer
 
 
 def load_train_data(path):
@@ -32,38 +35,42 @@ def load_test_data(path):
     return data
 
 
-class TrainDataset(Dataset):
+class CosentTrainDataset(Dataset):
     """训练数据集, 重写__getitem__和__len__方法"""
 
-    def __init__(self, data, tokenizer, max_len=64):
-        self.data = data
+    def __init__(self, tokenizer: PreTrainedTokenizer, file_path: str, max_len: int = 64):
         self.tokenizer = tokenizer
+        assert os.path.isfile(file_path), f"Input file path {file_path} not found"
+        self.data = load_train_data(file_path)
         self.max_len = max_len
 
     def __len__(self):
         return len(self.data)
 
     def text_2_id(self, text: str):
-        return self.tokenizer(text, max_length=self.max_len, truncation=True, padding='max_length', return_tensors='pt')
+        return self.tokenizer(text, max_length=self.max_len, truncation=True,
+                              padding='max_length', return_tensors='pt')
 
     def __getitem__(self, index: int):
         line = self.data[index]
         return self.text_2_id([line[0]]), line[1]
 
 
-class TestDataset(Dataset):
+class CosentTestDataset(Dataset):
     """测试数据集, 重写__getitem__和__len__方法"""
 
-    def __init__(self, data, tokenizer, max_len=64):
-        self.data = data
+    def __init__(self, tokenizer: PreTrainedTokenizer, file_path: str, max_len: int = 64):
         self.tokenizer = tokenizer
+        assert os.path.isfile(file_path), f"Input file path {file_path} not found"
+        self.data = load_test_data(file_path)
         self.max_len = max_len
 
     def __len__(self):
         return len(self.data)
 
     def text_2_id(self, text: str):
-        return self.tokenizer(text, max_length=self.max_len, truncation=True, padding='max_length', return_tensors='pt')
+        return self.tokenizer(text, max_length=self.max_len, truncation=True,
+                              padding='max_length', return_tensors='pt')
 
     def __getitem__(self, index: int):
         line = self.data[index]

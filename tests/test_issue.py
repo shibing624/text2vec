@@ -8,10 +8,10 @@ import unittest
 
 sys.path.append('..')
 
-from text2vec import SBert, cos_sim
+from text2vec import SentenceModel, cos_sim
 from text2vec import BM25
 
-sbert_model = SBert()
+sbert_model = SentenceModel()
 
 
 def sbert_sim_score(str_a, str_b):

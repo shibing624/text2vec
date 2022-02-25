@@ -8,8 +8,7 @@ import sys
 import unittest
 
 sys.path.append('..')
-from text2vec import SBert
-import numpy as np
+from text2vec import SentenceModel
 
 
 def use_transformers(sentences=('如何更换花呗绑定银行卡', '花呗更改绑定银行卡')):
@@ -43,7 +42,7 @@ class SBERTEmbeddingsTestCase(unittest.TestCase):
     def test_encode_text(self):
         """测试文本 text encode结果"""
         a = '如何更换花呗绑定银行卡'
-        m = SBert('shibing624/text2vec-base-chinese')
+        m = SentenceModel('shibing624/text2vec-base-chinese')
         emb = m.encode(a)
         print(a, emb)
         self.assertEqual(emb.shape, (768,))

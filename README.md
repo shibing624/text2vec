@@ -94,7 +94,7 @@ Cross-Encoder适用于向量检索精排。
 # Feature
 ### 文本向量表示模型
 - [Word2Vec](text2vec/word2vec.py)：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe）实现词向量检索，本项目实现了句子（词向量求平均）的word2vec向量表示
-- [SBert(Sentence-BERT)](text2vec/sentence_bert)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
+- [SentenceModel(Sentence-BERT)](text2vec/sentence_bert)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
 - [CoSENT(Cosine Sentence)](text2vec/cosent)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
 
 ### 文本相似度比较方法
@@ -103,7 +103,7 @@ Cross-Encoder适用于向量检索精排。
 - 点积（Dot Product）：两向量归一化后求内积
 - 词移距离（Word Mover’s Distance）：词移距离使用两文本间的词向量，测量其中一文本中的单词在语义空间中移动到另一文本单词所需要的最短距离
 - [RankBM25](text2vec/bm25.py)：BM25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序
-- [SemanticSearch](https://github.com/shibing624/text2vec/blob/master/text2vec/sbert.py#L80)：向量相似检索，使用Cosine Similarty + topk高效计算，比一对一暴力计算快一个数量级
+- [SemanticSearch](https://github.com/shibing624/text2vec/blob/master/text2vec/sentencemodel.py#L80)：向量相似检索，使用Cosine Similarty + topk高效计算，比一对一暴力计算快一个数量级
 
 # Evaluate
 
@@ -191,8 +191,8 @@ python3 setup.py install
 基于`pretrained model`计算文本向量
 
 ```shell
->>> from text2vec import SBert
->>> m = SBert()
+>>> from text2vec import SentenceModel
+>>> m = SentenceModel()
 >>> m.encode("如何更换花呗绑定银行卡")
 Embedding shape: (384,)
 ```
@@ -203,7 +203,8 @@ Embedding shape: (384,)
 import sys
 
 sys.path.append('..')
-from text2vec import SBert, Word2Vec
+from text2vec import SentenceModel, Word2Vec
+
 
 def compute_emb(model):
     # Embed a list of sentences
@@ -224,13 +225,14 @@ def compute_emb(model):
         print("Embedding shape:", embedding.shape)
         print("")
 
-t2v_model = SBert("shibing624/text2vec-base-chinese") # 中文句向量模型(CoSENT)
+
+t2v_model = SentenceModel("shibing624/text2vec-base-chinese")  # 中文句向量模型(CoSENT)
 compute_emb(t2v_model)
 
-sbert_model = SBert("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2") # 支持多语言的句向量模型（Sentence-BERT）
+sbert_model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")  # 支持多语言的句向量模型（Sentence-BERT）
 compute_emb(sbert_model)
 
-w2v_model = Word2Vec("w2v-light-tencent-chinese") # 中文词向量模型(word2vec)
+w2v_model = Word2Vec("w2v-light-tencent-chinese")  # 中文词向量模型(word2vec)
 compute_emb(w2v_model)
 ```
 
@@ -350,9 +352,9 @@ The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 import sys
 
 sys.path.append('..')
-from text2vec import SBert, cos_sim, semantic_search
+from text2vec import SentenceModel, cos_sim, semantic_search
 
-embedder = SBert()
+embedder = SentenceModel()
 
 # Corpus with example sentences
 corpus = [

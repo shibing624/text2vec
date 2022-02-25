@@ -10,7 +10,7 @@ from time import time
 import os
 
 sys.path.append('..')
-from text2vec import Similarity, SimType, EmbType
+from text2vec import Similarity, SimilarityType, EmbeddingType
 from text2vec.cosent.train import compute_corrcoef
 from text2vec.cosent.data_helper import load_test_data
 
@@ -21,7 +21,7 @@ sts_test_path = os.path.join(pwd_path, '../text2vec/data/STS-B/STS-B.test.data')
 class SimTestCase(unittest.TestCase):
     def test_w2v_sim_each(self):
         """测试w2v_sim_each"""
-        m = Similarity(similarity_type=SimType.COSINE, embedding_type=EmbType.W2V)
+        m = Similarity(similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.WORD2VEC)
         sents1, sents2, labels = load_test_data(sts_test_path)
         t1 = time()
         scores = []
@@ -37,7 +37,7 @@ class SimTestCase(unittest.TestCase):
 
     def test_w2v_sim_batch(self):
         """测试w2v_sim_batch"""
-        m = Similarity(similarity_type=SimType.COSINE, embedding_type=EmbType.W2V)
+        m = Similarity(similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.WORD2VEC)
         sents1, sents2, labels = load_test_data(sts_test_path)
         t1 = time()
         scores = m.get_scores(sents1, sents2)
@@ -53,7 +53,7 @@ class SimTestCase(unittest.TestCase):
 
     def test_sbert_sim_each(self):
         """测试sbert_sim_each"""
-        m = Similarity(similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT)
+        m = Similarity(similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.BERT)
         sents1, sents2, labels = load_test_data(sts_test_path)
         t1 = time()
         scores = []
@@ -69,7 +69,7 @@ class SimTestCase(unittest.TestCase):
 
     def test_sbert_sim_batch(self):
         """测试sbert_sim_each_batch"""
-        m = Similarity(similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT)
+        m = Similarity(similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.BERT)
         sents1, sents2, labels = load_test_data(sts_test_path)
         t1 = time()
         scores = m.get_scores(sents1, sents2)

@@ -9,7 +9,7 @@ import unittest
 from time import time
 
 sys.path.append('..')
-from text2vec import Word2Vec, SBert
+from text2vec import Word2Vec, SentenceModel
 from text2vec.cosent.data_helper import load_test_data
 
 pwd_path = os.path.abspath(os.path.dirname(__file__))
@@ -20,7 +20,7 @@ class QPSEncoderTestCase(unittest.TestCase):
     def test_cosent_speed(self):
         """测试cosent_speed"""
         sents1, sents2, labels = load_test_data(sts_test_path)
-        m = SBert('shibing624/text2vec-base-chinese')
+        m = SentenceModel('shibing624/text2vec-base-chinese')
         sents = sents1 + sents2
         print('sente size:', len(sents))
         t1 = time()
@@ -66,7 +66,7 @@ class QPSEncoderTestCase(unittest.TestCase):
     def test_sbert_speed(self):
         """测试sbert_speed"""
         sents1, sents2, labels = load_test_data(sts_test_path)
-        m = SBert()
+        m = SentenceModel()
         sents = sents1 + sents2
         print('sente size:', len(sents))
         t1 = time()

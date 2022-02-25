@@ -10,7 +10,7 @@ from time import time
 import os
 
 sys.path.append('..')
-from text2vec import Similarity, SimType, EmbType
+from text2vec import Similarity, SimilarityType, EmbeddingType
 from text2vec.cosent.train import compute_corrcoef
 from text2vec.cosent.data_helper import load_test_data
 
@@ -22,7 +22,7 @@ class SimModelTestCase(unittest.TestCase):
         """测试test_w2v_sim_batch"""
         model_name = 'w2v-light-tencent-chinese'
         print(model_name)
-        m = Similarity(model_name, similarity_type=SimType.COSINE, embedding_type=EmbType.W2V)
+        m = Similarity(model_name, similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.WORD2VEC)
         test_path = os.path.join(pwd_path, '../text2vec/data/STS-B/STS-B.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()
@@ -101,7 +101,7 @@ class SimModelTestCase(unittest.TestCase):
         """测试sbert_sim_each_batch"""
         model_name = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
         print(model_name)
-        m = Similarity(model_name, similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT)
+        m = Similarity(model_name, similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.BERT)
         test_path = os.path.join(pwd_path, '../text2vec/data/STS-B/STS-B.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()
@@ -178,7 +178,7 @@ class SimModelTestCase(unittest.TestCase):
 
     def test_set_sim_model_batch(self):
         """测试test_set_sim_model_batch"""
-        m = Similarity('shibing624/text2vec-base-chinese', similarity_type=SimType.COSINE, embedding_type=EmbType.SBERT)
+        m = Similarity('shibing624/text2vec-base-chinese', similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.BERT)
         test_path = os.path.join(pwd_path, '../text2vec/data/STS-B/STS-B.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()

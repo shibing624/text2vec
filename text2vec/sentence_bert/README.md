@@ -30,17 +30,19 @@ test测试集的评估结果：
 - 复现脚本
 执行以下脚本，直接复现上表中`Sentence-MacBERT`的模型效果：
 ```shell
-cd sentence_bert
-sh train.sh 
+cd examples
+CUDA_VISIBLE_DEVICES=0
+python3 training_sup_sentencebert.py --do_train --do_predict --num_epochs 10 --output_dir outputs/STS-B-model > outputs/STS-B.log 2>&1
 ```
+
 ## 使用说明
 #### 训练
 ```shell
-python train.py
+python3 training_sup_sentencebert.py --do_train --num_epochs 10 --output_dir outputs/STS-B-model > outputs/STS-B.log 2>&1
 ```
 #### 预测
 ```shell
-python infer.py
+python3 training_sup_sentencebert.py --do_predict --output_dir outputs/STS-B-model > outputs/STS-B.log 2>&1
 ```
 
 # Reference
