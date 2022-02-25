@@ -193,8 +193,9 @@ class CosentModel(SentenceModel):
 
         training_progress_scores = {
             "global_step": [],
-            "spearman": [],
             "train_loss": [],
+            "eval_spearman": [],
+            "eval_pearson": [],
         }
         for current_epoch in trange(int(num_epochs), desc="Epoch", disable=False, mininterval=0):
             self.model.train()
@@ -247,7 +248,7 @@ class CosentModel(SentenceModel):
             report = pd.DataFrame(training_progress_scores)
             report.to_csv(os.path.join(output_dir, "training_progress_scores.csv"), index=False)
 
-            eval_spearman = results["spearman"]
+            eval_spearman = results["eval_spearman"]
             if eval_spearman < best_eval_metric:
                 best_eval_metric = eval_spearman
                 self.save_model(output_dir, model=self.model, results=results)
@@ -317,8 +318,8 @@ class CosentModel(SentenceModel):
         logger.debug(f"preds:  {batch_preds[:10]}")
         logger.debug(f"pearson: {pearson}, spearman: {spearman}")
 
-        results["spearman"] = spearman
-        results["pearson"] = pearson
+        results["eval_spearman"] = spearman
+        results["eval_pearson"] = pearson
         if output_dir:
             os.makedirs(output_dir, exist_ok=True)
             with open(os.path.join(output_dir, "eval_results.txt"), "w") as writer:
