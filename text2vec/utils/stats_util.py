@@ -6,7 +6,7 @@
 from loguru import logger
 import random
 import numpy as np
-import scipy.stats
+from scipy.stats import pearsonr, spearmanr
 import torch
 
 
@@ -34,14 +34,14 @@ def compute_spearmanr(x, y):
     """
     Spearman相关系数
     """
-    return scipy.stats.spearmanr(x, y).correlation
+    return spearmanr(x, y).correlation
 
 
 def compute_pearsonr(x, y):
     """
     Pearson系数
     """
-    return scipy.stats.perasonr(x, y)[0]
+    return pearsonr(x, y)[0]
 
 
 def mean_pooling(model_output, attention_mask):
