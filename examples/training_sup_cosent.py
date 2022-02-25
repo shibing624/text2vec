@@ -70,21 +70,20 @@ def main():
         model = CosentModel(model_name_or_path=args.output_dir, encoder_type=EncoderType.FIRST_LAST_AVG,
                             max_seq_length=args.max_seq_length)
         test_data = load_test_data(args.test_file)
-        test_data = test_data[:20]
+        test_data = test_data[:500]
 
         # Predict embeddings
         srcs = []
         trgs = []
         labels = []
-        for src, trg, label in test_data:
+        for terms in test_data:
+            src, trg, label = terms[0], terms[1], terms[2]
             srcs.append(src)
             trgs.append(trg)
             labels.append(label)
-            logger.debug(f'{src} {trg} {label}')
-            sentence_embeddings = model.encode(src)
-            logger.debug("Input :", src)
-            logger.debug("Output:", sentence_embeddings.shape)
-            logger.debug("=" * 20)
+        logger.debug(f'{test_data[0]}')
+        sentence_embeddings = model.encode(srcs)
+        logger.debug(type(sentence_embeddings), sentence_embeddings.shape, sentence_embeddings[0].shape)
         # Predict similarity scores
         calc_similarity_scores(args.output_dir, srcs, trgs, labels)
 

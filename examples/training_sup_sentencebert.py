@@ -76,18 +76,16 @@ def main():
         srcs = []
         trgs = []
         labels = []
-        for src, trg, label in test_data:
+        for terms in test_data:
+            src, trg, label = terms[0], terms[1], terms[2]
             srcs.append(src)
             trgs.append(trg)
             labels.append(label)
-            logger.debug(f'{src} {trg} {label}')
-            sentence_embeddings = model.encode(src)
-            logger.debug("Input :", src)
-            logger.debug("Output:", sentence_embeddings.shape)
-            logger.debug("=" * 20)
+        logger.debug(f'{test_data[0]}')
+        sentence_embeddings = model.encode(srcs)
+        logger.debug(type(sentence_embeddings), sentence_embeddings.shape, sentence_embeddings[0].shape)
         # Predict similarity scores
-        calc_similarity_scores(args.model_dir, srcs, trgs, labels)
+        calc_similarity_scores(args.output_dir, srcs, trgs, labels)
 
-
-if __name__ == '__main__':
-    main()
+    if __name__ == '__main__':
+        main()
