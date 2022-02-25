@@ -38,7 +38,7 @@ class SentenceBertModel(SentenceModel):
             num_classes: Number of classes for classification.
         """
         super().__init__(model_name_or_path, encoder_type, max_seq_length)
-        self.fc = nn.Linear(self.model.config.hidden_size * 3, num_classes)
+        self.fc = nn.Linear(self.model.config.hidden_size * 3, num_classes).to(device)
         self.results = {}
 
     def train_model(
@@ -173,10 +173,9 @@ class SentenceBertModel(SentenceModel):
 
         logger.info("  Training started")
         global_step = 0
-        tr_loss, logging_loss = 0.0, 0.0
         self.model.zero_grad()
         epoch_number = 0
-        best_eval_metric = 1e3
+        best_eval_metric = 0
         steps_trained_in_current_epoch = 0
         epochs_trained = 0
 
@@ -249,7 +248,6 @@ class SentenceBertModel(SentenceModel):
                     loss = loss / gradient_accumulation_steps
 
                 loss.backward()
-                tr_loss += loss.item()
                 if (step + 1) % gradient_accumulation_steps == 0:
                     torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_grad_norm)
                     optimizer.step()
@@ -268,8 +266,9 @@ class SentenceBertModel(SentenceModel):
             report.to_csv(os.path.join(output_dir, "training_progress_scores.csv"), index=False)
 
             eval_spearman = results["eval_spearman"]
-            if eval_spearman < best_eval_metric:
+            if eval_spearman > best_eval_metric:
                 best_eval_metric = eval_spearman
+                logger.info(f"Save new best model, best_eval_metric: {best_eval_metric}")
                 self.save_model(output_dir, model=self.model, results=results)
 
             if 0 < max_steps < global_step:
@@ -355,7 +354,7 @@ class SentenceBertModel(SentenceModel):
         :param results:
         :return:
         """
-        logger.info("Saving model checkpoint to %s", output_dir)
+        logger.info(f"Saving model checkpoint to {output_dir}")
         os.makedirs(output_dir, exist_ok=True)
         model_to_save = model.module if hasattr(model, "module") else model
         model_to_save.save_pretrained(output_dir)
