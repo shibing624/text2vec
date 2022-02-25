@@ -52,6 +52,7 @@ def main():
     parser.add_argument('--num_epochs', default=10, type=int, help='Number of training epochs')
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='Learning rate')
+    parser.add_argument('--nli_limit_size', default=200000, type=float, help='Learning rate')
     args = parser.parse_args()
     logger.info(args)
 
@@ -75,6 +76,9 @@ def main():
                     label_id = label2int[row['label']]
                     nli_train_samples.append((row['sentence1'], label_id))
                     nli_train_samples.append((row['sentence2'], label_id))
+                    if len(nli_train_samples) > args.nli_limit_size:
+                        break
+
         train_dataset = CosentTrainDataset(model.tokenizer, nli_train_samples, args.max_seq_length)
 
         # Convert the dataset to a DataLoader ready for validation
