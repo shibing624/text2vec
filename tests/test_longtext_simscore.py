@@ -36,7 +36,7 @@ class TestCase(unittest.TestCase):
     def test_bert_sim(self):
         r = sbert_sim_score(a, b)
         print(r)
-        self.assertEqual(round(r, 3), 0.791)
+        self.assertEqual(round(r, 3), 0.889)
 
 
 if __name__ == '__main__':

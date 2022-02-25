@@ -50,7 +50,7 @@ class EmbeddingsTestCase(unittest.TestCase):
         w = '，'
         comma_res = w2v_model.encode(w)
         print(w, comma_res)
-        self.assertEqual(comma_res, 0.0)
+        self.assertEqual(comma_res[0], 0.0)
 
         w = '特价机票'
         r = w2v_model.encode(w)
