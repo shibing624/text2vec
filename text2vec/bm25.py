@@ -4,8 +4,7 @@
 @description: 
 """
 
-from typing import List, Union, Tuple
-import numpy as np
+from typing import List, Union, Tuple, Optional
 from text2vec.utils.rank_bm25 import BM25Okapi
 from text2vec.utils.tokenizer import JiebaTokenizer
 
@@ -30,18 +29,18 @@ class BM25:
             if isinstance(self.corpus, str) or not hasattr(self.corpus, '__len__'):
                 self.corpus = [self.corpus]
 
-            self.corpus_seg = {k: self.jieba_tokenizer.tokenize(k) for k in self.corpus}
+            self.corpus_seg = {k: self.jieba_tokenizer.tokenize(k, HMM=False) for k in self.corpus}
             self.bm25_instance = BM25Okapi(corpus=list(self.corpus_seg.values()))
 
-    def get_scores(self, query: str, top_k: int = 10) -> List[Tuple[str, float]]:
+    def get_scores(self, query: str, top_k: Optional[int] = None) -> List[Tuple[str, float]]:
         """
         Get scores between query and docs
-        :param query: str, input str
-        :param top_k: int
+        :param query: str, input str, no need segment, auto segment by jieba
+        :param top_k: int, top k results, default is None, means return all results
         :return: list, List[corpus_str, score] for query between docs
         """
         self.init()
-        tokens = self.jieba_tokenizer.tokenize(query)
+        tokens = self.jieba_tokenizer.tokenize(query, HMM=False)
         scores = self.bm25_instance.get_scores(query=tokens)
 
         corpus_scores = list(zip(self.corpus, scores))
