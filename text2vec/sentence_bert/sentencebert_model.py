@@ -19,15 +19,13 @@ from text2vec.sentence_model import SentenceModel, EncoderType, device
 from text2vec.sentence_bert.sentencebert_dataset import SentenceBertTrainDataset, SentenceBertTestDataset
 from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr, set_seed
 
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-
 
 class SentenceBertModel(SentenceModel):
     def __init__(
             self,
             model_name_or_path: str = "hfl/chinese-macbert-base",
             encoder_type: EncoderType = EncoderType.FIRST_LAST_AVG,
-            max_seq_length: int = 64,
+            max_seq_length: int = 128,
             num_classes: int = 2,
     ):
         """
@@ -35,11 +33,12 @@ class SentenceBertModel(SentenceModel):
 
         Args:
             model_name_or_path: Default Transformer model name or path to a directory containing Transformer model file (pytorch_nodel.bin).
+            encoder_type: EncoderType.FIRST_LAST_AVG or EncoderType.LAST_AVG or EncoderType.POOLER
             max_seq_length: The maximum total input sequence length after tokenization.
+            num_classes: Number of classes for classification.
         """
-        super().__init__(model_name_or_path, encoder_type)
+        super().__init__(model_name_or_path, encoder_type, max_seq_length)
         self.fc = nn.Linear(self.model.config.hidden_size * 3, num_classes)
-        self.max_seq_length = max_seq_length
         self.results = {}
 
     def train_model(

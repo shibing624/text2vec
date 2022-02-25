@@ -32,7 +32,7 @@ def set_args():
     """
     参数
     """
-    parser = argparse.ArgumentParser('--CoSENT进行相似性判断')
+    parser = argparse.ArgumentParser()
     parser.add_argument('--task_name', default='English-STS-B', type=str, help='数据名称')
     parser.add_argument('--is_nli_and_stsb', default=False, type=bool, help='Trained on NLI data + STSb data')
     # 'sentence-transformers/bert-base-nli-mean-tokens'

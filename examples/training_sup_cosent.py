@@ -31,26 +31,26 @@ def calc_similarity_scores(model_dir, sents1, sents2, labels):
         sims.append(s[i][i])
     sims = np.array(sims)
     labels = np.array(labels)
-    corrcoef = compute_spearmanr(labels, sims)
+    spearman = compute_spearmanr(labels, sims)
     logger.debug(f'labels: {labels[:10]}')
     logger.debug(f'preds:  {sims[:10]}')
-    logger.debug(f'Spearman corr: {corrcoef}')
+    logger.debug(f'Spearman: {spearman}')
     logger.debug(f'spend time: {spend_time}, count:{len(sents1 + sents2)}, qps: {len(sents1 + sents2) / spend_time}')
-    return corrcoef
+    return spearman
 
 
 def main():
     parser = argparse.ArgumentParser('--CoSENT Text Matching task')
     parser.add_argument('--model_name', default='hfl/chinese-macbert-base', type=str,
                         help='Model Arch, such as: hfl/chinese-macbert-base')
-    parser.add_argument('--train_path', default='data/STS-B/STS-B.train.data', type=str, help='Train data path')
-    parser.add_argument('--valid_path', default='data/STS-B/STS-B.valid.data', type=str, help='Valid data path')
-    parser.add_argument('--test_path', default='data/STS-B/STS-B.test.data', type=str, help='Test data path')
+    parser.add_argument('--train_file', default='data/STS-B/STS-B.train.data', type=str, help='Train data path')
+    parser.add_argument('--valid_file', default='data/STS-B/STS-B.valid.data', type=str, help='Valid data path')
+    parser.add_argument('--test_file', default='data/STS-B/STS-B.test.data', type=str, help='Test data path')
     parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
     parser.add_argument("--do_predict", action="store_true", help="Whether to run predict.")
-    parser.add_argument('--output_dir', default='./output_finetuned_cosent', type=str, help='Model output directory')
+    parser.add_argument('--output_dir', default='./outputs/STS-B-cosent', type=str, help='Model output directory')
     parser.add_argument('--max_seq_length', default=64, type=int, help='Max sequence length')
-    parser.add_argument('--num_epochs', default=1, type=int, help='Number of training epochs')
+    parser.add_argument('--num_epochs', default=3, type=int, help='Number of training epochs')
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='Learning rate')
     args = parser.parse_args()
@@ -60,14 +60,14 @@ def main():
         model = CosentModel(model_name_or_path=args.model_name, encoder_type=EncoderType.FIRST_LAST_AVG,
                             max_seq_length=args.max_seq_length)
         model.train_model(args.train_file,
-                          args.model_dir,
+                          args.output_dir,
                           eval_file=args.valid_file,
                           num_epochs=args.num_epochs,
                           batch_size=args.batch_size,
                           lr=args.learning_rate)
-        logger.info(f"Model saved to {args.model_dir}")
+        logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:
-        model = CosentModel(model_name_or_path=args.model_dir, encoder_type=EncoderType.FIRST_LAST_AVG,
+        model = CosentModel(model_name_or_path=args.output_dir, encoder_type=EncoderType.FIRST_LAST_AVG,
                             max_seq_length=args.max_seq_length)
         test_data = load_test_data(args.test_file)
         test_data = test_data[:20]
@@ -86,7 +86,7 @@ def main():
             logger.debug("Output:", sentence_embeddings.shape)
             logger.debug("=" * 20)
         # Predict similarity scores
-        calc_similarity_scores(args.model_dir, srcs, trgs, labels)
+        calc_similarity_scores(args.output_dir, srcs, trgs, labels)
 
 
 if __name__ == '__main__':

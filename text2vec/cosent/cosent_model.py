@@ -5,7 +5,6 @@
 """
 
 import os
-from typing import Dict, List, Union
 from loguru import logger
 import math
 import pandas as pd
@@ -17,15 +16,13 @@ from text2vec.sentence_model import SentenceModel, EncoderType, device
 from text2vec.cosent.cosent_dataset import CosentTestDataset, CosentTrainDataset
 from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr, set_seed
 
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-
 
 class CosentModel(SentenceModel):
     def __init__(
             self,
             model_name_or_path: str = "hfl/chinese-macbert-base",
             encoder_type: EncoderType = EncoderType.FIRST_LAST_AVG,
-            max_seq_length: int = 64,
+            max_seq_length: int = 128,
     ):
         """
         Initializes a CoSENT Model.
@@ -34,10 +31,7 @@ class CosentModel(SentenceModel):
             model_name_or_path: Default Transformer model name or path to a directory containing Transformer model file (pytorch_nodel.bin).
             max_seq_length: The maximum total input sequence length after tokenization.
         """
-        super().__init__(model_name_or_path, encoder_type)
-        self.model_name_or_path = model_name_or_path
-        self.encoder_type = encoder_type
-        self.max_seq_length = max_seq_length
+        super().__init__(model_name_or_path, encoder_type, max_seq_length)
         self.results = {}
 
     def train_model(
@@ -276,6 +270,7 @@ class CosentModel(SentenceModel):
             logger.info(self.results)
 
         return result
+
     def evaluate(self, eval_dataset, output_dir: str = None, batch_size: int = 16):
         """
         Evaluates the model on eval_dataset.
