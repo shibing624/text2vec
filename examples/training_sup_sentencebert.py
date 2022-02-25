@@ -5,7 +5,6 @@
 """
 import argparse
 import sys
-import os
 import time
 import numpy as np
 from loguru import logger
@@ -14,13 +13,11 @@ sys.path.append('..')
 
 from text2vec.sentence_bert.sentencebert_model import SentenceBertModel, EncoderType
 from text2vec.sentence_bert.sentencebert_dataset import load_test_data
-from text2vec import SentenceModel, cos_sim, compute_spearmanr
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+from text2vec import cos_sim, compute_spearmanr
 
 
-def calc_similarity_scores(model_dir, sents1, sents2, labels):
-    m = SentenceModel(model_dir)
+def calc_similarity_scores(args, sents1, sents2, labels):
+    m = SentenceBertModel(args.output_dir, encoder_type=EncoderType.FIRST_LAST_AVG, max_seq_length=args.max_seq_length)
     t1 = time.time()
     e1 = m.encode(sents1)
     e2 = m.encode(sents2)
@@ -35,12 +32,13 @@ def calc_similarity_scores(model_dir, sents1, sents2, labels):
     logger.debug(f'labels: {labels[:10]}')
     logger.debug(f'preds:  {sims[:10]}')
     logger.debug(f'Spearman: {spearman}')
-    logger.debug(f'spend time: {spend_time}, count:{len(sents1 + sents2)}, qps: {len(sents1 + sents2) / spend_time}')
+    logger.debug(
+        f'spend time: {spend_time:.4f}, count:{len(sents1 + sents2)}, qps: {len(sents1 + sents2) / spend_time}')
     return spearman
 
 
 def main():
-    parser = argparse.ArgumentParser('--SentenceBERT Text Matching task')
+    parser = argparse.ArgumentParser('SentenceBERT Text Matching task')
     parser.add_argument('--model_name', default='hfl/chinese-macbert-base', type=str,
                         help='Model Arch, such as: hfl/chinese-macbert-base')
     parser.add_argument('--train_file', default='data/STS-B/STS-B.train.data', type=str, help='Train data path')
@@ -60,17 +58,17 @@ def main():
         model = SentenceBertModel(model_name_or_path=args.model_name, encoder_type=EncoderType.FIRST_LAST_AVG,
                                   max_seq_length=args.max_seq_length)
         model.train_model(args.train_file,
-                          args.model_dir,
+                          args.output_dir,
                           eval_file=args.valid_file,
                           num_epochs=args.num_epochs,
                           batch_size=args.batch_size,
                           lr=args.learning_rate)
-        logger.info(f"Model saved to {args.model_dir}")
+        logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:
-        model = SentenceBertModel(model_name_or_path=args.model_dir, encoder_type=EncoderType.FIRST_LAST_AVG,
+        model = SentenceBertModel(model_name_or_path=args.output_dir, encoder_type=EncoderType.FIRST_LAST_AVG,
                                   max_seq_length=args.max_seq_length)
         test_data = load_test_data(args.test_file)
-        test_data = test_data[:20]
+        test_data = test_data[:100]
 
         # Predict embeddings
         srcs = []
@@ -83,9 +81,10 @@ def main():
             labels.append(label)
         logger.debug(f'{test_data[0]}')
         sentence_embeddings = model.encode(srcs)
-        logger.debug(type(sentence_embeddings), sentence_embeddings.shape, sentence_embeddings[0].shape)
+        logger.debug(f"{type(sentence_embeddings)}, {sentence_embeddings.shape}, {sentence_embeddings[0].shape}")
         # Predict similarity scores
-        calc_similarity_scores(args.output_dir, srcs, trgs, labels)
+        calc_similarity_scores(args, srcs, trgs, labels)
 
-    if __name__ == '__main__':
-        main()
+
+if __name__ == '__main__':
+    main()
