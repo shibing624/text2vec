@@ -15,10 +15,10 @@ if __name__ == '__main__':
     sbert_model = SentenceModel('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
     # Corpus with example sentences
     corpus = [
-        '花呗更改绑定银行卡',
-        '我什么时候开通了花呗',
         '卡',
         '银行卡',
+        '花呗更改绑定银行卡',
+        '我什么时候开通了花呗',
         'A man is eating food.',
         'A man is eating a piece of bread.',
         'The girl is carrying a baby.',

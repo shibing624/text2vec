@@ -22,23 +22,24 @@ test测试集的评估结果：
 ### 说明
 - 中文预训练模型
 以下可以用于中文的预训练语言模型，通过如下方式直接调用transformers下载并使用：
-1. MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
-2. Mengzi模型：`--pretrained_model_path Langboat/mengzi-bert-base`
-3. BERT模型：`--pretrained_model_path bert-base-chinese`
-4. RoBERTa模型：`--pretrained_model_path hfl/chinese-roberta-wwm-ext`
+1. MacBERT模型：`--model_name hfl/chinese-macbert-base`
+2. Mengzi模型：`--model_name Langboat/mengzi-bert-base`
+3. BERT模型：`--model_name bert-base-chinese`
+4. RoBERTa模型：`--model_name hfl/chinese-roberta-wwm-ext`
 
 - 复现脚本
 执行以下脚本，直接复现上表中`Sentence-MacBERT`的模型效果：
+
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0
-python3 training_sup_sentencebert.py --do_train --do_predict --num_epochs 10 --output_dir ./outputs/STS-B-sentencebert > outputs/STS-B.log 2>&1
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --do_predict --num_epochs 15
 ```
 
 ## 使用说明
 #### 训练
 ```shell
-python3 training_sup_sentencebert.py --do_train --num_epochs 10 --output_dir ./outputs/STS-B-sentencebert > outputs/STS-B.log 2>&1
+cd examples
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --num_epochs 15 --output_dir ./outputs/STS-B-sentencebert
 ```
 #### 预测
 ```shell

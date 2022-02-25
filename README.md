@@ -147,13 +147,13 @@ Cross-Encoder适用于向量检索精排。
 - 结果值均使用spearman系数
 - 结果均只用该数据集的train训练，在test上评估得到的表现，没用外部数据
 - `paraphrase-multilingual-MiniLM-L12-v2`模型名称是`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文
-- `CoSENT-macbert-base`模型达到同级别参数量SOTA效果，是用CoSENT方法训练，运行[text2vec/cosent](text2vec/cosent)文件夹下代码可以复现结果
-- `SBERT-macbert-base`模型，是用SBERT方法训练，运行[text2vec/sentence_bert](text2vec/sentence_bert)文件夹下代码可以复现结果
+- `CoSENT-macbert-base`模型达到同级别参数量SOTA效果，是用CoSENT方法训练，运行[examples/training_sup_cosent.py](examples/training_sup_cosent.py)代码可以复现结果
+- `SBERT-macbert-base`模型，是用SBERT方法训练，运行[examples/training_sup_sentencebert.py](examples/training_sup_sentencebert.py)代码可以复现结果
 - `text2vec-base-chinese`模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)
 - `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用
-- 各预训练模型均可以通过transformers调用，如MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
+- 各预训练模型均可以通过transformers调用，如MacBERT模型：`--model_name hfl/chinese-macbert-base`
 - 中文匹配数据集下载[链接见下方](#数据集)
-- 中文匹配任务实验表明，pooling最优是`first_last_avg`，预测可以调用SBert的`mean pooling`方法，效果损失很小
+- 中文匹配任务实验表明，pooling最优是`first_last_avg`，预测可以使用 SentenceModel 的`EncoderType.FIRST_LAST_AVG`
 - QPS的GPU测试环境是Tesla V100，显存32GB
 
 # Demo
@@ -188,7 +188,7 @@ python3 setup.py install
 
 ### 1. 计算文本向量
 
-基于`pretrained model`计算文本向量
+基于`pretrained model`计算文本向量：
 
 ```shell
 >>> from text2vec import SentenceModel
@@ -197,7 +197,7 @@ python3 setup.py install
 Embedding shape: (384,)
 ```
 
-示例[computing_embeddings.py](./examples/computing_embeddings.py)
+example: [computing_embeddings.py](./examples/computing_embeddings.py)
 
 ```python
 import sys
@@ -216,9 +216,7 @@ def compute_emb(model):
                  'Sentences are passed as a list of string.',
                  'The quick brown fox jumps over the lazy dog.']
     sentence_embeddings = model.encode(sentences)
-
     print(type(sentence_embeddings), sentence_embeddings.shape)
-
     # The result is a list of sentence embeddings as numpy arrays
     for sentence, embedding in zip(sentences, sentence_embeddings):
         print("Sentence:", sentence)
@@ -247,17 +245,25 @@ Embedding shape: (768,)
  ... 
 ```
 
-返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentences_size, model_embedding_size)`
-
-模型说明：
-
-- `shibing624/text2vec-base-chinese`模型是CoSENT方法在中文STS-B数据集训练得到的，模型已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，可以通过上面示例方法text2vec的SBert类调用，或者直接用transformers库调用，模型自动下载到本机路径：`~/.cache/huggingface/transformers`
+- 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentences_size, model_embedding_size)`
+- 模型说明：`shibing624/text2vec-base-chinese`模型是CoSENT方法在中文STS-B数据集训练得到的，模型已经上传到huggingface的
+模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，
+可以通过上面示例方法text2vec的SBert类调用，或者直接用transformers库调用，模型自动下载到本机路径：`~/.cache/huggingface/transformers`
 
 #### Usage (HuggingFace Transformers)
-Without [text2vec](https://github.com/shibing624/text2vec), you can use the model like this: First, you pass your input through the transformer model, then you have to apply the right pooling-operation on-top of the contextualized word embeddings.
+Without [text2vec](https://github.com/shibing624/text2vec), you can use the model like this: 
+
+First, you pass your input through the transformer model, then you have to apply the right pooling-operation on-top of the contextualized word embeddings.
+
+example: [examples/use_origin_transformers.py](examples/use_origin_transformers.py)
+
 ```python
-from transformers import BertTokenizer, BertModel
+import os
 import torch
+from transformers import AutoTokenizer, AutoModel
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+
 
 # Mean Pooling - Take attention mask into account for correct averaging
 def mean_pooling(model_output, attention_mask):
@@ -265,9 +271,10 @@ def mean_pooling(model_output, attention_mask):
     input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
     return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
+
 # Load model from HuggingFace Hub
-tokenizer = BertTokenizer.from_pretrained('shibing624/text2vec-base-chinese')
-model = BertModel.from_pretrained('shibing624/text2vec-base-chinese')
+tokenizer = AutoTokenizer.from_pretrained('shibing624/text2vec-base-chinese')
+model = AutoModel.from_pretrained('shibing624/text2vec-base-chinese')
 sentences = ['如何更换花呗绑定银行卡', '花呗更改绑定银行卡']
 # Tokenize sentences
 encoded_input = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
@@ -293,7 +300,7 @@ print(sentence_embeddings)
 
 ### 2. 计算句子之间的相似度值
 
-示例[semantic_text_similarity.py](./examples/semantic_text_similarity.py)
+example: [semantic_text_similarity.py](./examples/semantic_text_similarity.py)
 
 ```python
 import sys
@@ -312,7 +319,7 @@ sentences2 = ['花呗更改绑定银行卡',
               'A woman watches TV',
               'The new movie is so great']
 
-sim_model = Similarity(similarity_type='cosine', embedding_type='sbert')
+sim_model = Similarity()
 for i in range(len(sentences1)):
     for j in range(len(sentences2)):
         score = sim_model.get_score(sentences1[i], sentences2[j])
@@ -321,22 +328,22 @@ for i in range(len(sentences1)):
 
 output:
 ```shell
-如何更换花呗绑定银行卡 		 花呗更改绑定银行卡 		 Score: 0.9477
-如何更换花呗绑定银行卡 		 The dog plays in the garden 		 Score: -0.1748
-如何更换花呗绑定银行卡 		 A woman watches TV 		 Score: -0.0839
-如何更换花呗绑定银行卡 		 The new movie is so great 		 Score: -0.0044
-The cat sits outside 		 花呗更改绑定银行卡 		 Score: -0.0097
-The cat sits outside 		 The dog plays in the garden 		 Score: 0.1908
-The cat sits outside 		 A woman watches TV 		 Score: -0.0203
-The cat sits outside 		 The new movie is so great 		 Score: 0.0302
-A man is playing guitar 		 花呗更改绑定银行卡 		 Score: -0.0010
-A man is playing guitar 		 The dog plays in the garden 		 Score: 0.1062
-A man is playing guitar 		 A woman watches TV 		 Score: 0.0055
-A man is playing guitar 		 The new movie is so great 		 Score: 0.0097
-The new movie is awesome 		 花呗更改绑定银行卡 		 Score: 0.0302
-The new movie is awesome 		 The dog plays in the garden 		 Score: -0.0160
-The new movie is awesome 		 A woman watches TV 		 Score: 0.1321
-The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
+如何更换花呗绑定银行卡 		 花呗更改绑定银行卡 		 Score: 0.9816
+如何更换花呗绑定银行卡 		 The dog plays in the garden 		 Score: 0.0045
+如何更换花呗绑定银行卡 		 A woman watches TV 		 Score: 0.1182
+如何更换花呗绑定银行卡 		 The new movie is so great 		 Score: 0.3477
+The cat sits outside 		 花呗更改绑定银行卡 		 Score: 0.2565
+The cat sits outside 		 The dog plays in the garden 		 Score: 0.2908
+The cat sits outside 		 A woman watches TV 		 Score: 0.0062
+The cat sits outside 		 The new movie is so great 		 Score: 0.1860
+A man is playing guitar 		 花呗更改绑定银行卡 		 Score: 0.3274
+A man is playing guitar 		 The dog plays in the garden 		 Score: 0.2775
+A man is playing guitar 		 A woman watches TV 		 Score: 0.2480
+A man is playing guitar 		 The new movie is so great 		 Score: 0.2803
+The new movie is awesome 		 花呗更改绑定银行卡 		 Score: 0.3129
+The new movie is awesome 		 The dog plays in the garden 		 Score: 0.1660
+The new movie is awesome 		 A woman watches TV 		 Score: 0.2698
+The new movie is awesome 		 The new movie is so great 		 Score: 0.9698
 ```
 
 > 句子余弦相似度值`score`范围是[-1, 1]，值越大越相似。
@@ -393,39 +400,57 @@ output:
 ```shell
 Query: 如何更换花呗绑定银行卡
 Top 5 most similar sentences in corpus:
-花呗更改绑定银行卡 (Score: 0.9477)
-我什么时候开通了花呗 (Score: 0.3635)
-A man is eating food. (Score: 0.0321)
-A man is riding a horse. (Score: 0.0228)
-Two men pushed carts through the woods. (Score: 0.0090)
+花呗更改绑定银行卡 (Score: 0.9816)
+我什么时候开通了花呗 (Score: 0.7659)
+A man is eating food. (Score: 0.4724)
+...
 ======================
 Query: A man is eating pasta.
 Top 5 most similar sentences in corpus:
-A man is eating food. (Score: 0.6734)
-A man is eating a piece of bread. (Score: 0.4269)
-A man is riding a horse. (Score: 0.2086)
-A man is riding a white horse on an enclosed ground. (Score: 0.1020)
-A cheetah is running behind its prey. (Score: 0.0566)
+A man is eating food. (Score: 0.5832)
+A man is eating a piece of bread. (Score: 0.3820)
+A man is riding a horse. (Score: 0.3288)
+...
 ======================
 Query: Someone in a gorilla costume is playing a set of drums.
 Top 5 most similar sentences in corpus:
-A monkey is playing drums. (Score: 0.8167)
-A cheetah is running behind its prey. (Score: 0.2720)
-A woman is playing violin. (Score: 0.1721)
-A man is riding a horse. (Score: 0.1291)
-A man is riding a white horse on an enclosed ground. (Score: 0.1213)
+A monkey is playing drums. (Score: 0.8042)
+A cheetah is running behind its prey. (Score: 0.4219)
+我什么时候开通了花呗 (Score: 0.2905)
+...
 ======================
 Query: A cheetah chases prey on across a field.
 Top 5 most similar sentences in corpus:
-A cheetah is running behind its prey. (Score: 0.9147)
-A monkey is playing drums. (Score: 0.2655)
-A man is riding a horse. (Score: 0.1933)
-A man is riding a white horse on an enclosed ground. (Score: 0.1733)
-A man is eating food. (Score: 0.0329)
+A cheetah is running behind its prey. (Score: 0.9317)
+A man is riding a horse. (Score: 0.4217)
+我什么时候开通了花呗 (Score: 0.3582)
+...
 ```
 
 > `Score`的值范围[-1, 1]，值越大，表示该query与corpus相似度越近。
 
+
+
+## 模型训练和预测
+### CoSENT 监督模型
+执行以下脚本，直接复现上表中`MacBERT+CoSENT`的模型效果：
+
+example: [examples/training_sup_cosent.py](examples/training_sup_cosent.py)
+
+```shell
+cd examples
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_cosent.py --do_train --do_predict --num_epochs 15 --model_name hfl/chinese-macbert-base
+```
+
+### SentenceBERT 监督模型
+执行以下脚本，直接复现上表中`MacBERT+SBERT`的模型效果：
+
+example: [examples/training_sup_sentencebert.py](examples/training_sup_sentencebert.py)
+
+```shell
+cd examples
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --do_predict --num_epochs 15 --model_name hfl/chinese-macbert-base
+```
 
 
 # Contact
@@ -473,3 +498,4 @@ A man is eating food. (Score: 0.0329)
 - [Improvements to BM25 and Language Models Examined](http://www.cs.otago.ac.nz/homepages/andrew/papers/2014-2.pdf)
 - [CoSENT：比Sentence-BERT更有效的句向量方案](https://kexue.fm/archives/8847)
 - [谈谈文本匹配和多轮检索](https://zhuanlan.zhihu.com/p/111769969)
+- [Sentence-transformers](https://www.sbert.net/examples/applications/computing-embeddings/README.html)

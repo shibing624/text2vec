@@ -40,7 +40,7 @@ if __name__ == "__main__":
     compute_emb(t2v_model)
 
     sbert_model = SentenceModel(
-        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", max_seq_length=60)  # 支持多语言的句向量模型（Sentence-BERT）
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")  # 支持多语言的句向量模型（Sentence-BERT）
     compute_emb(sbert_model)
 
     w2v_model = Word2Vec("w2v-light-tencent-chinese")  # 中文词向量模型(word2vec)

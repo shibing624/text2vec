@@ -38,34 +38,24 @@ parser.add_argument('--task_name', default='STS-B', type=str, help='数据集')
 ### 说明
 - 中文预训练模型
 以下可以用于中文的预训练语言模型，通过如下方式直接调用transformers下载并使用：
-1. MacBERT模型：`--pretrained_model_path hfl/chinese-macbert-base`
-2. Mengzi模型：`--pretrained_model_path Langboat/mengzi-bert-base`
-3. BERT模型：`--pretrained_model_path bert-base-chinese`
-4. RoBERTa模型：`--pretrained_model_path hfl/chinese-roberta-wwm-ext`
+1. MacBERT模型：`--model_name hfl/chinese-macbert-base`
+2. Mengzi模型：`--model_name Langboat/mengzi-bert-base`
+3. BERT模型：`--model_name bert-base-chinese`
+4. RoBERTa模型：`--model_name hfl/chinese-roberta-wwm-ext`
 
 - SBERT指Sentence-BERT
-- bert-base-nli-mean-tokens是`--pretrained_model_path sentence-transformers/bert-base-nli-mean-tokens`
+- bert-base-nli-mean-tokens是`--model_name sentence-transformers/bert-base-nli-mean-tokens`
 - 以上结果均只用该数据集的train训练，在test上评估得到的结果，没用外部数据
 - 中文匹配模型的pooling方法都是用的`first_last_avg`
 
+### 模型训练及预测
 - 复现脚本
 执行以下脚本，直接复现上表中`MacBERT+CoSENT`的模型效果：
 
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0
-python3 training_sup_cosent.py --do_train --do_predict --num_epochs 10 --output_dir ./outputs/STS-B-cosent > outputs/STS-B.log 2>&1
-```
-
-## 使用说明
-#### 训练
-```shell
-python3 training_sup_cosent.py --do_train --num_epochs 10 --output_dir ./outputs/STS-B-cosent > outputs/STS-B.log 2>&1
-```
-#### 预测
-```shell
-python3 training_sup_cosent.py --do_predict --output_dir ./outputs/STS-B-cosent
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_cosent.py --do_train --do_predict --num_epochs 15 --output_dir ./outputs/STS-B-cosent --model_name hfl/chinese-macbert-base
 ```
 
 # Reference

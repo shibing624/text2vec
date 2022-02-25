@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 @author:XuMing(xuming624@qq.com)
-@description:
-refer: from sentence_transformers import SentenceTransformer
+@description: Rewrite the Base sentence model, add encode function
+refer: sentence_transformers.SentenceTransformer and simpletransformers
 """
 import os
 from enum import Enum

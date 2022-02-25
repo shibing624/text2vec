@@ -16,7 +16,8 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from text2vec.sentence_model import SentenceModel, EncoderType, device
-from text2vec.sentence_bert.sentencebert_dataset import SentenceBertTrainDataset, SentenceBertTestDataset
+from text2vec.sentence_bert.sentencebert_dataset import SentenceBertTrainDataset, SentenceBertTestDataset, \
+    load_test_data, load_train_data
 from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr, set_seed
 
 
@@ -80,12 +81,13 @@ class SentenceBertModel(SentenceModel):
             global_step: Number of global steps trained
             training_details: Average training loss if evaluate_during_training is False or full training progress scores if evaluate_during_training is True
         """
-        train_dataset = SentenceBertTrainDataset(self.tokenizer, train_file, self.max_seq_length)
+        train_dataset = SentenceBertTrainDataset(self.tokenizer, load_train_data(train_file), self.max_seq_length)
+        eval_dataset = SentenceBertTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
 
         global_step, training_details = self.train(
             train_dataset,
             output_dir,
-            eval_file=eval_file,
+            eval_dataset=eval_dataset,
             verbose=verbose,
             batch_size=batch_size,
             num_epochs=num_epochs,
@@ -128,7 +130,7 @@ class SentenceBertModel(SentenceModel):
             self,
             train_dataset: Dataset,
             output_dir: str,
-            eval_file: str = None,
+            eval_dataset: Dataset = None,
             verbose: bool = True,
             batch_size: int = 8,
             num_epochs: int = 1,
@@ -256,7 +258,7 @@ class SentenceBertModel(SentenceModel):
                     global_step += 1
             epoch_number += 1
             output_dir_current = os.path.join(output_dir, "checkpoint-{}-epoch-{}".format(global_step, epoch_number))
-            results = self.eval_model(eval_file, output_dir_current, verbose=verbose, batch_size=batch_size)
+            results = self.eval_model(eval_dataset, output_dir_current, verbose=verbose, batch_size=batch_size)
             self.save_model(output_dir_current, model=self.model, results=results)
             training_progress_scores["global_step"].append(global_step)
             training_progress_scores["train_loss"].append(current_loss)
@@ -276,12 +278,11 @@ class SentenceBertModel(SentenceModel):
 
         return global_step, training_progress_scores
 
-    def eval_model(self, eval_file: str, output_dir: str = None, verbose: bool = True, batch_size: int = 16):
+    def eval_model(self, eval_dataset: Dataset, output_dir: str = None, verbose: bool = True, batch_size: int = 16):
         """
         Evaluates the model on eval_df. Saves results to args.output_dir
             result: Dictionary containing evaluation results.
         """
-        eval_dataset = SentenceBertTestDataset(self.tokenizer, eval_file, self.max_seq_length)
         result = self.evaluate(eval_dataset, output_dir, batch_size=batch_size)
         self.results.update(result)
 

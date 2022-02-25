@@ -12,6 +12,8 @@ from transformers import PreTrainedTokenizer
 
 def load_train_data(path):
     data = []
+    if not os.path.isfile(path):
+        return data
     with open(path, 'r', encoding='utf8') as f:
         for line in f:
             line = line.strip().split('\t')
@@ -25,6 +27,8 @@ def load_train_data(path):
 
 def load_test_data(path):
     data = []
+    if not os.path.isfile(path):
+        return data
     with open(path, 'r', encoding='utf8') as f:
         for line in f:
             line = line.strip().split('\t')
@@ -38,10 +42,9 @@ def load_test_data(path):
 class CosentTrainDataset(Dataset):
     """训练数据集, 重写__getitem__和__len__方法"""
 
-    def __init__(self, tokenizer: PreTrainedTokenizer, file_path: str, max_len: int = 64):
+    def __init__(self, tokenizer: PreTrainedTokenizer, data: list, max_len: int = 64):
         self.tokenizer = tokenizer
-        assert os.path.isfile(file_path), f"Input file path {file_path} not found"
-        self.data = load_train_data(file_path)
+        self.data = data
         self.max_len = max_len
 
     def __len__(self):
@@ -59,10 +62,9 @@ class CosentTrainDataset(Dataset):
 class CosentTestDataset(Dataset):
     """测试数据集, 重写__getitem__和__len__方法"""
 
-    def __init__(self, tokenizer: PreTrainedTokenizer, file_path: str, max_len: int = 64):
+    def __init__(self, tokenizer: PreTrainedTokenizer, data: list, max_len: int = 64):
         self.tokenizer = tokenizer
-        assert os.path.isfile(file_path), f"Input file path {file_path} not found"
-        self.data = load_test_data(file_path)
+        self.data = data
         self.max_len = max_len
 
     def __len__(self):
