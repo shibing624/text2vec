@@ -24,6 +24,9 @@ class EncoderType(Enum):
     POOLER = 3
     MEAN = 4
 
+    def __str__(self):
+        return self.name
+
 
 class SentenceModel:
     def __init__(
@@ -46,6 +49,8 @@ class SentenceModel:
         thus, we use <last_hidden_state>.
         """
         self.model_name_or_path = model_name_or_path
+        if encoder_type not in list(EncoderType):
+            raise ValueError(f"encoder_type must be in {list(EncoderType)}")
         self.encoder_type = encoder_type
         self.max_seq_length = max_seq_length
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)

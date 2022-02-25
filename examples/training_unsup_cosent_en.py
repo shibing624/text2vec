@@ -19,7 +19,7 @@ from text2vec import cos_sim, http_get
 
 
 def calc_similarity_scores(args, sents1, sents2, labels):
-    m = CosentModel(args.output_dir, encoder_type=EncoderType.FIRST_LAST_AVG, max_seq_length=args.max_seq_length)
+    m = CosentModel(args.output_dir, encoder_type=args.encoder_type, max_seq_length=args.max_seq_length)
     t1 = time.time()
     e1 = m.encode(sents1)
     e2 = m.encode(sents2)
@@ -53,12 +53,15 @@ def main():
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='Learning rate')
     parser.add_argument('--nli_limit_size', default=200000, type=float, help='Learning rate')
+    parser.add_argument('--encoder_type', default='FIRST_LAST_AVG', type=lambda t: EncoderType[t],
+                        choices=list(EncoderType), help='Encoder type, string name of EncoderType')
+    args = parser.parse_args()
     args = parser.parse_args()
     logger.info(args)
 
     test_dataset = []
     if args.do_train:
-        model = CosentModel(model_name_or_path=args.model_name, encoder_type=EncoderType.FIRST_LAST_AVG,
+        model = CosentModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
                             max_seq_length=args.max_seq_length)
         # 无监督实验，在NLI train数据上训练，评估模型在STS test上的表现
         data_dir = os.path.abspath(os.path.dirname(args.stsb_file))
@@ -104,7 +107,7 @@ def main():
                     lr=args.learning_rate)
         logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:
-        model = CosentModel(model_name_or_path=args.output_dir, encoder_type=EncoderType.FIRST_LAST_AVG,
+        model = CosentModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
                             max_seq_length=args.max_seq_length)
         test_data = test_dataset
         test_data = test_data[:100]

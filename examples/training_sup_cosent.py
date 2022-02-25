@@ -11,13 +11,13 @@ from loguru import logger
 
 sys.path.append('..')
 
-from text2vec.cosent.cosent_model import CosentModel, compute_spearmanr, EncoderType
+from text2vec.cosent.cosent_model import CosentModel
 from text2vec.cosent.cosent_dataset import load_test_data
-from text2vec import cos_sim
+from text2vec import cos_sim, compute_spearmanr, EncoderType
 
 
 def calc_similarity_scores(args, sents1, sents2, labels):
-    m = CosentModel(args.output_dir, encoder_type=EncoderType.FIRST_LAST_AVG, max_seq_length=args.max_seq_length)
+    m = CosentModel(args.output_dir, encoder_type=args.encoder_type, max_seq_length=args.max_seq_length)
     t1 = time.time()
     e1 = m.encode(sents1)
     e2 = m.encode(sents2)
@@ -51,11 +51,14 @@ def main():
     parser.add_argument('--num_epochs', default=10, type=int, help='Number of training epochs')
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='Learning rate')
+    parser.add_argument('--encoder_type', default='FIRST_LAST_AVG', type=lambda t: EncoderType[t],
+                        choices=list(EncoderType), help='Encoder type, string name of EncoderType')
+    args = parser.parse_args()
     args = parser.parse_args()
     logger.info(args)
 
     if args.do_train:
-        model = CosentModel(model_name_or_path=args.model_name, encoder_type=EncoderType.FIRST_LAST_AVG,
+        model = CosentModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
                             max_seq_length=args.max_seq_length)
         model.train_model(args.train_file,
                           args.output_dir,
@@ -65,7 +68,7 @@ def main():
                           lr=args.learning_rate)
         logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:
-        model = CosentModel(model_name_or_path=args.output_dir, encoder_type=EncoderType.FIRST_LAST_AVG,
+        model = CosentModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
                             max_seq_length=args.max_seq_length)
         test_data = load_test_data(args.test_file)
         test_data = test_data[:100]
