@@ -54,10 +54,9 @@ def main():
     parser.add_argument('--encoder_type', default='FIRST_LAST_AVG', type=lambda t: EncoderType[t],
                         choices=list(EncoderType), help='Encoder type, string name of EncoderType')
     args = parser.parse_args()
-    args = parser.parse_args()
     logger.info(args)
 
-    test_dataset = []
+    test_samples = []
     if args.do_train:
         model = CosentModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
                             max_seq_length=args.max_seq_length)
@@ -80,7 +79,6 @@ def main():
                     train_samples.append((row['sentence2'], score))
         train_dataset = CosentTrainDataset(model.tokenizer, train_samples, args.max_seq_length)
         valid_dataset = CosentTestDataset(model.tokenizer, valid_samples, args.max_seq_length)
-        test_dataset = CosentTestDataset(model.tokenizer, test_samples, args.max_seq_length)
         model.train(train_dataset,
                     args.output_dir,
                     eval_dataset=valid_dataset,
@@ -91,8 +89,7 @@ def main():
     if args.do_predict:
         model = CosentModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
                             max_seq_length=args.max_seq_length)
-        test_data = test_dataset
-        test_data = test_data[:100]
+        test_data = test_samples
 
         # Predict embeddings
         srcs = []

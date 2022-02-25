@@ -54,7 +54,6 @@ def main():
     parser.add_argument('--encoder_type', default='FIRST_LAST_AVG', type=lambda t: EncoderType[t],
                         choices=list(EncoderType), help='Encoder type, string name of EncoderType')
     args = parser.parse_args()
-    args = parser.parse_args()
     logger.info(args)
 
     if args.do_train:
@@ -71,7 +70,6 @@ def main():
         model = CosentModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
                             max_seq_length=args.max_seq_length)
         test_data = load_test_data(args.test_file)
-        test_data = test_data[:100]
 
         # Predict embeddings
         srcs = []
