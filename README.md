@@ -94,7 +94,7 @@ Cross-Encoder适用于向量检索精排。
 # Feature
 ### 文本向量表示模型
 - [Word2Vec](text2vec/word2vec.py)：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe）实现词向量检索，本项目实现了句子（词向量求平均）的word2vec向量表示
-- [SentenceModel(Sentence-BERT)](text2vec/sentence_bert)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
+- [SBERT(Sentence-BERT)](text2vec/sentence_bert)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
 - [CoSENT(Cosine Sentence)](text2vec/cosent)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
 
 ### 文本相似度比较方法
@@ -103,7 +103,7 @@ Cross-Encoder适用于向量检索精排。
 - 点积（Dot Product）：两向量归一化后求内积
 - 词移距离（Word Mover’s Distance）：词移距离使用两文本间的词向量，测量其中一文本中的单词在语义空间中移动到另一文本单词所需要的最短距离
 - [RankBM25](text2vec/bm25.py)：BM25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序
-- [SemanticSearch](https://github.com/shibing624/text2vec/blob/master/text2vec/sentencemodel.py#L80)：向量相似检索，使用Cosine Similarty + topk高效计算，比一对一暴力计算快一个数量级
+- [SemanticSearch](https://github.com/shibing624/text2vec/blob/master/text2vec/similarity.py#L144)：向量相似检索，使用Cosine Similarty + topk高效计算，比一对一暴力计算快一个数量级
 
 # Evaluate
 
@@ -147,13 +147,13 @@ Cross-Encoder适用于向量检索精排。
 - 结果值均使用spearman系数
 - 结果均只用该数据集的train训练，在test上评估得到的表现，没用外部数据
 - `paraphrase-multilingual-MiniLM-L12-v2`模型名称是`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文
-- `CoSENT-macbert-base`模型达到同级别参数量SOTA效果，是用CoSENT方法训练，运行[examples/training_sup_cosent.py](examples/training_sup_cosent.py)代码可以复现结果
-- `SBERT-macbert-base`模型，是用SBERT方法训练，运行[examples/training_sup_sentencebert.py](examples/training_sup_sentencebert.py)代码可以复现结果
+- `CoSENT-macbert-base`模型达到同级别参数量SOTA效果，是用CoSENT方法训练，运行[examples/training_sup_cosent.py](examples/training_sup_cosent.py)代码复现结果
+- `SBERT-macbert-base`模型，是用SBERT方法训练，运行[examples/training_sup_sentencebert.py](examples/training_sup_sentencebert.py)代码复现结果
 - `text2vec-base-chinese`模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)
 - `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--model_name hfl/chinese-macbert-base`
 - 中文匹配数据集下载[链接见下方](#数据集)
-- 中文匹配任务实验表明，pooling最优是`first_last_avg`，预测可以使用 SentenceModel 的`EncoderType.FIRST_LAST_AVG`
+- 中文匹配任务实验表明，pooling最优是`first_last_avg`，即 SentenceModel 的`EncoderType.FIRST_LAST_AVG`
 - QPS的GPU测试环境是Tesla V100，显存32GB
 
 # Demo
@@ -197,7 +197,7 @@ python3 setup.py install
 Embedding shape: (384,)
 ```
 
-example: [computing_embeddings.py](./examples/computing_embeddings.py)
+example: [examples/computing_embeddings.py](examples/computing_embeddings.py)
 
 ```python
 import sys
@@ -300,7 +300,7 @@ print(sentence_embeddings)
 
 ### 2. 计算句子之间的相似度值
 
-example: [semantic_text_similarity.py](./examples/semantic_text_similarity.py)
+example: [examples/semantic_text_similarity_demo.py](examples/semantic_text_similarity_demo.py)
 
 ```python
 import sys
@@ -353,7 +353,7 @@ The new movie is awesome 		 The new movie is so great 		 Score: 0.9698
 一般在文档候选集中找与query最相似的文本，常用于QA场景的问句相似匹配、文本相似检索等任务。
 
 
-示例[semantic_search.py](./examples/semantic_search.py)
+example: [examples/semantic_search_demo.py](examples/semantic_search_demo.py)
 
 ```python
 import sys
