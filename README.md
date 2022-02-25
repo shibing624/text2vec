@@ -433,23 +433,50 @@ A man is riding a horse. (Score: 0.4217)
 
 ## 模型训练和预测
 ### CoSENT 监督模型
-执行以下脚本，直接复现上表中`MacBERT+CoSENT`的模型效果：
+#### 在中文STS-B数据集训练和评估`MacBERT+CoSENT`的模型效果
 
 example: [examples/training_sup_cosent.py](examples/training_sup_cosent.py)
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_cosent.py --do_train --do_predict --num_epochs 15 --model_name hfl/chinese-macbert-base
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_cosent.py --do_train --do_predict --num_epochs 20 --model_name hfl/chinese-macbert-base
+```
+
+#### 在英文STS-B数据集训练和评估`BERT+CoSENT`的模型效果
+
+example: [examples/training_sup_cosent_en.py](examples/training_sup_cosent_en.py)
+
+```shell
+cd examples
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_cosent.py --do_train --do_predict --num_epochs 20 --model_name bert-base-uncased
+```
+
+### CoSENT 无监督模型
+#### 在英文NLI数据集训练`BERT+CoSENT`模型，在STS-B测试集评估效果
+
+example: [examples/training_unsup_cosent_en.py](examples/training_unsup_cosent_en.py)
+
+```shell
+cd examples
+CUDA_VISIBLE_DEVICES=0 python3 training_unsup_cosent_en.py --do_train --do_predict --num_epochs 20
 ```
 
 ### SentenceBERT 监督模型
-执行以下脚本，直接复现上表中`MacBERT+SBERT`的模型效果：
+#### 在中文STS-B数据集训练和评估`MacBERT+SBERT`的模型效果
 
 example: [examples/training_sup_sentencebert.py](examples/training_sup_sentencebert.py)
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --do_predict --num_epochs 15 --model_name hfl/chinese-macbert-base
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base
+```
+#### 在英文STS-B数据集训练和评估`BERT+SBERT`的模型效果
+
+example: [examples/training_sup_sentencebert_en.py](examples/training_sup_sentencebert_en.py)
+
+```shell
+cd examples
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased
 ```
 
 

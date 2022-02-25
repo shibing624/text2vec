@@ -50,12 +50,12 @@ parser.add_argument('--task_name', default='STS-B', type=str, help='数据集')
 
 ### 模型训练及预测
 - 复现脚本
-执行以下脚本，直接复现上表中`MacBERT+CoSENT`的模型效果：
+执行以下脚本，复现上表中中文`MacBERT+CoSENT`的模型效果：
 
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_cosent.py --do_train --do_predict --num_epochs 15 --output_dir ./outputs/STS-B-cosent --model_name hfl/chinese-macbert-base
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_cosent.py --do_train --do_predict --num_epochs 20 --model_name hfl/chinese-macbert-base
 ```
 
 # Reference

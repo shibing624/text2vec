@@ -32,14 +32,14 @@ test测试集的评估结果：
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --do_predict --num_epochs 15
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --do_predict --num_epochs 10
 ```
 
 ## 使用说明
 #### 训练
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --num_epochs 15 --output_dir ./outputs/STS-B-sentencebert
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_sentencebert.py --do_train --num_epochs 10 --output_dir ./outputs/STS-B-sentencebert
 ```
 #### 预测
 ```shell
