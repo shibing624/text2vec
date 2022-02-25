@@ -24,15 +24,7 @@ def compute_emb(model):
         'Sentences are passed as a list of string.',
         'The quick brown fox jumps over the lazy dog.'
     ]
-    sentences = [
-        '银行卡',
-        '如何更换花呗绑定银行卡',
-        '花呗更改绑定银行卡',
-        'This framework generates embeddings for each input sentence',
-    ]
-    sentences = '如何更换花呗绑定银行卡'
     sentence_embeddings = model.encode(sentences)
-
     print(type(sentence_embeddings), sentence_embeddings.shape)
 
     # The result is a list of sentence embeddings as numpy arrays
@@ -44,12 +36,12 @@ def compute_emb(model):
 
 
 if __name__ == "__main__":
-    # t2v_model = SentenceModel("shibing624/text2vec-base-chinese")  # 中文句向量模型(CoSENT)
-    # compute_emb(t2v_model)
+    t2v_model = SentenceModel("shibing624/text2vec-base-chinese")  # 中文句向量模型(CoSENT)
+    compute_emb(t2v_model)
 
     sbert_model = SentenceModel(
         "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2", max_seq_length=60)  # 支持多语言的句向量模型（Sentence-BERT）
     compute_emb(sbert_model)
 
-    # w2v_model = Word2Vec("w2v-light-tencent-chinese")  # 中文词向量模型(word2vec)
-    # compute_emb(w2v_model)
+    w2v_model = Word2Vec("w2v-light-tencent-chinese")  # 中文词向量模型(word2vec)
+    compute_emb(w2v_model)
