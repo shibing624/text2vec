@@ -7,8 +7,8 @@
 [![GitHub issues](https://img.shields.io/github/issues/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/issues)
 [![Wechat Group](http://vlog.sfyc.ltd/wechat_everyday/wxgroup_logo.png?imageView2/0/w/60/h/20)](#Contact)
 
-# text2vec
-text2vec, text to vector.
+# Text2vec
+text2vec, Text to Vector.
 
 文本向量表征工具，把文本转化为向量矩阵，是文本进行计算机处理的第一步。
 
