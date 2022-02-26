@@ -149,8 +149,8 @@ Cross-Encoder适用于向量检索精排。
 - `paraphrase-multilingual-MiniLM-L12-v2`模型名称是`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，速度快，效果好，支持中文
 - `CoSENT-macbert-base`模型达到同级别参数量SOTA效果，是用CoSENT方法训练，运行[examples/training_sup_cosent.py](examples/training_sup_cosent.py)代码复现结果
 - `SBERT-macbert-base`模型，是用SBERT方法训练，运行[examples/training_sup_sentencebert.py](examples/training_sup_sentencebert.py)代码复现结果
-- `text2vec-base-chinese`模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)
-- `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用
+- `text2vec-base-chinese`模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，中文语义匹配任务推荐使用
+- `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用，适用于中文字面匹配任务和缺少数据的冷启动情况
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--model_name hfl/chinese-macbert-base`
 - 中文匹配数据集下载[链接见下方](#数据集)
 - 中文匹配任务实验表明，pooling最优是`first_last_avg`，即 SentenceModel 的`EncoderType.FIRST_LAST_AVG`
@@ -200,7 +200,6 @@ Embedding shape: (384,)
 example: [examples/computing_embeddings_demo.py](examples/computing_embeddings_demo.py)
 
 ```python
-
 import sys
 
 sys.path.append('..')
@@ -231,19 +230,20 @@ def compute_emb(model):
 
 
 if __name__ == "__main__":
-    # 中文句向量模型(CoSENT)
+    # 中文句向量模型(CoSENT)，中文语义匹配任务推荐，支持fine-tune继续训练
     t2v_model = SentenceModel("shibing624/text2vec-base-chinese",
                               encoder_type=EncoderType.FIRST_LAST_AVG)
     compute_emb(t2v_model)
 
-    # 支持多语言的句向量模型（Sentence-BERT）
+    # 支持多语言的句向量模型（Sentence-BERT），英文语义匹配任务推荐，支持fine-tune继续训练
     sbert_model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-                                encoder_type=EncoderType.POOLER)
+                                encoder_type=EncoderType.MEAN)
     compute_emb(sbert_model)
 
-    # 中文词向量模型(word2vec)
+    # 中文词向量模型(word2vec)，中文字面匹配任务和冷启动适用
     w2v_model = Word2Vec("w2v-light-tencent-chinese")
     compute_emb(w2v_model)
+
 ```
 
 output:
@@ -258,9 +258,10 @@ Embedding shape: (768,)
 ```
 
 - 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentences_size, model_embedding_size)`
-- 模型说明：`shibing624/text2vec-base-chinese`模型是CoSENT方法在中文STS-B数据集训练得到的，模型已经上传到huggingface的
+- `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`模型是 text2vec.SentenceModel 指定的默认模型
+- `shibing624/text2vec-base-chinese`模型是CoSENT方法在中文STS-B数据集训练得到的，模型已经上传到huggingface的
 模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，
-可以通过上面示例方法text2vec的 SentenceModel 类调用，或者直接用transformers库调用，模型自动下载到本机路径：`~/.cache/huggingface/transformers`
+可以通过上面示例方法text2vec的 SentenceModel 类调用，或者如下所示直接用transformers库调用，模型自动下载到本机路径：`~/.cache/huggingface/transformers`
 
 #### Usage (HuggingFace Transformers)
 Without [text2vec](https://github.com/shibing624/text2vec), you can use the model like this: 

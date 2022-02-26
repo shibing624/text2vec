@@ -36,16 +36,16 @@ def compute_emb(model):
 
 
 if __name__ == "__main__":
-    # 中文句向量模型(CoSENT)
+    # 中文句向量模型(CoSENT)，中文语义匹配任务推荐，支持fine-tune继续训练
     t2v_model = SentenceModel("shibing624/text2vec-base-chinese",
                               encoder_type=EncoderType.FIRST_LAST_AVG)
     compute_emb(t2v_model)
 
-    # 支持多语言的句向量模型（Sentence-BERT）
+    # 支持多语言的句向量模型（Sentence-BERT），英文语义匹配任务推荐，支持fine-tune继续训练
     sbert_model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
                                 encoder_type=EncoderType.MEAN)
     compute_emb(sbert_model)
 
-    # 中文词向量模型(word2vec)
+    # 中文词向量模型(word2vec)，中文字面匹配任务和冷启动适用
     w2v_model = Word2Vec("w2v-light-tencent-chinese")
     compute_emb(w2v_model)
