@@ -6,7 +6,9 @@
 
 from text2vec.version import __version__
 from text2vec.word2vec import Word2Vec, load_stopwords
-from text2vec.sentence_model import SentenceModel, EncoderType
+from text2vec.sentence_model import SentenceModel
+from text2vec.sentence_model import SentenceModel as SBert
+from text2vec.sentence_model import EncoderType
 from text2vec.bm25 import BM25
 from text2vec.similarity import Similarity, SimilarityType, EmbeddingType, semantic_search, cos_sim
 from text2vec.ngram import NGram
