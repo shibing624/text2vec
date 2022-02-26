@@ -5,8 +5,6 @@ CoSENT（Cosine Sentence），比Sentence-BERT更有效的句向量方案
 ## 实验结果
 预训练模型比较了孟子(Mengzi)、MacBERT、BERT等, 只用了训练集训练5个epoch，然后在测试集上给出斯皮尔曼系数（spearman）评测结果。
 
-指定不同数据集，只需在train.py文件中，修改`task_name`参数:  
-parser.add_argument('--task_name', default='STS-B', type=str, help='数据集')  
 
 - 英文匹配数据集的评测结果：
 

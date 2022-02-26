@@ -16,7 +16,7 @@ from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from text2vec.sentence_model import SentenceModel, EncoderType, device
 from text2vec.sentence_bert.sentencebert_dataset import SentenceBertTrainDataset, SentenceBertTestDataset, \
     load_test_data, load_train_data
-from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr, set_seed
+from text2vec.utils.stats_util import set_seed
 
 
 class SentenceBertModel(SentenceModel):
@@ -38,7 +38,6 @@ class SentenceBertModel(SentenceModel):
         """
         super().__init__(model_name_or_path, encoder_type, max_seq_length)
         self.fc = nn.Linear(self.model.config.hidden_size * 3, num_classes).to(device)
-        self.results = {}
 
     def train_model(
             self,
@@ -113,13 +112,13 @@ class SentenceBertModel(SentenceModel):
         # (u, v, |u - v|)
         embs = [source_embeddings, target_embeddings, torch.abs(source_embeddings - target_embeddings)]
         input_embs = torch.cat(embs, 1)
-        # softmax
+        # fc layer
         outputs = self.fc(input_embs)
         return outputs
 
     def calc_loss(self, y_true, y_pred):
         """
-        Calc loss with two sentence embeddings
+        Calc loss with two sentence embeddings, Softmax loss
         """
         loss = nn.CrossEntropyLoss()(y_pred, y_true)
         return loss
@@ -229,16 +228,10 @@ class SentenceBertModel(SentenceModel):
                 labels = labels.to(device)
 
                 # get sentence embeddings of BERT encoder
-                source_embeddings = self.get_sentence_embeddings(
-                    self.model(source_input_ids, source_attention_mask, source_token_type_ids,
-                               output_hidden_states=True),
-                    source_attention_mask
-                )
-                target_embeddings = self.get_sentence_embeddings(
-                    self.model(target_input_ids, target_attention_mask, target_token_type_ids,
-                               output_hidden_states=True),
-                    target_attention_mask
-                )
+                source_embeddings = self.get_sentence_embeddings(source_input_ids, source_attention_mask,
+                                                                 source_token_type_ids)
+                target_embeddings = self.get_sentence_embeddings(target_input_ids, target_attention_mask,
+                                                                 target_token_type_ids)
                 outputs = self.concat_embeddings(source_embeddings, target_embeddings)
                 loss = self.calc_loss(labels, outputs)
                 current_loss = loss.item()
@@ -277,93 +270,3 @@ class SentenceBertModel(SentenceModel):
                 return global_step, training_progress_scores
 
         return global_step, training_progress_scores
-
-    def eval_model(self, eval_dataset: Dataset, output_dir: str = None, verbose: bool = True, batch_size: int = 16):
-        """
-        Evaluates the model on eval_df. Saves results to args.output_dir
-            result: Dictionary containing evaluation results.
-        """
-        result = self.evaluate(eval_dataset, output_dir, batch_size=batch_size)
-        self.results.update(result)
-
-        if verbose:
-            logger.info(self.results)
-
-        return result
-
-    def evaluate(self, eval_dataset, output_dir: str = None, batch_size: int = 16):
-        """
-        Evaluates the model on eval_dataset.
-
-        Utility function to be used by the eval_model() method. Not intended to be used directly.
-        """
-        results = {}
-
-        eval_dataloader = DataLoader(eval_dataset, batch_size=batch_size)
-        self.model.to(device)
-        self.model.eval()
-
-        batch_labels = []
-        batch_preds = []
-        for batch in tqdm(eval_dataloader, disable=False, desc="Running Evaluation"):
-            source, target, labels = batch
-            labels = labels.to(device)
-            batch_labels.extend(labels.cpu().numpy())
-            # source        [batch, 1, seq_len] -> [batch, seq_len]
-            source_input_ids = source.get('input_ids').squeeze(1).to(device)
-            source_attention_mask = source.get('attention_mask').squeeze(1).to(device)
-            source_token_type_ids = source.get('token_type_ids').squeeze(1).to(device)
-
-            # target        [batch, 1, seq_len] -> [batch, seq_len]
-            target_input_ids = target.get('input_ids').squeeze(1).to(device)
-            target_attention_mask = target.get('attention_mask').squeeze(1).to(device)
-            target_token_type_ids = target.get('token_type_ids').squeeze(1).to(device)
-
-            with torch.no_grad():
-                source_embeddings = self.get_sentence_embeddings(
-                    self.model(source_input_ids, source_attention_mask, source_token_type_ids,
-                               output_hidden_states=True),
-                    source_attention_mask
-                )
-                target_embeddings = self.get_sentence_embeddings(
-                    self.model(target_input_ids, target_attention_mask, target_token_type_ids,
-                               output_hidden_states=True),
-                    target_attention_mask
-                )
-                preds = torch.cosine_similarity(source_embeddings, target_embeddings)
-            batch_preds.extend(preds.cpu().numpy())
-
-        spearman = compute_spearmanr(batch_labels, batch_preds)
-        pearson = compute_pearsonr(batch_labels, batch_preds)
-        logger.debug(f"labels: {batch_labels[:10]}")
-        logger.debug(f"preds:  {batch_preds[:10]}")
-        logger.debug(f"pearson: {pearson}, spearman: {spearman}")
-
-        results["eval_spearman"] = spearman
-        results["eval_pearson"] = pearson
-        if output_dir:
-            os.makedirs(output_dir, exist_ok=True)
-            with open(os.path.join(output_dir, "eval_results.txt"), "w") as writer:
-                for key in sorted(results.keys()):
-                    writer.write("{} = {}\n".format(key, str(results[key])))
-
-        return results
-
-    def save_model(self, output_dir, model, results=None):
-        """
-        Saves the model to output_dir.
-        :param output_dir:
-        :param model:
-        :param results:
-        :return:
-        """
-        logger.info(f"Saving model checkpoint to {output_dir}")
-        os.makedirs(output_dir, exist_ok=True)
-        model_to_save = model.module if hasattr(model, "module") else model
-        model_to_save.save_pretrained(output_dir)
-        self.tokenizer.save_pretrained(output_dir)
-        if results:
-            output_eval_file = os.path.join(output_dir, "eval_results.txt")
-            with open(output_eval_file, "w") as writer:
-                for key in sorted(results.keys()):
-                    writer.write("{} = {}\n".format(key, str(results[key])))
