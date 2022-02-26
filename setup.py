@@ -13,9 +13,6 @@ if sys.version_info < (3,):
 with open('README.md', 'r', encoding='utf-8') as f:
     readme = f.read()
 
-with open('requirements.txt', 'r', encoding='utf-8') as f:
-    reqs = f.read()
-
 setup(
     name='text2vec',
     version=__version__,
@@ -43,9 +40,16 @@ setup(
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
     ],
     keywords='word embedding,text2vec,Chinese Text Similarity Calculation Tool,similarity,word2vec',
-    install_requires=reqs.strip().split('\n'),
+    install_requires=[
+        "jieba>=0.39",
+        "loguru",
+        "transformers>=4.6.0",
+        "tqdm",
+        "scikit-learn",
+        "gensim>=4.0.0",
+        "numpy",
+    ],
     packages=find_packages(exclude=['tests']),
     package_dir={'text2vec': 'text2vec'},
-    package_data={'text2vec': ['*.*', 'utils/*', '../README.*', '../*.txt',
-                               'data/*', 'data/STS-B/*', 'data/English-STS-B/stsbenchmark.tsv.gz', ]}
+    package_data={'text2vec': ['*.*', 'data/*.txt']}
 )
