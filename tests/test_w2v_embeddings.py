@@ -20,10 +20,10 @@ class EmbeddingsTestCase(unittest.TestCase):
         char = '卡'
         emb = w2v_model.encode(char)
         t = type(emb)
-        print(t)
+        print(type(emb))
         self.assertTrue(t == np.ndarray)
 
-        print(char, emb, emb.shape)
+        print(char, emb.shape)
         self.assertEqual(emb.shape, (200,))
 
         print(' '.join(["{:.3f}".format(i) for i in emb[:3]]))
@@ -33,7 +33,7 @@ class EmbeddingsTestCase(unittest.TestCase):
         """测试文本 word encode结果"""
         word = '银行卡'
         emb = w2v_model.encode(word)
-        print(word, emb)
+        print(word, emb[:10])
         self.assertEqual(emb.shape, (200,))
         self.assertTrue(abs(emb[0] - 0.0103) < 0.001)
 
@@ -41,7 +41,7 @@ class EmbeddingsTestCase(unittest.TestCase):
         """测试文本 text encode结果"""
         a = '如何更换花呗绑定银行卡'
         emb = w2v_model.encode(a)
-        print(a, emb)
+        print(a, emb[:10])
         self.assertEqual(emb.shape, (200,))
         self.assertTrue(abs(emb[0] - 0.0182) < 0.001)
 
@@ -54,15 +54,15 @@ class EmbeddingsTestCase(unittest.TestCase):
 
         w = '特价机票'
         r = w2v_model.encode(w)
-        print(w, r)
+        print(w, r[:10])
 
         w = '特价'
         r1 = w2v_model.encode(w)
-        print(w, r1)
+        print(w, r1[:10])
 
         w = '机票'
         r2 = w2v_model.encode(w)
-        print(w, r2)
+        print(w, r2[:10])
 
         emb = [r1, r2]
         r_average = np.array(emb).sum(axis=0) / 2.0

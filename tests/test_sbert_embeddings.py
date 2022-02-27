@@ -34,7 +34,7 @@ def use_transformers(sentences=('如何更换花呗绑定银行卡', '花呗更�
     # Perform pooling. In this case, max pooling.
     sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
     print("Sentence embeddings:")
-    print(sentence_embeddings)
+    print(sentence_embeddings.shape)
     return sentence_embeddings
 
 
@@ -50,7 +50,7 @@ class SBERTEmbeddingsTestCase(unittest.TestCase):
     def test_tr_emb(self):
         """测试test_tr_emb"""
         r = use_transformers()
-        print(r)
+        print(r.shape)
 
 
 if __name__ == '__main__':
