@@ -74,9 +74,18 @@ def load_en_nli_dataset(nli_file, limit_size=200000):
                 label_id = label2int[row['label']]
                 nli_train_samples.append((row['sentence1'], label_id))
                 nli_train_samples.append((row['sentence2'], label_id))
-                if limit_size > 0 and len(nli_train_samples) > limit_size:
+                if 0 < limit_size < len(nli_train_samples):
                     break
     return nli_train_samples
+
+
+def convert_to_cosent_train_dataset(train_samples):
+    # Convert the dataset to CoSENT model training format
+    train_dataset = []
+    for sample in train_samples:
+        train_dataset.append((sample[0], sample[2]))
+        train_dataset.append((sample[1], sample[2]))
+    return train_dataset
 
 
 def main():
@@ -88,7 +97,7 @@ def main():
                         help='Train data path')
     parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
     parser.add_argument("--do_predict", action="store_true", help="Whether to run predict.")
-    parser.add_argument('--output_dir', default='./outputs/STS-B-en-cosent-unsup', type=str,
+    parser.add_argument('--output_dir', default='./outputs/STS-B-en-model-unsup', type=str,
                         help='Model output directory')
     parser.add_argument('--max_seq_length', default=64, type=int, help='Max sequence length')
     parser.add_argument('--num_epochs', default=10, type=int, help='Number of training epochs')
@@ -110,6 +119,7 @@ def main():
         if args.model_arch == 'cosent':
             model = CosentModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
                                 max_seq_length=args.max_seq_length)
+            train_samples = convert_to_cosent_train_dataset(train_samples)
             train_dataset = CosentTrainDataset(model.tokenizer, train_samples, args.max_seq_length)
         elif args.model_arch == 'sentencebert':
             model = SentenceBertModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,

@@ -475,7 +475,7 @@ example: [examples/training_sup_text_matching_model.py](examples/training_sup_te
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict --num_epochs 20 --model_name hfl/chinese-macbert-base
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict --num_epochs 20 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-cosent
 ```
 
 - 在英文STS-B数据集训练和评估`BERT+CoSENT`模型
@@ -484,7 +484,7 @@ example: [examples/training_sup_text_matching_model_en.py](examples/training_sup
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 20 --model_name bert-base-uncased
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 20 --model_name bert-base-uncased  --output_dir ./outputs/STS-B-en-cosent
 ```
 
 #### CoSENT 无监督模型
@@ -494,7 +494,7 @@ example: [examples/training_unsup_cosent_en.py](examples/training_unsup_cosent_e
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_unsup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 20
+CUDA_VISIBLE_DEVICES=0 python3 training_unsup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 20 --output_dir ./outputs/STS-B-en-sup-cosent
 ```
 
 
@@ -520,7 +520,7 @@ example: [examples/training_sup_text_matching_model.py](examples/training_sup_te
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-sbert
 ```
 - 在英文STS-B数据集训练和评估`BERT+SBERT`模型
 
@@ -528,7 +528,7 @@ example: [examples/training_sup_text_matching_model_en.py](examples/training_sup
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased
+CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-sbert
 ```
 
 ## BERT-Match model
