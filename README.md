@@ -451,33 +451,6 @@ A man is eating food. (Score: 0.0329)
 
 
 # Models
-## BERT-Match model
-BERT文本匹配模型，孪生网络结构，表征式句向量表示
-
-
-Network structure:
-
-Training:
-<img src="docs/sim-bert-fc-train.png" width="200" />
-
-
-Inference:
-<img src="docs/inference.png" width="200" />
-
-## Sentence-BERT model
-
-Sentence-BERT文本匹配模型，表征式句向量表示方案
-
-Network structure:
-
-Training:
-<img src="docs/sbert_train.png" width="200" />
-
-
-Inference:
-<img src="docs/sbert_inference.png" width="200" />
-
-
 
 ## CoSENT model
 
@@ -487,16 +460,14 @@ CoSENT（Cosine Sentence）文本匹配模型，在Sentence-BERT上改进了Cosi
 Network structure:
 
 Training:
+
 <img src="docs/cosent_train.png" width="200" />
 
 
 Inference:
+
 <img src="docs/inference.png" width="200" />
 
-
-
-## 模型训练和预测
-### CoSENT
 #### CoSENT 监督模型
 - 在中文STS-B数据集训练和评估`MacBERT+CoSENT`模型
 
@@ -525,7 +496,23 @@ example: [examples/training_unsup_cosent_en.py](examples/training_unsup_cosent_e
 cd examples
 CUDA_VISIBLE_DEVICES=0 python3 training_unsup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 20
 ```
-### SentenceBERT
+
+
+## Sentence-BERT model
+
+Sentence-BERT文本匹配模型，表征式句向量表示方案
+
+Network structure:
+
+Training:
+
+<img src="docs/sbert_train.png" width="200" />
+
+
+Inference:
+
+<img src="docs/sbert_inference.png" width="200" />
+
 #### SentenceBERT 监督模型
 - 在中文STS-B数据集训练和评估`MacBERT+SBERT`模型
 
@@ -543,6 +530,18 @@ example: [examples/training_sup_text_matching_model_en.py](examples/training_sup
 cd examples
 CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased
 ```
+
+## BERT-Match model
+BERT文本匹配模型，孪生网络结构，表征式句向量表示
+
+Network structure:
+
+Training:
+<img src="docs/sim-bert-fc-train.png" width="200" />
+
+
+Inference:
+<img src="docs/inference.png" width="200" />
 
 
 # Contact
