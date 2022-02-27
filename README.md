@@ -461,12 +461,12 @@ Network structure:
 
 Training:
 
-<img src="docs/cosent_train.png" width="200" />
+<img src="docs/cosent_train.png" width="300" />
 
 
 Inference:
 
-<img src="docs/inference.png" width="200" />
+<img src="docs/inference.png" width="300" />
 
 #### CoSENT 监督模型
 - 在中文STS-B数据集训练和评估`MacBERT+CoSENT`模型
@@ -506,12 +506,12 @@ Network structure:
 
 Training:
 
-<img src="docs/sbert_train.png" width="200" />
+<img src="docs/sbert_train.png" width="300" />
 
 
 Inference:
 
-<img src="docs/sbert_inference.png" width="200" />
+<img src="docs/sbert_inference.png" width="300" />
 
 #### SentenceBERT 监督模型
 - 在中文STS-B数据集训练和评估`MacBERT+SBERT`模型
@@ -538,12 +538,12 @@ Network structure:
 
 Training:
 
-<img src="docs/sim-bert-fc-train.png" width="200" />
+<img src="docs/sim-bert-fc-train.png" width="300" />
 
 
 Inference:
 
-<img src="docs/inference.png" width="200" />
+<img src="docs/inference.png" width="300" />
 
 
 # Contact
