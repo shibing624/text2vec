@@ -537,10 +537,12 @@ BERT文本匹配模型，孪生网络结构，表征式句向量表示
 Network structure:
 
 Training:
+
 <img src="docs/sim-bert-fc-train.png" width="200" />
 
 
 Inference:
+
 <img src="docs/inference.png" width="200" />
 
 
