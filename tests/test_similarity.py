@@ -35,6 +35,7 @@ class SimTestCase(unittest.TestCase):
     def test_w2v_sim_each(self):
         """测试w2v_sim_each"""
         m = Similarity(similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.WORD2VEC)
+        print(m)
         sents1, sents2, labels = load_test_data(sts_test_path)
         t1 = time()
         scores = []

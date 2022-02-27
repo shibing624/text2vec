@@ -72,7 +72,10 @@ class Similarity:
                 raise ValueError(e)
         else:
             raise ValueError('embedding_type error')
-        logger.debug(f"Model: {self.model}, similarity_type: {similarity_type}, embedding_type: {embedding_type}")
+
+    def __repr__(self):
+        return f"<Similarity> model : {self.model}, similarity_type: {self.similarity_type}, " \
+               f"embedding_type: {self.embedding_type}"
 
     def get_score(self, sentence1: str, sentence2: str) -> float:
         """

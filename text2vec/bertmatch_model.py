@@ -39,6 +39,10 @@ class BertMatchModel(SentenceModel):
         super().__init__(model_name_or_path, encoder_type, max_seq_length)
         self.classifier = nn.Linear(self.bert.config.hidden_size * 2, num_classes).to(device)
 
+    def __repr__(self):
+        return f"<BertMatchModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
+               f"max_seq_length: {self.max_seq_length}>"
+
     def train_model(
             self,
             train_file: str,

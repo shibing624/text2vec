@@ -43,7 +43,7 @@ class EmbeddingsTestCase(unittest.TestCase):
         emb = w2v_model.encode(a)
         print(a, emb[:10])
         self.assertEqual(emb.shape, (200,))
-        self.assertTrue(abs(emb[0] - 0.0182) < 0.001)
+        self.assertTrue(abs(emb[0] - 0.02396) < 0.001)
 
     def test_oov_emb(self):
         """测试 OOV word embedding"""
@@ -66,7 +66,7 @@ class EmbeddingsTestCase(unittest.TestCase):
 
         emb = [r1, r2]
         r_average = np.array(emb).sum(axis=0) / 2.0
-        print('r_average:', r_average)
+        print('r_average:', r_average[:10], r_average.shape)
 
         if r[0] == r_average[0]:
             print('same')
