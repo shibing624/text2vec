@@ -304,8 +304,6 @@ print("Sentence embeddings:")
 print(sentence_embeddings)
 ```
 
-
-
 #### 提供两种`Word2Vec`词向量，任选一个：
 
   - 轻量版腾讯词向量 [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制，运行程序，自动下载到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
@@ -453,18 +451,18 @@ A man is eating food. (Score: 0.0329)
 
 
 # Models
-## BERT-fc model
+## BERT-Match model
 BERT文本匹配模型，孪生网络结构，表征式句向量表示
 
 
 Network structure:
 
 Training:
-![train](./docs/sim-bert-fc-train.png)
+<img src="docs/sim-bert-fc-train.png" width="200" />
 
 
 Inference:
-![infer](./docs/inference.png)
+<img src="docs/inference.png" width="200" />
 
 ## Sentence-BERT model
 
@@ -473,11 +471,11 @@ Sentence-BERT文本匹配模型，表征式句向量表示方案
 Network structure:
 
 Training:
-![sbert_train](./docs/sbert_train.png)
+<img src="docs/sbert_train.png" width="200" />
 
 
 Inference:
-![sbert_infer](./docs/sbert_inference.png)
+<img src="docs/sbert_inference.png" width="200" />
 
 
 
@@ -489,16 +487,17 @@ CoSENT（Cosine Sentence）文本匹配模型，在Sentence-BERT上改进了Cosi
 Network structure:
 
 Training:
-![train](./docs/cosent_train.png)
+<img src="docs/cosent_train.png" width="200" />
 
 
 Inference:
-![infer](./docs/inference.png)
+<img src="docs/inference.png" width="200" />
 
 
 
 ## 模型训练和预测
-### CoSENT 监督模型
+### CoSENT
+#### CoSENT 监督模型
 - 在中文STS-B数据集训练和评估`MacBERT+CoSENT`模型
 
 example: [examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)
@@ -517,7 +516,7 @@ cd examples
 CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 20 --model_name bert-base-uncased
 ```
 
-### CoSENT 无监督模型
+#### CoSENT 无监督模型
 - 在英文NLI数据集训练`BERT+CoSENT`模型，在STS-B测试集评估效果
 
 example: [examples/training_unsup_cosent_en.py](examples/training_unsup_cosent_en.py)
@@ -526,8 +525,8 @@ example: [examples/training_unsup_cosent_en.py](examples/training_unsup_cosent_e
 cd examples
 CUDA_VISIBLE_DEVICES=0 python3 training_unsup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 20
 ```
-
-### SentenceBERT 监督模型
+### SentenceBERT
+#### SentenceBERT 监督模型
 - 在中文STS-B数据集训练和评估`MacBERT+SBERT`模型
 
 example: [examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)
