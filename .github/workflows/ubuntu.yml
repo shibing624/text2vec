@@ -39,6 +39,6 @@ jobs:
           EARTHENGINE_TOKEN: ${{ secrets.EARTHENGINE_TOKEN }}
       - name: Install from pypi
         run: |
-          pip uninstall text2vec
+          pip uninstall -y text2vec
           pip install -U text2vec
           python -c "import text2vec; print(text2vec.__version__)"
