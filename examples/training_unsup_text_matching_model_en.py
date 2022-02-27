@@ -72,8 +72,7 @@ def load_en_nli_dataset(nli_file, limit_size=200000):
         for row in reader:
             if row['split'] == 'train':
                 label_id = label2int[row['label']]
-                nli_train_samples.append((row['sentence1'], label_id))
-                nli_train_samples.append((row['sentence2'], label_id))
+                nli_train_samples.append((row['sentence1'], row['sentence2'], label_id))
                 if 0 < limit_size < len(nli_train_samples):
                     break
     return nli_train_samples
