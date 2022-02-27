@@ -50,22 +50,29 @@ class Similarity:
             logger.warning('similarity_type set error, use default cosine')
             similarity_type = SimilarityType.COSINE
         if similarity_type == SimilarityType.WMD and embedding_type != EmbeddingType.WORD2VEC:
-            logger.warning('wmd sim type, emb type must be w2v')
+            logger.warning('If use wmd sim type, emb type must be w2v')
             embedding_type = EmbeddingType.WORD2VEC
         self.similarity_type = similarity_type
         self.embedding_type = embedding_type
         self.encoder_type = encoder_type
-        self.model_name_or_path = model_name_or_path
         self.jieba_tokenizer = JiebaTokenizer()
-        self.model = None
 
-    def load_model(self):
-        if self.model is None:
-            if self.embedding_type == EmbeddingType.WORD2VEC:
+        if self.embedding_type == EmbeddingType.WORD2VEC:
+            try:
                 # Default: Word2Vec("w2v-light-tencent-chinese")
-                self.model = Word2Vec(self.model_name_or_path)
-            if self.embedding_type == EmbeddingType.BERT:
-                self.model = SentenceModel(self.model_name_or_path, encoder_type=self.encoder_type)
+                self.model = Word2Vec(model_name_or_path)
+            except ValueError as e:
+                logger.error(f"{model_name_or_path} is not Word2Vec model")
+                raise ValueError(e)
+        elif self.embedding_type == EmbeddingType.BERT:
+            try:
+                self.model = SentenceModel(model_name_or_path, encoder_type=self.encoder_type)
+            except ValueError as e:
+                logger.error(f"{model_name_or_path} is not Bert model")
+                raise ValueError(e)
+        else:
+            raise ValueError('embedding_type error')
+        logger.debug(f"Model: {self.model}, similarity_type: {similarity_type}, embedding_type: {embedding_type}")
 
     def get_score(self, sentence1: str, sentence2: str) -> float:
         """
@@ -79,7 +86,6 @@ class Similarity:
         sentence2 = sentence2.strip()
         if not sentence1 or not sentence2:
             return res
-        self.load_model()
         if self.similarity_type == SimilarityType.COSINE:
             emb1 = self.model.encode(sentence1)
             emb2 = self.model.encode(sentence2)
@@ -106,7 +112,6 @@ class Similarity:
         if only_aligned and len(sentences1) != len(sentences2):
             logger.warning('Sentences size not equal, auto set is_aligned=False')
             only_aligned = False
-        self.load_model()
         embs1 = self.model.encode(sentences1)
         embs2 = self.model.encode(sentences2)
         if self.embedding_type == EmbeddingType.BERT:

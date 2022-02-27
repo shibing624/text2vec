@@ -34,6 +34,10 @@ class CosentModel(SentenceModel):
         """
         super().__init__(model_name_or_path, encoder_type, max_seq_length)
 
+    def __repr__(self):
+        return f"<CoSENTModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
+               f"max_seq_length: {self.max_seq_length}>"
+
     def train_model(
             self,
             train_file: str,

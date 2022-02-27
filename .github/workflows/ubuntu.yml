@@ -13,7 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9 ]
+        #python-version: [ 3.7, 3.8, 3.9 ]
+        python-version: [ 3.9 ]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
@@ -36,3 +37,8 @@ jobs:
           HEREMAPS_API_KEY: ${{ secrets.HEREMAPS_API_KEY }}
           PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
           EARTHENGINE_TOKEN: ${{ secrets.EARTHENGINE_TOKEN }}
+      - name: Install from pypi
+        run: |
+          pip uninstall text2vec
+          pip install -U text2vec
+          python -c "import text2vec; print(text2vec.__version__)"

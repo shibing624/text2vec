@@ -44,7 +44,7 @@ class SBERTEmbeddingsTestCase(unittest.TestCase):
         a = '如何更换花呗绑定银行卡'
         m = SentenceModel('shibing624/text2vec-base-chinese')
         emb = m.encode(a)
-        print(a, emb)
+        print(a)
         self.assertEqual(emb.shape, (768,))
 
     def test_tr_emb(self):

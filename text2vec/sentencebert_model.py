@@ -13,7 +13,7 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
-from text2vec.sentence_model import SentenceModel, EncoderType,device
+from text2vec.sentence_model import SentenceModel, EncoderType, device
 from text2vec.text_matching_dataset import TextMatchingTrainDataset, TextMatchingTestDataset, \
     load_test_data, load_train_data
 from text2vec.utils.stats_util import set_seed
@@ -38,6 +38,10 @@ class SentenceBertModel(SentenceModel):
         """
         super().__init__(model_name_or_path, encoder_type, max_seq_length)
         self.classifier = nn.Linear(self.bert.config.hidden_size * 3, num_classes).to(device)
+
+    def __repr__(self):
+        return f"<SentenceBertModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
+               f"max_seq_length: {self.max_seq_length}>"
 
     def train_model(
             self,

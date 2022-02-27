@@ -15,7 +15,7 @@ from text2vec.utils.get_file import get_file
 from text2vec.utils.tokenizer import JiebaTokenizer
 
 pwd_path = os.path.abspath(os.path.dirname(__file__))
-default_stopwords_file = os.path.join(pwd_path, 'data/stopwords.txt')
+default_stopwords_file = os.path.join(pwd_path, 'stopwords.txt')
 USER_DATA_DIR = os.path.expanduser('~/.text2vec/datasets/')
 
 
@@ -47,9 +47,9 @@ class Word2Vec:
     }
 
     def __init__(self, model_name_or_path: str = 'w2v-light-tencent-chinese',
-                 w2v_kwargs: Optional[Dict] = None,
-                 stopwords: Optional[List[str]] = None,
-                 cache_folder=USER_DATA_DIR):
+                 w2v_kwargs: Dict = None,
+                 stopwords: List[str] = None,
+                 cache_folder: str = USER_DATA_DIR):
         """
         Init word2vec model
 
@@ -63,29 +63,36 @@ class Word2Vec:
         self.w2v_kwargs = w2v_kwargs if w2v_kwargs is not None else {}
         if model_name_or_path and os.path.exists(model_name_or_path):
             logger.info('Load pretrained model:{}'.format(model_name_or_path))
-            model_path = model_name_or_path
         else:
             model_dict = self.model_key_map.get(model_name_or_path, self.model_key_map['w2v-light-tencent-chinese'])
             tar_filename = model_dict.get('tar_filename')
             self.w2v_kwargs.update({'binary': model_dict.get('binary')})
             url = model_dict.get('url')
             untar_filename = model_dict.get('untar_filename')
-            model_path = os.path.join(cache_folder, untar_filename)
-            if not os.path.exists(model_path):
+
+            # Set new model_name_or_path
+            old_model_name = model_name_or_path
+            model_name_or_path = os.path.join(cache_folder, untar_filename)
+            logger.warning(f"{old_model_name} not found, Set default model name: {model_name_or_path}")
+            if not os.path.exists(model_name_or_path):
+                logger.debug(f"Downloading {url} to {model_name_or_path}")
                 os.makedirs(cache_folder, exist_ok=True)
                 get_file(tar_filename, url, extract=True,
                          cache_dir=cache_folder,
                          cache_subdir=cache_folder,
                          verbose=1)
         t0 = time.time()
-        w2v = KeyedVectors.load_word2vec_format(model_path, **self.w2v_kwargs)
+        w2v = KeyedVectors.load_word2vec_format(model_name_or_path, **self.w2v_kwargs)
         # w2v.init_sims(replace=True)
         logger.debug('Load w2v from {}, spend {:.2f} sec'.format(model_name_or_path, time.time() - t0))
         self.stopwords = stopwords if stopwords else load_stopwords(default_stopwords_file)
         self.w2v = w2v
         self.jieba_tokenizer = JiebaTokenizer()
-        logger.debug('Word count: {}, emb size: {}'.format(len(w2v.key_to_index), w2v.vector_size))
-        logger.debug('Set stopwords: {}, count: {}'.format(sorted(list(self.stopwords))[:10], len(self.stopwords)))
+        self.model_name_or_path = model_name_or_path
+
+    def __repr__(self):
+        return f"<Word2Vec, word count: {len(self.w2v.key_to_index)}, emb size: {self.w2v.vector_size}, " \
+               f"stopwords count: {len(self.stopwords)}>"
 
     def encode(self, sentences: Union[List[str], str]) -> Union[List, ndarray]:
         """

@@ -62,6 +62,10 @@ class SentenceModel:
         self.bert.to(device)
         self.results = {}  # Save training process evaluation result
 
+    def __repr__(self):
+        return f"<SentenceModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
+               f"max_seq_length: {self.max_seq_length}>"
+
     def get_sentence_embeddings(self, input_ids, attention_mask, token_type_ids):
         """
         Returns the model output by encoder_type as embeddings.
