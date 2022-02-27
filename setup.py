@@ -48,6 +48,7 @@ setup(
         "scikit-learn",
         "gensim>=4.0.0",
         "numpy",
+        "pandas",
     ],
     packages=find_packages(exclude=['tests']),
     package_dir={'text2vec': 'text2vec'},
