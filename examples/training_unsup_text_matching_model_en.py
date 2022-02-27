@@ -83,6 +83,8 @@ def convert_to_cosent_train_dataset(train_samples):
     # Convert the dataset to CoSENT model training format
     train_dataset = []
     for sample in train_samples:
+        if len(sample) != 3:
+            continue
         train_dataset.append((sample[0], sample[2]))
         train_dataset.append((sample[1], sample[2]))
     return train_dataset
