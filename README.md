@@ -452,6 +452,50 @@ A man is eating food. (Score: 0.0329)
 > `Score`的值范围[-1, 1]，值越大，表示该query与corpus中的句子相似度越近。
 
 
+# Models
+## BERT-fc model
+BERT文本匹配模型，孪生网络结构，表征式句向量表示
+
+
+Network structure:
+
+Training:
+![train](./docs/sim-bert-fc-train.png)
+
+
+Inference:
+![infer](./docs/inference.png)
+
+## Sentence-BERT model
+
+Sentence-BERT文本匹配模型，表征式句向量表示方案
+
+Network structure:
+
+Training:
+![sbert_train](./docs/sbert_train.png)
+
+
+Inference:
+![sbert_infer](./docs/sbert_inference.png)
+
+
+
+## CoSENT model
+
+CoSENT（Cosine Sentence）文本匹配模型，在Sentence-BERT上改进了CosineRankLoss的句向量方案
+
+
+Network structure:
+
+Training:
+![train](./docs/cosent_train.png)
+
+
+Inference:
+![infer](./docs/inference.png)
+
+
 
 ## 模型训练和预测
 ### CoSENT 监督模型

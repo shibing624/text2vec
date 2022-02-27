@@ -58,17 +58,17 @@ class SentenceModel:
         self.encoder_type = encoder_type
         self.max_seq_length = max_seq_length
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
-        self.model = AutoModel.from_pretrained(model_name_or_path)
-        self.model.to(device)
+        self.bert = AutoModel.from_pretrained(model_name_or_path)
+        self.bert.to(device)
         self.results = {}  # Save training process evaluation result
 
     def get_sentence_embeddings(self, input_ids, attention_mask, token_type_ids):
         """
         Returns the model output by encoder_type as embeddings.
 
-        Utility function for self.model() method.
+        Utility function for self.bert() method.
         """
-        model_output = self.model(input_ids, attention_mask, token_type_ids, output_hidden_states=True)
+        model_output = self.bert(input_ids, attention_mask, token_type_ids, output_hidden_states=True)
 
         if self.encoder_type == EncoderType.FIRST_LAST_AVG:
             # Get the first and last hidden states, and average them to get the embeddings
@@ -111,7 +111,7 @@ class SentenceModel:
         """
         Returns the embeddings for a batch of sentences.
         """
-        self.model.eval()
+        self.bert.eval()
         input_is_string = False
         if isinstance(sentences, str) or not hasattr(sentences, "__len__"):
             sentences = [sentences]
@@ -163,8 +163,8 @@ class SentenceModel:
         results = {}
 
         eval_dataloader = DataLoader(eval_dataset, batch_size=batch_size)
-        self.model.to(device)
-        self.model.eval()
+        self.bert.to(device)
+        self.bert.eval()
 
         batch_labels = []
         batch_preds = []

@@ -11,16 +11,16 @@ from loguru import logger
 
 sys.path.append('..')
 
-from text2vec.sentence_bert.sentencebert_model import SentenceBertModel
-from text2vec.sentence_bert.sentencebert_dataset import load_test_data
+from text2vec import CosentModel
+from text2vec import SentenceBertModel, BertMatchModel
+from text2vec import load_test_data
 from text2vec import cos_sim, compute_spearmanr, EncoderType
 
 
-def calc_similarity_scores(args, sents1, sents2, labels):
-    m = SentenceBertModel(args.output_dir, encoder_type=args.encoder_type, max_seq_length=args.max_seq_length)
+def calc_similarity_scores(model, sents1, sents2, labels):
     t1 = time.time()
-    e1 = m.encode(sents1)
-    e2 = m.encode(sents2)
+    e1 = model.encode(sents1)
+    e2 = model.encode(sents2)
     spend_time = time.time() - t1
     s = cos_sim(e1, e2)
     sims = []
@@ -38,15 +38,17 @@ def calc_similarity_scores(args, sents1, sents2, labels):
 
 
 def main():
-    parser = argparse.ArgumentParser('SentenceBERT Text Matching task')
+    parser = argparse.ArgumentParser('Text Matching task')
+    parser.add_argument('--model_arch', default='cosent', const='cosent', nargs='?',
+                        choices=['cosent', 'sentencebert', 'bert'], help='model architecture')
     parser.add_argument('--model_name', default='hfl/chinese-macbert-base', type=str,
-                        help='Model Arch, such as: hfl/chinese-macbert-base')
+                        help='Transformers model model or path')
     parser.add_argument('--train_file', default='data/STS-B/STS-B.train.data', type=str, help='Train data path')
     parser.add_argument('--valid_file', default='data/STS-B/STS-B.valid.data', type=str, help='Valid data path')
     parser.add_argument('--test_file', default='data/STS-B/STS-B.test.data', type=str, help='Test data path')
     parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
     parser.add_argument("--do_predict", action="store_true", help="Whether to run predict.")
-    parser.add_argument('--output_dir', default='./outputs/STS-B-sentencebert', type=str, help='Model output directory')
+    parser.add_argument('--output_dir', default='./outputs/STS-B-cosent', type=str, help='Model output directory')
     parser.add_argument('--max_seq_length', default=64, type=int, help='Max sequence length')
     parser.add_argument('--num_epochs', default=10, type=int, help='Number of training epochs')
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
@@ -57,8 +59,15 @@ def main():
     logger.info(args)
 
     if args.do_train:
-        model = SentenceBertModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
-                                  max_seq_length=args.max_seq_length)
+        if args.model_arch == 'cosent':
+            model = CosentModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
+                                max_seq_length=args.max_seq_length)
+        elif args.model_arch == 'sentencebert':
+            model = SentenceBertModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
+                                      max_seq_length=args.max_seq_length)
+        else:
+            model = BertMatchModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
+                                   max_seq_length=args.max_seq_length)
         model.train_model(args.train_file,
                           args.output_dir,
                           eval_file=args.valid_file,
@@ -67,8 +76,15 @@ def main():
                           lr=args.learning_rate)
         logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:
-        model = SentenceBertModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
-                                  max_seq_length=args.max_seq_length)
+        if args.model_arch == 'cosent':
+            model = CosentModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
+                                max_seq_length=args.max_seq_length)
+        elif args.model_arch == 'sentencebert':
+            model = SentenceBertModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
+                                      max_seq_length=args.max_seq_length)
+        else:
+            model = BertMatchModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
+                                   max_seq_length=args.max_seq_length)
         test_data = load_test_data(args.test_file)
 
         # Predict embeddings
@@ -84,7 +100,7 @@ def main():
         sentence_embeddings = model.encode(srcs)
         logger.debug(f"{type(sentence_embeddings)}, {sentence_embeddings.shape}, {sentence_embeddings[0].shape}")
         # Predict similarity scores
-        calc_similarity_scores(args, srcs, trgs, labels)
+        calc_similarity_scores(model, srcs, trgs, labels)
 
 
 if __name__ == '__main__':

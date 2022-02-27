@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @author:XuMing(xuming624@qq.com)
-@description: Create Sentence-BERT model for text matching task
+@description: Create BERT model for text matching task
 """
 
 import os
@@ -14,16 +14,16 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from text2vec.sentence_model import SentenceModel, EncoderType, device
-from text2vec.sentence_bert.sentencebert_dataset import SentenceBertTrainDataset, SentenceBertTestDataset, \
+from text2vec.text_matching_dataset import TextMatchingTrainDataset, TextMatchingTestDataset, \
     load_test_data, load_train_data
 from text2vec.utils.stats_util import set_seed
 
 
-class SentenceBertModel(SentenceModel):
+class BertMatchModel(SentenceModel):
     def __init__(
             self,
-            model_name_or_path: str = "hfl/chinese-macbert-base",
-            encoder_type: EncoderType = EncoderType.MEAN,
+            model_name_or_path: str = "bert-base-chinese",
+            encoder_type: EncoderType = EncoderType.FIRST_LAST_AVG,
             max_seq_length: int = 128,
             num_classes: int = 2,
     ):
@@ -37,7 +37,7 @@ class SentenceBertModel(SentenceModel):
             num_classes: Number of classes for classification.
         """
         super().__init__(model_name_or_path, encoder_type, max_seq_length)
-        self.fc = nn.Linear(self.model.config.hidden_size * 3, num_classes).to(device)
+        self.classifier = nn.Linear(self.bert.config.hidden_size * 2, num_classes).to(device)
 
     def train_model(
             self,
@@ -78,8 +78,8 @@ class SentenceBertModel(SentenceModel):
             global_step: Number of global steps trained
             training_details: Average training loss if evaluate_during_training is False or full training progress scores if evaluate_during_training is True
         """
-        train_dataset = SentenceBertTrainDataset(self.tokenizer, load_train_data(train_file), self.max_seq_length)
-        eval_dataset = SentenceBertTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
+        train_dataset = TextMatchingTrainDataset(self.tokenizer, load_train_data(train_file), self.max_seq_length)
+        eval_dataset = TextMatchingTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
 
         global_step, training_details = self.train(
             train_dataset,
@@ -109,11 +109,11 @@ class SentenceBertModel(SentenceModel):
         :param target_embeddings:
         :return: embeddings
         """
-        # (u, v, |u - v|)
-        embs = [source_embeddings, target_embeddings, torch.abs(source_embeddings - target_embeddings)]
+        # (u, v)
+        embs = [source_embeddings, target_embeddings]
         input_embs = torch.cat(embs, 1)
         # fc layer
-        outputs = self.fc(input_embs)
+        outputs = self.classifier(input_embs)
         return outputs
 
     def calc_loss(self, y_true, y_pred):
@@ -147,12 +147,12 @@ class SentenceBertModel(SentenceModel):
         """
         os.makedirs(output_dir, exist_ok=True)
         logger.debug("Use pytorch device: {}".format(device))
-        self.model.to(device)
+        self.bert.to(device)
         set_seed(seed)
 
         train_dataloader = DataLoader(train_dataset, shuffle=False, batch_size=batch_size)
         total_steps = len(train_dataloader) * num_epochs
-        param_optimizer = list(self.model.named_parameters())
+        param_optimizer = list(self.bert.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
         optimizer_grouped_parameters = [
             {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
@@ -172,7 +172,7 @@ class SentenceBertModel(SentenceModel):
 
         logger.info("  Training started")
         global_step = 0
-        self.model.zero_grad()
+        self.bert.zero_grad()
         epoch_number = 0
         best_eval_metric = 0
         steps_trained_in_current_epoch = 0
@@ -203,7 +203,7 @@ class SentenceBertModel(SentenceModel):
             "eval_pearson": [],
         }
         for current_epoch in trange(int(num_epochs), desc="Epoch", disable=False, mininterval=0):
-            self.model.train()
+            self.bert.train()
             current_loss = 0
             if epochs_trained > 0:
                 epochs_trained -= 1
@@ -244,7 +244,7 @@ class SentenceBertModel(SentenceModel):
 
                 loss.backward()
                 if (step + 1) % gradient_accumulation_steps == 0:
-                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_grad_norm)
+                    torch.nn.utils.clip_grad_norm_(self.bert.parameters(), max_grad_norm)
                     optimizer.step()
                     scheduler.step()  # Update learning rate schedule
                     optimizer.zero_grad()
@@ -252,7 +252,7 @@ class SentenceBertModel(SentenceModel):
             epoch_number += 1
             output_dir_current = os.path.join(output_dir, "checkpoint-{}-epoch-{}".format(global_step, epoch_number))
             results = self.eval_model(eval_dataset, output_dir_current, verbose=verbose, batch_size=batch_size)
-            self.save_model(output_dir_current, model=self.model, results=results)
+            self.save_model(output_dir_current, model=self.bert, results=results)
             training_progress_scores["global_step"].append(global_step)
             training_progress_scores["train_loss"].append(current_loss)
             for key in results:
@@ -264,7 +264,7 @@ class SentenceBertModel(SentenceModel):
             if eval_spearman > best_eval_metric:
                 best_eval_metric = eval_spearman
                 logger.info(f"Save new best model, best_eval_metric: {best_eval_metric}")
-                self.save_model(output_dir, model=self.model, results=results)
+                self.save_model(output_dir, model=self.bert, results=results)
 
             if 0 < max_steps < global_step:
                 return global_step, training_progress_scores

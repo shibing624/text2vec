@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @author:XuMing(xuming624@qq.com)
-@description: Create CoSENT model for text matching task
+@description: Create Sentence-BERT model for text matching task
 """
 
 import os
@@ -9,29 +9,35 @@ from loguru import logger
 import math
 import pandas as pd
 import torch
+from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
-from text2vec.sentence_model import SentenceModel, EncoderType, device
-from text2vec.cosent.cosent_dataset import CosentTestDataset, CosentTrainDataset, load_train_data, load_test_data
+from text2vec.sentence_model import SentenceModel, EncoderType,device
+from text2vec.text_matching_dataset import TextMatchingTrainDataset, TextMatchingTestDataset, \
+    load_test_data, load_train_data
 from text2vec.utils.stats_util import set_seed
 
 
-class CosentModel(SentenceModel):
+class SentenceBertModel(SentenceModel):
     def __init__(
             self,
             model_name_or_path: str = "hfl/chinese-macbert-base",
-            encoder_type: EncoderType = EncoderType.FIRST_LAST_AVG,
+            encoder_type: EncoderType = EncoderType.MEAN,
             max_seq_length: int = 128,
+            num_classes: int = 2,
     ):
         """
-        Initializes a CoSENT Model.
+        Initializes a SentenceBert Model.
 
         Args:
             model_name_or_path: Default Transformer model name or path to a directory containing Transformer model file (pytorch_nodel.bin).
+            encoder_type: encoder type, set by model name
             max_seq_length: The maximum total input sequence length after tokenization.
+            num_classes: Number of classes for classification.
         """
         super().__init__(model_name_or_path, encoder_type, max_seq_length)
+        self.classifier = nn.Linear(self.bert.config.hidden_size * 3, num_classes).to(device)
 
     def train_model(
             self,
@@ -72,8 +78,8 @@ class CosentModel(SentenceModel):
             global_step: Number of global steps trained
             training_details: Average training loss if evaluate_during_training is False or full training progress scores if evaluate_during_training is True
         """
-        train_dataset = CosentTrainDataset(self.tokenizer, load_train_data(train_file), self.max_seq_length)
-        eval_dataset = CosentTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
+        train_dataset = TextMatchingTrainDataset(self.tokenizer, load_train_data(train_file), self.max_seq_length)
+        eval_dataset = TextMatchingTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
 
         global_step, training_details = self.train(
             train_dataset,
@@ -95,27 +101,27 @@ class CosentModel(SentenceModel):
 
         return global_step, training_details
 
+    def concat_embeddings(self, source_embeddings, target_embeddings):
+        """
+        Output the bert sentence embeddings, pass to classifier module. Applies different
+        concats and finally the linear layer to produce class scores
+        :param source_embeddings:
+        :param target_embeddings:
+        :return: embeddings
+        """
+        # (u, v, |u - v|)
+        embs = [source_embeddings, target_embeddings, torch.abs(source_embeddings - target_embeddings)]
+        input_embs = torch.cat(embs, 1)
+        # fc layer
+        logits = self.classifier(input_embs)
+        return logits
+
     def calc_loss(self, y_true, y_pred):
         """
-        CoSENT的排序loss，refer：https://kexue.fm/archives/8847
+        Calc loss with two sentence embeddings, Softmax loss
         """
-        # 1. 取出真实的标签
-        y_true = y_true[::2]  # tensor([1, 0, 1]) 真实的标签
-        # 2. 对输出的句子向量进行l2归一化   后面只需要对应为相乘  就可以得到cos值了
-        norms = (y_pred ** 2).sum(axis=1, keepdims=True) ** 0.5
-        y_pred = y_pred / norms
-        # 3. 奇偶向量相乘, 相似度矩阵除以温度系数0.05(等于*20)
-        y_pred = torch.sum(y_pred[::2] * y_pred[1::2], dim=1) * 20
-        # 4. 取出负例-正例的差值
-        y_pred = y_pred[:, None] - y_pred[None, :]  # 这里是算出所有位置 两两之间余弦的差值
-        # 矩阵中的第i行j列  表示的是第i个余弦值-第j个余弦值
-        y_true = y_true[:, None] < y_true[None, :]  # 取出负例-正例的差值
-        y_true = y_true.float()
-        y_pred = y_pred - (1 - y_true) * 1e12
-        y_pred = y_pred.view(-1)
-        # 这里加0是因为e^0 = 1相当于在log中加了1
-        y_pred = torch.cat((torch.tensor([0]).float().to(device), y_pred), dim=0)
-        return torch.logsumexp(y_pred, dim=0)
+        loss = nn.CrossEntropyLoss()(y_pred, y_true)
+        return loss
 
     def train(
             self,
@@ -141,12 +147,12 @@ class CosentModel(SentenceModel):
         """
         os.makedirs(output_dir, exist_ok=True)
         logger.debug("Use pytorch device: {}".format(device))
-        self.model.to(device)
+        self.bert.to(device)
         set_seed(seed)
 
         train_dataloader = DataLoader(train_dataset, shuffle=False, batch_size=batch_size)
         total_steps = len(train_dataloader) * num_epochs
-        param_optimizer = list(self.model.named_parameters())
+        param_optimizer = list(self.bert.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
         optimizer_grouped_parameters = [
             {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
@@ -166,7 +172,7 @@ class CosentModel(SentenceModel):
 
         logger.info("  Training started")
         global_step = 0
-        self.model.zero_grad()
+        self.bert.zero_grad()
         epoch_number = 0
         best_eval_metric = 0
         steps_trained_in_current_epoch = 0
@@ -197,7 +203,7 @@ class CosentModel(SentenceModel):
             "eval_pearson": [],
         }
         for current_epoch in trange(int(num_epochs), desc="Epoch", disable=False, mininterval=0):
-            self.model.train()
+            self.bert.train()
             current_loss = 0
             if epochs_trained > 0:
                 epochs_trained -= 1
@@ -210,14 +216,24 @@ class CosentModel(SentenceModel):
                 if steps_trained_in_current_epoch > 0:
                     steps_trained_in_current_epoch -= 1
                     continue
-                inputs, labels = batch
+                source, target, labels = batch
+                # source        [batch, 1, seq_len] -> [batch, seq_len]
+                source_input_ids = source.get('input_ids').squeeze(1).to(device)
+                source_attention_mask = source.get('attention_mask').squeeze(1).to(device)
+                source_token_type_ids = source.get('token_type_ids').squeeze(1).to(device)
+                # target        [batch, 1, seq_len] -> [batch, seq_len]
+                target_input_ids = target.get('input_ids').squeeze(1).to(device)
+                target_attention_mask = target.get('attention_mask').squeeze(1).to(device)
+                target_token_type_ids = target.get('token_type_ids').squeeze(1).to(device)
                 labels = labels.to(device)
-                # inputs        [batch, 1, seq_len] -> [batch, seq_len]
-                input_ids = inputs.get('input_ids').squeeze(1).to(device)
-                attention_mask = inputs.get('attention_mask').squeeze(1).to(device)
-                token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
-                output_embeddings = self.get_sentence_embeddings(input_ids, attention_mask, token_type_ids)
-                loss = self.calc_loss(labels, output_embeddings)
+
+                # get sentence embeddings of BERT encoder
+                source_embeddings = self.get_sentence_embeddings(source_input_ids, source_attention_mask,
+                                                                 source_token_type_ids)
+                target_embeddings = self.get_sentence_embeddings(target_input_ids, target_attention_mask,
+                                                                 target_token_type_ids)
+                logits = self.concat_embeddings(source_embeddings, target_embeddings)
+                loss = self.calc_loss(labels, logits)
                 current_loss = loss.item()
                 if verbose:
                     batch_iterator.set_description(
@@ -228,7 +244,7 @@ class CosentModel(SentenceModel):
 
                 loss.backward()
                 if (step + 1) % gradient_accumulation_steps == 0:
-                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_grad_norm)
+                    torch.nn.utils.clip_grad_norm_(self.bert.parameters(), max_grad_norm)
                     optimizer.step()
                     scheduler.step()  # Update learning rate schedule
                     optimizer.zero_grad()
@@ -236,7 +252,7 @@ class CosentModel(SentenceModel):
             epoch_number += 1
             output_dir_current = os.path.join(output_dir, "checkpoint-{}-epoch-{}".format(global_step, epoch_number))
             results = self.eval_model(eval_dataset, output_dir_current, verbose=verbose, batch_size=batch_size)
-            self.save_model(output_dir_current, model=self.model, results=results)
+            self.save_model(output_dir_current, model=self.bert, results=results)
             training_progress_scores["global_step"].append(global_step)
             training_progress_scores["train_loss"].append(current_loss)
             for key in results:
@@ -248,7 +264,7 @@ class CosentModel(SentenceModel):
             if eval_spearman > best_eval_metric:
                 best_eval_metric = eval_spearman
                 logger.info(f"Save new best model, best_eval_metric: {best_eval_metric}")
-                self.save_model(output_dir, model=self.model, results=results)
+                self.save_model(output_dir, model=self.bert, results=results)
 
             if 0 < max_steps < global_step:
                 return global_step, training_progress_scores

@@ -41,8 +41,8 @@ def load_test_data(path):
     return data
 
 
-class SentenceBertTrainDataset(Dataset):
-    """训练数据集, 重写__getitem__和__len__方法"""
+class TextMatchingTrainDataset(Dataset):
+    """文本匹配训练数据集, 重写__getitem__和__len__方法"""
 
     def __init__(self, tokenizer: PreTrainedTokenizer, data: list, max_len: int = 64):
         self.tokenizer = tokenizer
@@ -61,8 +61,8 @@ class SentenceBertTrainDataset(Dataset):
         return self.text_2_id([line[0]]), self.text_2_id([line[1]]), line[2]
 
 
-class SentenceBertTestDataset(Dataset):
-    """测试数据集, 重写__getitem__和__len__方法"""
+class TextMatchingTestDataset(Dataset):
+    """文本匹配测试数据集, 重写__getitem__和__len__方法"""
 
     def __init__(self, tokenizer: PreTrainedTokenizer, data: list, max_len: int = 64):
         self.tokenizer = tokenizer
