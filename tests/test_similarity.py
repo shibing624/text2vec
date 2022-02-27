@@ -26,6 +26,8 @@ def load_test_data(path):
             sents1.append(line[0])
             sents2.append(line[1])
             labels.append(int(line[2]))
+            if len(sents1) > 10:
+                break
     return sents1, sents2, labels
 
 

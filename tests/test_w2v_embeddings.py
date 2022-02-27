@@ -43,7 +43,7 @@ class EmbeddingsTestCase(unittest.TestCase):
         emb = w2v_model.encode(a)
         print(a, emb)
         self.assertEqual(emb.shape, (200,))
-        self.assertTrue(abs(emb[0] - 0.023) < 0.001)
+        self.assertTrue(abs(emb[0] - 0.0182) < 0.001)
 
     def test_oov_emb(self):
         """测试 OOV word embedding"""
