@@ -1,4 +1,5 @@
 on:
+  workflow_dispatch: # Manually running a workflow
   push:
     branches:
       - release/*
@@ -19,15 +20,26 @@ jobs:
     env:
       SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
     steps:
-      - uses: actions/cache@v2
+      - name: CHECKOUT CODE
+        uses: actions/checkout@v2
+      - name: Cache pip
+        uses: actions/cache@v2
         if: startsWith(runner.os, 'macOS')
         with:
           path: ~/Library/Caches/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      - name: CHECKOUT CODE
-        uses: actions/checkout@v2
+      - name: Cache transformers models
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/huggingface/transformers
+          key: ${{ runner.os }}-transformers-
+      - name: Cache text2vec models
+        uses: actions/cache@v2
+        with:
+          path: ~/.text2vec
+          key: ${{ runner.os }}-text2vec-
       - name: SETUP PYTHON
         uses: actions/setup-python@v2
         with:
@@ -39,7 +51,11 @@ jobs:
           pip install torch
           pip install -r requirements.txt
           pip install .
-      - name: Test from pypi
+      - name: PKG-TEST
         run: |
-          pip uninstall -y text2vec # install from pypi
-          pip install -U text2vec
+          python -m unittest discover tests/
+      - name: Install from pypi
+        run: |
+          pip uninstall -y text2vec
+          pip install -U text2vec # install from pypi
+          python -c "import text2vec; print(text2vec.__version__)"

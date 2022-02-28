@@ -13,23 +13,35 @@ jobs:
         #python-version: [ 3.7, 3.8, 3.9 ]
         python-version: [ 3.9 ]
     steps:
-      - uses: actions/cache@v2
+      - uses: actions/checkout@v2
+      - name: Cache pip
+        uses: actions/cache@v2
         if: startsWith(runner.os, 'Linux')
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      - uses: actions/checkout@v2
+      - name: Cache transformers models
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/huggingface/transformers
+          key: ${{ runner.os }}-transformers-
+      - name: Cache text2vec models
+        uses: actions/cache@v2
+        with:
+          path: ~/.text2vec
+          key: ${{ runner.os }}-text2vec-
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install torch
         run: |
           python -m pip install --upgrade pip
-          pip install --no-cache-dir Cython
-          pip install --no-cache-dir torch
+          pip install Cython
+          pip install torch
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
@@ -37,10 +49,6 @@ jobs:
       - name: PKG-TEST
         run: |
           python -m unittest discover tests/
-        env:
-          HEREMAPS_API_KEY: ${{ secrets.HEREMAPS_API_KEY }}
-          PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
-          EARTHENGINE_TOKEN: ${{ secrets.EARTHENGINE_TOKEN }}
       - name: Install from pypi
         run: |
           pip uninstall -y text2vec
