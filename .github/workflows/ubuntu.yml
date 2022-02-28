@@ -1,10 +1,5 @@
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  workflow_dispatch: # Manually running a workflow
 
 name: Linux build
 jobs:
