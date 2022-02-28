@@ -1,6 +1,8 @@
 on:
   workflow_dispatch: # Manually running a workflow
-
+  push:
+    branches:
+      - release/*
 name: Linux build
 jobs:
   test-ubuntu:
@@ -11,6 +13,13 @@ jobs:
         #python-version: [ 3.7, 3.8, 3.9 ]
         python-version: [ 3.9 ]
     steps:
+      - uses: actions/cache@v2
+        if: startsWith(runner.os, 'Linux')
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
