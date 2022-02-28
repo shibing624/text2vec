@@ -573,7 +573,7 @@ Inference:
 
 APA:
 ```latex
-Xu, M. Text2vec: Text to Vector toolkit (Version 1.1.2) [Computer software]. https://github.com/shibing624/text2vec
+Xu, M. Text2vec: Text to vector toolkit (Version 1.1.2) [Computer software]. https://github.com/shibing624/text2vec
 ```
 
 BibTeX:
