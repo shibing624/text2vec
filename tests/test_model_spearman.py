@@ -46,7 +46,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -61,7 +61,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -76,7 +76,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -91,7 +91,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -106,7 +106,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -125,7 +125,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -140,7 +140,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -155,7 +155,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -170,7 +170,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -185,7 +185,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -202,7 +202,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -217,7 +217,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -232,7 +232,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -247,7 +247,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
@@ -262,7 +262,7 @@ class SimModelTestCase(unittest.TestCase):
         sims = []
         for i in range(len(sents1)):
             sims.append(scores[i][i])
-        spend_time = min(time() - t1, 1e-9)
+        spend_time = max(time() - t1, 1e-9)
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
