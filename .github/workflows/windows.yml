@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - master
+      - release/*
   pull_request:
     branches:
       - master
@@ -11,6 +11,13 @@ jobs:
   test-windows:
     runs-on: windows-latest
     steps:
+      - uses: actions/cache@v2
+        if: startsWith(runner.os, 'Windows')
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - uses: actions/checkout@v2
       - name: Install miniconda
         uses: conda-incubator/setup-miniconda@v2
@@ -20,13 +27,17 @@ jobs:
       - name: Install torch
         run: |
           python -m pip install --upgrade pip
-          pip install --no-cache-dir torch
+          pip install torch
       - name: Test torch installation
         run: |
           python -c "import torch; print(torch.__version__)"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install --no-cache-dir Cython
+          pip install Cython
           pip install -r requirements.txt
           pip install .
+      - name: Test from pypi
+        run: |
+          pip uninstall -y text2vec # install from pypi
+          pip install -U text2vec
