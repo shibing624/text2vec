@@ -42,6 +42,7 @@ jobs:
           pip install torch
       - name: Test torch installation
         run: |
+          python -c "import sys; print(sys.version)"
           python -c "import torch; print(torch.__version__)"
       - name: Install dependencies
         run: |
@@ -51,6 +52,8 @@ jobs:
           pip install .
       - name: PKG-TEST
         run: |
+          set PYTHONIOENCODING=utf-8
+          set PYTHONLEGACYWINDOWSSTDIO=utf-8
           python -m unittest discover tests/
       - name: Install from pypi
         run: |

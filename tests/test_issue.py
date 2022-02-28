@@ -26,14 +26,14 @@ class IssueTestCase(unittest.TestCase):
         a = '研究团队面向国家重大战略需求追踪国际前沿发展借鉴国际人工智能研究领域的科研模式有效整合创新资源解决复'
         b = '英汉互译比较语言学'
         r = sbert_sim_score(a, b)
-        # print(a, b, r)
+        print(a, b, r)
         self.assertTrue(abs(r - 0.1733) < 0.001)
 
     def test_sim_same(self):
         a = '汉英翻译比较语言学'
         b = '英汉互译比较语言学'
         r = sbert_sim_score(a, b)
-        # print(a, b, r)
+        print(a, b, r)
         self.assertTrue(abs(r - 0.8639) < 0.001)
 
     def test_search_sim(self):
@@ -45,7 +45,7 @@ class IssueTestCase(unittest.TestCase):
             '跃起前扑。', '上下右三边有框，', '上沿双边框内填刻三角纹，', '下沿双边框内填刻斜条纹。']
         self.assertEqual(len(sentences), 28)
         uniq_sentences = list(set(sentences))
-        # print(uniq_sentences)
+        print(uniq_sentences)
         print(len(uniq_sentences))
         self.assertEqual(len(uniq_sentences), 23)
 
