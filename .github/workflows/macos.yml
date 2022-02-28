@@ -19,6 +19,13 @@ jobs:
     env:
       SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
     steps:
+      - uses: actions/cache@v2
+        if: startsWith(runner.os, 'macOS')
+        with:
+          path: ~/Library/Caches/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - name: CHECKOUT CODE
         uses: actions/checkout@v2
       - name: SETUP PYTHON
@@ -32,3 +39,7 @@ jobs:
           pip install torch
           pip install -r requirements.txt
           pip install .
+      - name: Test from pypi
+        run: |
+          pip uninstall -y text2vec # install from pypi
+          pip install -U text2vec
