@@ -570,13 +570,20 @@ Inference:
 # Citation
 
 如果你在研究中使用了text2vec，请按如下格式引用：
+APA:
 
 ```latex
-@misc{text2vec,
-  title={text2vec: A Tool for Text to Vector},
-  author={Ming Xu},
-  howpublished={https://github.com/shibing624/text2vec},
-  year={2022}
+Xu, M. Text2vec: Text to Vector toolkit (Version 1.1.2) [Computer software]. https://github.com/shibing624/text2vec
+```
+
+BibTeX:
+
+```latex
+@software{Xu_Text2vec_Text_to,
+author = {Xu, Ming},
+title = {{Text2vec: Text to Vector toolkit}},
+url = {https://github.com/shibing624/text2vec},
+version = {1.1.2}
 }
 ```
 
