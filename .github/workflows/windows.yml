@@ -50,11 +50,7 @@ jobs:
           pip install Cython
           pip install -r requirements.txt
           pip install .
-      - name: PKG-TEST
-        run: |
-          set PYTHONIOENCODING=utf-8
-          set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          python -m unittest discover tests/
+
       - name: Install from pypi
         run: |
           pip uninstall -y text2vec
