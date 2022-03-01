@@ -48,7 +48,7 @@ def main():
                         help='Transformers model model or path')
     parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
     parser.add_argument("--do_predict", action="store_true", help="Whether to run predict.")
-    parser.add_argument('--output_dir', default='./outputs/STS-B-model-v1', type=str, help='Model output directory')
+    parser.add_argument('--output_dir', default='./outputs/STS-B-model', type=str, help='Model output directory')
     parser.add_argument('--max_seq_length', default=64, type=int, help='Max sequence length')
     parser.add_argument('--num_epochs', default=10, type=int, help='Number of training epochs')
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
@@ -88,9 +88,7 @@ def main():
         else:
             model = BertMatchModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
                                    max_seq_length=args.max_seq_length)
-        test_dataset = HFTextMatchingTestDataset(model.tokenizer, args.task_name, max_len=args.max_seq_length,
-                                                 split="test")
-
+        test_dataset = load_dataset("shibing624/nli_zh", args.task_name, split="test")
         # Predict embeddings
         srcs = []
         trgs = []
