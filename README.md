@@ -179,9 +179,42 @@ python3 setup.py install
 ```
 
 ### 数据集
+中文语义匹配数据集已经上传到huggingface datasets [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh)
+
+数据集使用示例：
+```shell
+pip3 install datasets
+```
+
+```python
+from datasets import load_dataset
+
+dataset = load_dataset("shibing624/nli_zh", "STS-B")
+print(dataset)
+print(dataset['test'][0])
+```
+
+output:
+```shell
+DatasetDict({
+    train: Dataset({
+        features: ['sentence1', 'sentence2', 'label'],
+        num_rows: 5231
+    })
+    validation: Dataset({
+        features: ['sentence1', 'sentence2', 'label'],
+        num_rows: 1458
+    })
+    test: Dataset({
+        features: ['sentence1', 'sentence2', 'label'],
+        num_rows: 1361
+    })
+})
+{'sentence1': '一个女孩在给她的头发做发型。', 'sentence2': '一个女孩在梳头。', 'label': 2}
+```
+
 常见中文语义匹配数据集，包含[ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)、[BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)、[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)、[PAWSX](https://arxiv.org/abs/1908.11828)、[STS-B](https://github.com/pluto-junzeng/CNSD)共5个任务。
 可以从数据集对应的链接自行下载，也可以从[百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ)下载。
-
 其中senteval_cn目录是评测数据集汇总，senteval_cn.zip是senteval目录的打包，两者下其一就好。
 
 # Usage

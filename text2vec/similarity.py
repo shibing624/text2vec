@@ -102,7 +102,7 @@ class Similarity:
 
     def get_scores(
             self, sentences1: List[str], sentences2: List[str], only_aligned: bool = False
-    ) -> Union[List[Tensor], ndarray, Tensor, None]:
+    ) -> ndarray:
         """
         Get similarity scores between sentences1 and sentences2
         :param sentences1: list, sentence1 list
@@ -111,7 +111,7 @@ class Similarity:
         :return: return: Matrix with res[i][j]  = cos_sim(a[i], b[j])
         """
         if not sentences1 or not sentences2:
-            return None
+            return np.array([])
         if only_aligned and len(sentences1) != len(sentences2):
             logger.warning('Sentences size not equal, auto set is_aligned=False')
             only_aligned = False
