@@ -62,7 +62,7 @@ class SentenceModel:
         self.bert.to(device)
         self.results = {}  # Save training process evaluation result
 
-    def __repr__(self):
+    def __str__(self):
         return f"<SentenceModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
                f"max_seq_length: {self.max_seq_length}>"
 

@@ -189,7 +189,7 @@ pip3 install datasets
 ```python
 from datasets import load_dataset
 
-dataset = load_dataset("shibing624/nli_zh", "STS-B")
+dataset = load_dataset("shibing624/nli_zh", "STS-B") # ATEC or BQ or LCQMC or PAWSX or STS-B
 print(dataset)
 print(dataset['test'][0])
 ```
@@ -213,7 +213,8 @@ DatasetDict({
 {'sentence1': '一个女孩在给她的头发做发型。', 'sentence2': '一个女孩在梳头。', 'label': 2}
 ```
 
-常见中文语义匹配数据集，包含[ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)、[BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)、[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)、[PAWSX](https://arxiv.org/abs/1908.11828)、[STS-B](https://github.com/pluto-junzeng/CNSD)共5个任务。
+常见中文语义匹配数据集，包含[ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)、[BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)、
+[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)、[PAWSX](https://arxiv.org/abs/1908.11828)、[STS-B](https://github.com/pluto-junzeng/CNSD)共5个任务。
 可以从数据集对应的链接自行下载，也可以从[百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ)下载。
 其中senteval_cn目录是评测数据集汇总，senteval_cn.zip是senteval目录的打包，两者下其一就好。
 
@@ -502,6 +503,7 @@ Inference:
 <img src="docs/inference.png" width="300" />
 
 #### CoSENT 监督模型
+
 - 在中文STS-B数据集训练和评估`MacBERT+CoSENT`模型
 
 example: [examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)
@@ -509,6 +511,15 @@ example: [examples/training_sup_text_matching_model.py](examples/training_sup_te
 ```shell
 cd examples
 CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-cosent
+```
+
+
+
+- 在蚂蚁金融匹配数据集ATEC上训练和评估`MacBERT+CoSENT`模型
+
+支持这些中文匹配数据集的使用：'ATEC', 'STS-B', 'BQ', 'LCQMC', 'PAWSX'，具体参考HuggingFace datasets [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh)
+```shell
+python3 training_sup_text_matching_model.py --task_name ATEC --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/ATEC-cosent
 ```
 
 - 在英文STS-B数据集训练和评估`BERT+CoSENT`模型

@@ -15,8 +15,8 @@ from text2vec.cosent_model import CosentModel
 from text2vec.sentencebert_model import SentenceBertModel
 from text2vec.bertmatch_model import BertMatchModel
 from text2vec.text_matching_dataset import TextMatchingTrainDataset, TextMatchingTestDataset, load_test_data, \
-    load_train_data
-from text2vec.cosent_dataset import CosentTrainDataset
+    load_train_data, HFTextMatchingTrainDataset, HFTextMatchingTestDataset
+from text2vec.cosent_dataset import CosentTrainDataset, HFCosentTrainDataset
 from text2vec.utils.tokenizer import JiebaTokenizer
 from text2vec.utils.get_file import http_get, get_file
 from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr

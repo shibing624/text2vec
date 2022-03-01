@@ -73,7 +73,7 @@ class Similarity:
         else:
             raise ValueError('embedding_type error')
 
-    def __repr__(self):
+    def __str__(self):
         return f"<Similarity> model : {self.model}, similarity_type: {self.similarity_type}, " \
                f"embedding_type: {self.embedding_type}"
 

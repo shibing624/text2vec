@@ -89,7 +89,6 @@ def main():
                         choices=list(EncoderType), help='Encoder type, string name of EncoderType')
     args = parser.parse_args()
     logger.info(args)
-
     train_samples, valid_samples, test_samples = load_en_stsb_dataset(args.stsb_file)
 
     if args.do_train:

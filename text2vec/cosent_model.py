@@ -13,8 +13,8 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from text2vec.sentence_model import SentenceModel, EncoderType, device
-from text2vec.cosent_dataset import CosentTrainDataset, load_cosent_train_data
-from text2vec.text_matching_dataset import TextMatchingTestDataset, load_test_data
+from text2vec.cosent_dataset import CosentTrainDataset, load_cosent_train_data, HFCosentTrainDataset
+from text2vec.text_matching_dataset import TextMatchingTestDataset, load_test_data, HFTextMatchingTestDataset
 from text2vec.utils.stats_util import set_seed
 
 
@@ -34,14 +34,14 @@ class CosentModel(SentenceModel):
         """
         super().__init__(model_name_or_path, encoder_type, max_seq_length)
 
-    def __repr__(self):
+    def __str__(self):
         return f"<CoSENTModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
                f"max_seq_length: {self.max_seq_length}>"
 
     def train_model(
             self,
-            train_file: str,
-            output_dir: str,
+            train_file: str = None,
+            output_dir: str = "./outputs",
             eval_file: str = None,
             verbose: bool = True,
             batch_size: int = 32,
@@ -53,7 +53,9 @@ class CosentModel(SentenceModel):
             eps: float = 1e-6,
             gradient_accumulation_steps: int = 1,
             max_grad_norm: float = 1.0,
-            max_steps: int = -1
+            max_steps: int = -1,
+            use_hf_dataset: bool = False,
+            hf_dataset_name: str = "STS-B",
     ):
         """
         Trains the model on 'train_file'
@@ -73,12 +75,24 @@ class CosentModel(SentenceModel):
             gradient_accumulation_steps (optional): Number of updates steps to accumulate before performing a backward/update pass.
             max_grad_norm (optional): Max gradient norm.
             max_steps (optional): If > 0: set total number of training steps to perform. Override num_epochs.
+            use_hf_dataset (optional): Whether to use the HF dataset.
+            hf_dataset_name (optional): Name of the dataset to use for the HuggingFace datasets.
         Returns:
             global_step: Number of global steps trained
-            training_details: Average training loss if evaluate_during_training is False or full training progress scores if evaluate_during_training is True
+            training_details: full training progress scores
         """
-        train_dataset = CosentTrainDataset(self.tokenizer, load_cosent_train_data(train_file), self.max_seq_length)
-        eval_dataset = TextMatchingTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
+        if use_hf_dataset and hf_dataset_name:
+            logger.info(
+                f"Train_file will be ignored when use_hf_dataset is True, load HF dataset: {hf_dataset_name}")
+            train_dataset = HFCosentTrainDataset(self.tokenizer, hf_dataset_name, max_len=self.max_seq_length)
+            eval_dataset = HFTextMatchingTestDataset(self.tokenizer, hf_dataset_name, max_len=self.max_seq_length)
+        elif train_file is not None:
+            logger.info(
+                f"Hf_dataset_name: {hf_dataset_name} will be ignored when use_hf_dataset is False, load train_file: {train_file}")
+            train_dataset = CosentTrainDataset(self.tokenizer, load_cosent_train_data(train_file), self.max_seq_length)
+            eval_dataset = TextMatchingTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
+        else:
+            raise ValueError("Error, train_file|use_hf_dataset must be specified")
 
         global_step, training_details = self.train(
             train_dataset,
