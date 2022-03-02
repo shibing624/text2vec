@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
 """
 @author:XuMing(xuming624@qq.com)
-@description: 
+@description: This examples trains CoSENT model with the English STS dataset.
+It generates sentence embeddings that can be compared using cosine-similarity to measure the similarity.
 """
 import argparse
 import sys
+import csv
+import gzip
 import time
 import numpy as np
 from loguru import logger
-from datasets import load_dataset
 
 sys.path.append('..')
-
 from text2vec import CosentModel
-from text2vec import SentenceBertModel, BertMatchModel
+from text2vec import SentenceBertModel
+from text2vec import BertMatchModel
+from text2vec import CosentTrainDataset, TextMatchingTestDataset, TextMatchingTrainDataset
 from text2vec import cos_sim, compute_spearmanr, EncoderType
 
 
@@ -37,17 +40,47 @@ def calc_similarity_scores(model, sents1, sents2, labels):
     return spearman
 
 
+def load_en_stsb_dataset(stsb_file):
+    # Convert the dataset to a DataLoader ready for training
+    logger.info("Read STSbenchmark dataset")
+    train_samples = []
+    valid_samples = []
+    test_samples = []
+    with gzip.open(stsb_file, 'rt', encoding='utf8') as f:
+        reader = csv.DictReader(f, delimiter='\t', quoting=csv.QUOTE_NONE)
+        for row in reader:
+            score = float(row['score'])
+            if row['split'] == 'dev':
+                valid_samples.append((row['sentence1'], row['sentence2'], score))
+            elif row['split'] == 'test':
+                test_samples.append((row['sentence1'], row['sentence2'], score))
+            else:
+                score = int(score > 2.5)
+                train_samples.append((row['sentence1'], row['sentence2'], score))
+    return train_samples, valid_samples, test_samples
+
+
+def convert_to_cosent_train_dataset(train_samples):
+    # Convert the dataset to CoSENT model training format
+    train_dataset = []
+    for sample in train_samples:
+        if len(sample) != 3:
+            continue
+        train_dataset.append((sample[0], sample[2]))
+        train_dataset.append((sample[1], sample[2]))
+    return train_dataset
+
+
 def main():
     parser = argparse.ArgumentParser('Text Matching task')
     parser.add_argument('--model_arch', default='cosent', const='cosent', nargs='?',
                         choices=['cosent', 'sentencebert', 'bert'], help='model architecture')
-    parser.add_argument('--task_name', default='STS-B', const='STS-B', nargs='?',
-                        choices=['ATEC', 'STS-B', 'BQ', 'LCQMC', 'PAWSX'], help='task name of dataset')
-    parser.add_argument('--model_name', default='hfl/chinese-macbert-base', type=str,
-                        help='Transformers model model or path')
+    parser.add_argument('--model_name', default='bert-base-uncased', type=str, help='name of transformers model')
+    parser.add_argument('--stsb_file', default='data/English-STS-B/stsbenchmark.tsv.gz', type=str,
+                        help='Train data path')
     parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
     parser.add_argument("--do_predict", action="store_true", help="Whether to run predict.")
-    parser.add_argument('--output_dir', default='./outputs/STS-B-model', type=str, help='Model output directory')
+    parser.add_argument('--output_dir', default='./outputs/STS-B-en-model', type=str, help='Model output directory')
     parser.add_argument('--max_seq_length', default=64, type=int, help='Max sequence length')
     parser.add_argument('--num_epochs', default=10, type=int, help='Number of training epochs')
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
@@ -56,27 +89,31 @@ def main():
                         choices=list(EncoderType), help='Encoder type, string name of EncoderType')
     args = parser.parse_args()
     logger.info(args)
+    train_samples, valid_samples, test_samples = load_en_stsb_dataset(args.stsb_file)
 
     if args.do_train:
         if args.model_arch == 'cosent':
             model = CosentModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
                                 max_seq_length=args.max_seq_length)
+            train_samples = convert_to_cosent_train_dataset(train_samples)
+            train_dataset = CosentTrainDataset(model.tokenizer, train_samples, args.max_seq_length)
         elif args.model_arch == 'sentencebert':
             model = SentenceBertModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
                                       max_seq_length=args.max_seq_length)
+            train_dataset = TextMatchingTrainDataset(model.tokenizer, train_samples, args.max_seq_length)
         else:
             model = BertMatchModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
                                    max_seq_length=args.max_seq_length)
-
-        model.train_model(
-            output_dir=args.output_dir,
-            num_epochs=args.num_epochs,
-            batch_size=args.batch_size,
-            lr=args.learning_rate,
-            use_hf_dataset=True,
-            hf_dataset_name=args.task_name,
-        )
+            train_dataset = TextMatchingTrainDataset(model.tokenizer, train_samples, args.max_seq_length)
+        valid_dataset = TextMatchingTestDataset(model.tokenizer, valid_samples, args.max_seq_length)
+        model.train(train_dataset,
+                    args.output_dir,
+                    eval_dataset=valid_dataset,
+                    num_epochs=args.num_epochs,
+                    batch_size=args.batch_size,
+                    lr=args.learning_rate)
         logger.info(f"Model saved to {args.output_dir}")
+
     if args.do_predict:
         if args.model_arch == 'cosent':
             model = CosentModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
@@ -87,17 +124,16 @@ def main():
         else:
             model = BertMatchModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
                                    max_seq_length=args.max_seq_length)
-        test_dataset = load_dataset("shibing624/nli_zh", args.task_name, split="test")
         # Predict embeddings
         srcs = []
         trgs = []
         labels = []
-        for terms in test_dataset:
-            src, trg, label = terms['sentence1'], terms['sentence2'], terms['label']
+        for terms in test_samples:
+            src, trg, label = terms[0], terms[1], terms[2]
             srcs.append(src)
             trgs.append(trg)
             labels.append(label)
-        logger.debug(f'{test_dataset[0]}')
+        logger.debug(f'{test_samples[0]}')
         sentence_embeddings = model.encode(srcs)
         logger.debug(f"{type(sentence_embeddings)}, {sentence_embeddings.shape}, {sentence_embeddings[0].shape}")
         # Predict similarity scores

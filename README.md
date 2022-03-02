@@ -305,7 +305,7 @@ Without [text2vec](https://github.com/shibing624/text2vec), you can use the mode
 
 First, you pass your input through the transformer model, then you have to apply the right pooling-operation on-top of the contextualized word embeddings.
 
-example: [examples/use_origin_transformers.py](examples/use_origin_transformers.py)
+example: [examples/use_origin_transformers_demo.py](examples/use_origin_transformers_demo.py)
 
 ```python
 import os
@@ -510,10 +510,8 @@ example: [examples/training_sup_text_matching_model.py](examples/training_sup_te
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-cosent
+python3 training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-cosent
 ```
-
-
 
 - 在蚂蚁金融匹配数据集ATEC上训练和评估`MacBERT+CoSENT`模型
 
@@ -522,13 +520,21 @@ CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model.py --model_arch 
 python3 training_sup_text_matching_model.py --task_name ATEC --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/ATEC-cosent
 ```
 
+- 在自有中文数据集上训练模型
+
+example: [examples/training_sup_text_matching_model_selfdata.py](examples/training_sup_text_matching_model_selfdata.py)
+
+```shell
+python3 training_sup_text_matching_model_selfdata.py --do_train --do_predict
+```
+
 - 在英文STS-B数据集训练和评估`BERT+CoSENT`模型
 
 example: [examples/training_sup_text_matching_model_en.py](examples/training_sup_text_matching_model_en.py)
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased  --output_dir ./outputs/STS-B-en-cosent
+python3 training_sup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased  --output_dir ./outputs/STS-B-en-cosent
 ```
 
 #### CoSENT 无监督模型
@@ -538,7 +544,7 @@ example: [examples/training_unsup_text_matching_model_en.py](examples/training_u
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_unsup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-unsup-cosent
+python3 training_unsup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-unsup-cosent
 ```
 
 
@@ -564,7 +570,7 @@ example: [examples/training_sup_text_matching_model.py](examples/training_sup_te
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-sbert
+python3 training_sup_text_matching_model.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-sbert
 ```
 - 在英文STS-B数据集训练和评估`BERT+SBERT`模型
 
@@ -572,7 +578,7 @@ example: [examples/training_sup_text_matching_model_en.py](examples/training_sup
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_sup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-sbert
+python3 training_sup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-sbert
 ```
 
 #### SentenceBERT 无监督模型
@@ -582,7 +588,7 @@ example: [examples/training_unsup_text_matching_model_en.py](examples/training_u
 
 ```shell
 cd examples
-CUDA_VISIBLE_DEVICES=0 python3 training_unsup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-unsup-sbert
+python3 training_unsup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-unsup-sbert
 ```
 
 ## BERT-Match model
@@ -600,6 +606,14 @@ Inference:
 <img src="docs/inference.png" width="300" />
 
 训练脚本同上。
+
+以上训练脚本在安装text2vec后（`pip3 install -U text2vec`），支持命令行调用。
+
+如，在中文STS-B数据集训练和评估`MacBERT+SBERT`模型：
+
+```shell
+python3 -m text2vec.tools.training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict
+```
 
 # Contact
 

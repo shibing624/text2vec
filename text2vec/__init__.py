@@ -14,7 +14,7 @@ from text2vec.similarity import Similarity, SimilarityType, EmbeddingType, seman
 from text2vec.ngram import NGram
 from text2vec.cosent_model import CosentModel
 from text2vec.sentencebert_model import SentenceBertModel
-from text2vec.bertmatch_model import BertMatchModel
+from text2vec.bertmatching_model import BertMatchModel
 from text2vec.text_matching_dataset import TextMatchingTrainDataset, TextMatchingTestDataset, load_test_data, \
     load_train_data, HFTextMatchingTrainDataset, HFTextMatchingTestDataset
 from text2vec.cosent_dataset import CosentTrainDataset, HFCosentTrainDataset

@@ -13,18 +13,18 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
+from transformers import BertForSequenceClassification, BertTokenizer
 from text2vec.sentence_model import SentenceModel, EncoderType, device
-from text2vec.text_matching_dataset import TextMatchingTrainDataset, TextMatchingTestDataset, \
-    load_test_data, load_train_data, HFTextMatchingTestDataset, HFTextMatchingTrainDataset
+from text2vec.bertmatching_dataset import BertMatchingTestDataset, BertMatchingTrainDataset, \
+    load_test_data, load_train_data, HFBertMatchingTrainDataset, HFBertMatchingTestDataset
 from text2vec.utils.stats_util import set_seed
+from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr
 
 
-class BertMatchModel(SentenceModel):
+class BertMatchModule(nn.Module):
     def __init__(
             self,
             model_name_or_path: str = "bert-base-chinese",
-            encoder_type: EncoderType = EncoderType.FIRST_LAST_AVG,
-            max_seq_length: int = 128,
             num_classes: int = 2,
     ):
         """
@@ -32,16 +32,52 @@ class BertMatchModel(SentenceModel):
 
         Args:
             model_name_or_path: Default Transformer model name or path to a directory containing Transformer model file (pytorch_nodel.bin).
-            encoder_type: encoder type, set by model name
-            max_seq_length: The maximum total input sequence length after tokenization.
             num_classes: Number of classes for classification.
         """
-        super().__init__(model_name_or_path, encoder_type, max_seq_length)
-        self.classifier = nn.Linear(self.bert.config.hidden_size * 2, num_classes).to(device)
+        super().__init__()
+        self.bert = BertForSequenceClassification.from_pretrained(model_name_or_path, num_labels=num_classes)
+        self.bert.to(device)
+
+    def forward(self, input_ids, token_type_ids, attention_mask, labels=None):
+        """
+        Computes the loss for a batch of examples.
+        """
+        outputs = self.bert(input_ids, token_type_ids, attention_mask, labels=labels)
+        loss = outputs.loss
+        logits = outputs.logits
+        probs = nn.functional.softmax(logits, dim=-1)
+        return loss, logits, probs
+
+
+class BertMatchModel:
+    def __init__(
+            self,
+            model_name_or_path: str = "bert-base-chinese",
+            max_seq_length: int = 128,
+            num_classes: int = 2,
+            encoder_type=None,
+    ):
+        """
+        Initializes the base sentence model.
+
+        :param model_name_or_path: The name of the model to load from the huggingface models library.
+        :param max_seq_length: The maximum sequence length.
+        :param num_classes: The number of classes.
+        :param encoder_type: The encoder type.
+
+        bert model: https://huggingface.co/transformers/model_doc/bert.html?highlight=bert#transformers.BertModel.forward
+        BERT return: <last_hidden_state>, <pooler_output> [hidden_states, attentions]
+        Note that: in doc, it says <last_hidden_state> is better semantic summery than <pooler_output>.
+        thus, we use <last_hidden_state>.
+        """
+        self.model_name_or_path = model_name_or_path
+        self.max_seq_length = max_seq_length
+        self.model = BertMatchModule(model_name_or_path, num_classes)
+        self.tokenizer = BertTokenizer.from_pretrained(model_name_or_path)
+        self.results = {}  # Save training process evaluation result
 
     def __str__(self):
-        return f"<BertMatchModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
-               f"max_seq_length: {self.max_seq_length}>"
+        return f"<BertMatchModel: {self.model_name_or_path}, max_seq_length: {self.max_seq_length}>"
 
     def train_model(
             self,
@@ -89,13 +125,13 @@ class BertMatchModel(SentenceModel):
         if use_hf_dataset and hf_dataset_name:
             logger.info(
                 f"Train_file will be ignored when use_hf_dataset is True, load HF dataset: {hf_dataset_name}")
-            train_dataset = HFTextMatchingTrainDataset(self.tokenizer, hf_dataset_name, max_len=self.max_seq_length)
-            eval_dataset = HFTextMatchingTestDataset(self.tokenizer, hf_dataset_name, max_len=self.max_seq_length)
+            train_dataset = HFBertMatchingTrainDataset(self.tokenizer, hf_dataset_name, max_len=self.max_seq_length)
+            eval_dataset = HFBertMatchingTestDataset(self.tokenizer, hf_dataset_name, max_len=self.max_seq_length)
         elif train_file is not None:
             logger.info(
                 f"Hf_dataset_name: {hf_dataset_name} will be ignored when use_hf_dataset is False, load train_file: {train_file}")
-            train_dataset = TextMatchingTrainDataset(self.tokenizer, load_train_data(train_file), self.max_seq_length)
-            eval_dataset = TextMatchingTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
+            train_dataset = BertMatchingTrainDataset(self.tokenizer, load_train_data(train_file), self.max_seq_length)
+            eval_dataset = BertMatchingTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
         else:
             raise ValueError("Error, train_file|use_hf_dataset must be specified")
 
@@ -118,28 +154,6 @@ class BertMatchModel(SentenceModel):
         logger.info(f" Training model done. Saved to {output_dir}.")
 
         return global_step, training_details
-
-    def concat_embeddings(self, source_embeddings, target_embeddings):
-        """
-        Output the bert sentence embeddings, pass to classifier module. Applies different
-        concats and finally the linear layer to produce class scores
-        :param source_embeddings:
-        :param target_embeddings:
-        :return: embeddings
-        """
-        # (u, v)
-        embs = [source_embeddings, target_embeddings]
-        input_embs = torch.cat(embs, 1)
-        # fc layer
-        outputs = self.classifier(input_embs)
-        return outputs
-
-    def calc_loss(self, y_true, y_pred):
-        """
-        Calc loss with two sentence embeddings, Softmax loss
-        """
-        loss = nn.CrossEntropyLoss()(y_pred, y_true)
-        return loss
 
     def train(
             self,
@@ -165,12 +179,12 @@ class BertMatchModel(SentenceModel):
         """
         os.makedirs(output_dir, exist_ok=True)
         logger.debug("Use pytorch device: {}".format(device))
-        self.bert.to(device)
+        self.model.bert.to(device)
         set_seed(seed)
 
         train_dataloader = DataLoader(train_dataset, shuffle=False, batch_size=batch_size)
         total_steps = len(train_dataloader) * num_epochs
-        param_optimizer = list(self.bert.named_parameters())
+        param_optimizer = list(self.model.bert.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
         optimizer_grouped_parameters = [
             {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
@@ -190,7 +204,7 @@ class BertMatchModel(SentenceModel):
 
         logger.info("  Training started")
         global_step = 0
-        self.bert.zero_grad()
+        self.model.bert.zero_grad()
         epoch_number = 0
         best_eval_metric = 0
         steps_trained_in_current_epoch = 0
@@ -221,7 +235,7 @@ class BertMatchModel(SentenceModel):
             "eval_pearson": [],
         }
         for current_epoch in trange(int(num_epochs), desc="Epoch", disable=False, mininterval=0):
-            self.bert.train()
+            self.model.bert.train()
             current_loss = 0
             if epochs_trained > 0:
                 epochs_trained -= 1
@@ -234,25 +248,15 @@ class BertMatchModel(SentenceModel):
                 if steps_trained_in_current_epoch > 0:
                     steps_trained_in_current_epoch -= 1
                     continue
-                source, target, labels = batch
-                # source        [batch, 1, seq_len] -> [batch, seq_len]
-                source_input_ids = source.get('input_ids').squeeze(1).to(device)
-                source_attention_mask = source.get('attention_mask').squeeze(1).to(device)
-                source_token_type_ids = source.get('token_type_ids').squeeze(1).to(device)
-                # target        [batch, 1, seq_len] -> [batch, seq_len]
-                target_input_ids = target.get('input_ids').squeeze(1).to(device)
-                target_attention_mask = target.get('attention_mask').squeeze(1).to(device)
-                target_token_type_ids = target.get('token_type_ids').squeeze(1).to(device)
+                inputs, labels = batch
                 labels = labels.to(device)
-
-                # get sentence embeddings of BERT encoder
-                source_embeddings = self.get_sentence_embeddings(source_input_ids, source_attention_mask,
-                                                                 source_token_type_ids)
-                target_embeddings = self.get_sentence_embeddings(target_input_ids, target_attention_mask,
-                                                                 target_token_type_ids)
-                outputs = self.concat_embeddings(source_embeddings, target_embeddings)
-                loss = self.calc_loss(labels, outputs)
+                # inputs        [batch, 1, seq_len] -> [batch, seq_len]
+                input_ids = inputs.get('input_ids').squeeze(1).to(device)
+                attention_mask = inputs.get('attention_mask').squeeze(1).to(device)
+                token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
+                loss, logits, probs = self.model.forward(input_ids, attention_mask, token_type_ids, labels)
                 current_loss = loss.item()
+
                 if verbose:
                     batch_iterator.set_description(
                         f"Epoch: {epoch_number + 1}/{num_epochs}, Batch:{step}/{len(train_dataloader)}, Loss: {current_loss:9.4f}")
@@ -262,7 +266,7 @@ class BertMatchModel(SentenceModel):
 
                 loss.backward()
                 if (step + 1) % gradient_accumulation_steps == 0:
-                    torch.nn.utils.clip_grad_norm_(self.bert.parameters(), max_grad_norm)
+                    torch.nn.utils.clip_grad_norm_(self.model.bert.parameters(), max_grad_norm)
                     optimizer.step()
                     scheduler.step()  # Update learning rate schedule
                     optimizer.zero_grad()
@@ -270,7 +274,7 @@ class BertMatchModel(SentenceModel):
             epoch_number += 1
             output_dir_current = os.path.join(output_dir, "checkpoint-{}-epoch-{}".format(global_step, epoch_number))
             results = self.eval_model(eval_dataset, output_dir_current, verbose=verbose, batch_size=batch_size)
-            self.save_model(output_dir_current, model=self.bert, results=results)
+            self.save_model(output_dir_current, model=self.model.bert, results=results)
             training_progress_scores["global_step"].append(global_step)
             training_progress_scores["train_loss"].append(current_loss)
             for key in results:
@@ -282,9 +286,106 @@ class BertMatchModel(SentenceModel):
             if eval_spearman > best_eval_metric:
                 best_eval_metric = eval_spearman
                 logger.info(f"Save new best model, best_eval_metric: {best_eval_metric}")
-                self.save_model(output_dir, model=self.bert, results=results)
+                self.save_model(output_dir, model=self.model.bert, results=results)
 
             if 0 < max_steps < global_step:
                 return global_step, training_progress_scores
 
         return global_step, training_progress_scores
+
+    def eval_model(self, eval_dataset: Dataset, output_dir: str = None, verbose: bool = True, batch_size: int = 16):
+        """
+        Evaluates the model on eval_df. Saves results to args.output_dir
+            result: Dictionary containing evaluation results.
+        """
+        result = self.evaluate(eval_dataset, output_dir, batch_size=batch_size)
+        self.results.update(result)
+
+        if verbose:
+            logger.info(self.results)
+
+        return result
+
+    def evaluate(self, eval_dataset, output_dir: str = None, batch_size: int = 16):
+        """
+        Evaluates the model on eval_dataset.
+
+        Utility function to be used by the eval_model() method. Not intended to be used directly.
+        """
+        results = {}
+
+        eval_dataloader = DataLoader(eval_dataset, batch_size=batch_size)
+        self.model.bert.to(device)
+        self.model.bert.eval()
+
+        batch_labels = []
+        batch_preds = []
+        for batch in tqdm(eval_dataloader, disable=False, desc="Running Evaluation"):
+            inputs, labels = batch
+            labels = labels.to(device)
+            batch_labels.extend(labels.cpu().numpy())
+            # inputs        [batch, 1, seq_len] -> [batch, seq_len]
+            input_ids = inputs.get('input_ids').squeeze(1).to(device)
+            attention_mask = inputs.get('attention_mask').squeeze(1).to(device)
+            token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
+
+            with torch.no_grad():
+                loss, logits, probs = self.model.forward(input_ids, attention_mask, token_type_ids, labels)
+            batch_preds.extend(probs.cpu().numpy())
+
+        spearman = compute_spearmanr(batch_labels, batch_preds)
+        pearson = compute_pearsonr(batch_labels, batch_preds)
+        logger.debug(f"labels: {batch_labels[:10]}")
+        logger.debug(f"preds:  {batch_preds[:10]}")
+        logger.debug(f"pearson: {pearson}, spearman: {spearman}")
+
+        results["eval_spearman"] = spearman
+        results["eval_pearson"] = pearson
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
+            with open(os.path.join(output_dir, "eval_results.txt"), "w") as writer:
+                for key in sorted(results.keys()):
+                    writer.write("{} = {}\n".format(key, str(results[key])))
+
+        return results
+
+    def predict(self, test_dataset, batch_size: int = 16):
+        """
+        Predicts on test_dataset.
+        """
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size)
+        self.model.bert.to(device)
+        self.model.bert.eval()
+
+        batch_preds = []
+        for batch in tqdm(test_dataloader, disable=False, desc="Running Evaluation"):
+            inputs, _ = batch
+            # inputs        [batch, 1, seq_len] -> [batch, seq_len]
+            input_ids = inputs.get('input_ids').squeeze(1).to(device)
+            attention_mask = inputs.get('attention_mask').squeeze(1).to(device)
+            token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
+
+            with torch.no_grad():
+                loss, logits, probs = self.model.forward(input_ids, attention_mask, token_type_ids)
+            batch_preds.extend(probs.cpu().numpy())
+
+        return batch_preds
+
+    def save_model(self, output_dir, model, results=None):
+        """
+        Saves the model to output_dir.
+        :param output_dir:
+        :param model:
+        :param results:
+        :return:
+        """
+        logger.info(f"Saving model checkpoint to {output_dir}")
+        os.makedirs(output_dir, exist_ok=True)
+        model_to_save = model.module if hasattr(model, "module") else model
+        model_to_save.save_pretrained(output_dir)
+        self.tokenizer.save_pretrained(output_dir)
+        if results:
+            output_eval_file = os.path.join(output_dir, "eval_results.txt")
+            with open(output_eval_file, "w") as writer:
+                for key in sorted(results.keys()):
+                    writer.write("{} = {}\n".format(key, str(results[key])))

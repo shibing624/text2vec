@@ -16,6 +16,9 @@ from text2vec import CosentModel
 from text2vec import SentenceBertModel, BertMatchModel
 from text2vec import cos_sim, compute_spearmanr, EncoderType
 
+from text2vec.tools.training_sup_text_matching_model_en import main
+if __name__ == '__main__':
+    main()
 
 def calc_similarity_scores(model, sents1, sents2, labels):
     t1 = time.time()
@@ -35,6 +38,7 @@ def calc_similarity_scores(model, sents1, sents2, labels):
     logger.debug(
         f'spend time: {spend_time:.4f}, count:{len(sents1 + sents2)}, qps: {len(sents1 + sents2) / spend_time}')
     return spearman
+
 
 
 def main():
