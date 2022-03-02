@@ -5,6 +5,7 @@
 """
 
 from text2vec.version import __version__
+
 from text2vec.word2vec import Word2Vec, load_stopwords
 from text2vec.sentence_model import SentenceModel, EncoderType
 from text2vec.sentence_model import SentenceModel as SBert
