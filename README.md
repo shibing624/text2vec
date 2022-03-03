@@ -503,6 +503,16 @@ Inference:
 <img src="docs/inference.png" width="300" />
 
 #### CoSENT 监督模型
+Train and predict:
+
+```python
+from text2vec import CosentModel
+m = CosentModel("bert-base-chinese")
+print(m)
+m.train_model(use_hf_dataset=True, num_epochs=1, output_dir="./temp")
+r = m.encode(["我爱北京天安门"])
+print(r)
+```
 
 - 在中文STS-B数据集训练和评估`MacBERT+CoSENT`模型
 
@@ -607,13 +617,6 @@ Inference:
 
 训练脚本同上。
 
-以上训练脚本在安装text2vec后（`pip3 install -U text2vec`），支持命令行调用。
-
-如，在中文STS-B数据集训练和评估`MacBERT+SBERT`模型：
-
-```shell
-python3 -m text2vec.tools.training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict
-```
 
 # Contact
 
