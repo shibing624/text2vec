@@ -52,7 +52,7 @@ class SentenceBertModel(SentenceModel):
     def train_model(
             self,
             train_file: str = None,
-            output_dir: str = "./outputs",
+            output_dir: str = None,
             eval_file: str = None,
             verbose: bool = True,
             batch_size: int = 32,

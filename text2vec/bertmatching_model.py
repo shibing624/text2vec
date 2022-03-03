@@ -82,7 +82,7 @@ class BertMatchModel:
     def train_model(
             self,
             train_file: str = None,
-            output_dir: str = "./outputs",
+            output_dir: str = None,
             eval_file: str = None,
             verbose: bool = True,
             batch_size: int = 32,
@@ -254,7 +254,7 @@ class BertMatchModel:
                 input_ids = inputs.get('input_ids').squeeze(1).to(device)
                 attention_mask = inputs.get('attention_mask').squeeze(1).to(device)
                 token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
-                loss, logits, probs = self.model.forward(input_ids, attention_mask, token_type_ids, labels)
+                loss, logits, probs = self.model(input_ids, attention_mask, token_type_ids, labels)
                 current_loss = loss.item()
 
                 if verbose:
@@ -330,7 +330,7 @@ class BertMatchModel:
             token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
 
             with torch.no_grad():
-                loss, logits, probs = self.model.forward(input_ids, attention_mask, token_type_ids, labels)
+                loss, logits, probs = self.model(input_ids, attention_mask, token_type_ids, labels)
             batch_preds.extend(probs.cpu().numpy())
 
         spearman = compute_spearmanr(batch_labels, batch_preds)
@@ -366,7 +366,7 @@ class BertMatchModel:
             token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
 
             with torch.no_grad():
-                loss, logits, probs = self.model.forward(input_ids, attention_mask, token_type_ids)
+                loss, logits, probs = self.model(input_ids, attention_mask, token_type_ids)
             batch_preds.extend(probs.cpu().numpy())
 
         return batch_preds

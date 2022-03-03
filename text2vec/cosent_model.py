@@ -30,6 +30,7 @@ class CosentModel(SentenceModel):
 
         Args:
             model_name_or_path: Default Transformer model name or path to a directory containing Transformer model file (pytorch_nodel.bin).
+            encoder_type: Enum of type EncoderType.
             max_seq_length: The maximum total input sequence length after tokenization.
         """
         super().__init__(model_name_or_path, encoder_type, max_seq_length)
@@ -41,7 +42,7 @@ class CosentModel(SentenceModel):
     def train_model(
             self,
             train_file: str = None,
-            output_dir: str = "./outputs",
+            output_dir: str = None,
             eval_file: str = None,
             verbose: bool = True,
             batch_size: int = 32,
