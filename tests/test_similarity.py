@@ -89,7 +89,13 @@ class SimTestCase(unittest.TestCase):
         scores = m.get_scores(sents1, sents2)
         sims = []
         for i in range(len(sents1)):
+            for j in range(len(sents2)):
+                print(scores[i][j], sents1[i], sents2[j])
+        print()
+        for i in range(len(sents1)):
             sims.append(scores[i][i])
+            print(scores[i][i], sents1[i], sents2[i])
+
         spend_time = time() - t1
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])

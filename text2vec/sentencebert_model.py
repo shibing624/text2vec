@@ -4,16 +4,18 @@
 @description: Create Sentence-BERT model for text matching task
 """
 
-import os
-from loguru import logger
 import math
+import os
+
 import pandas as pd
 import torch
+from loguru import logger
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
-from text2vec.sentence_model import SentenceModel, EncoderType, device
+
+from text2vec.sentence_model import SentenceModel, device
 from text2vec.text_matching_dataset import (
     TextMatchingTrainDataset,
     TextMatchingTestDataset,
@@ -29,7 +31,7 @@ class SentenceBertModel(SentenceModel):
     def __init__(
             self,
             model_name_or_path: str = "hfl/chinese-macbert-base",
-            encoder_type: EncoderType = EncoderType.MEAN,
+            encoder_type: str = "MEAN",
             max_seq_length: int = 128,
             num_classes: int = 2,
     ):

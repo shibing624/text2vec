@@ -31,12 +31,19 @@ class EncoderType(Enum):
     def __str__(self):
         return self.name
 
+    @staticmethod
+    def from_string(s):
+        try:
+            return EncoderType[s]
+        except KeyError:
+            raise ValueError()
+
 
 class SentenceModel:
     def __init__(
             self,
             model_name_or_path: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-            encoder_type: EncoderType = EncoderType.MEAN,
+            encoder_type: Union[str, EncoderType] = "MEAN",
             max_seq_length: int = 128
     ):
         """
@@ -53,6 +60,7 @@ class SentenceModel:
         thus, we use <last_hidden_state>.
         """
         self.model_name_or_path = model_name_or_path
+        encoder_type = EncoderType.from_string(encoder_type) if isinstance(encoder_type, str) else encoder_type
         if encoder_type not in list(EncoderType):
             raise ValueError(f"encoder_type must be in {list(EncoderType)}")
         self.encoder_type = encoder_type

@@ -4,21 +4,23 @@
 @description: Create BERT model for text matching task
 """
 
-import os
-from loguru import logger
 import math
+import os
+
 import pandas as pd
 import torch
+from loguru import logger
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
-from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from transformers import BertForSequenceClassification, BertTokenizer
-from text2vec.sentence_model import SentenceModel, EncoderType, device
+from transformers.optimization import AdamW, get_linear_schedule_with_warmup
+
 from text2vec.bertmatching_dataset import BertMatchingTestDataset, BertMatchingTrainDataset, \
     load_test_data, load_train_data, HFBertMatchingTrainDataset, HFBertMatchingTestDataset
-from text2vec.utils.stats_util import set_seed
+from text2vec.sentence_model import device
 from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr
+from text2vec.utils.stats_util import set_seed
 
 
 class BertMatchModule(nn.Module):

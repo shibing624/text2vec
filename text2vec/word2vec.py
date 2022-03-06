@@ -90,7 +90,7 @@ class Word2Vec:
         self.jieba_tokenizer = JiebaTokenizer()
         self.model_name_or_path = model_name_or_path
 
-    def __repr__(self):
+    def __str__(self):
         return f"<Word2Vec, word count: {len(self.w2v.key_to_index)}, emb size: {self.w2v.vector_size}, " \
                f"stopwords count: {len(self.stopwords)}>"
 

@@ -13,7 +13,7 @@ from text2vec import SentenceModel, cos_sim, semantic_search, Similarity, Encode
 
 if __name__ == '__main__':
     m = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-                      encoder_type=EncoderType.MEAN)
+                      encoder_type="MEAN")
     # Corpus with example sentences
     corpus = [
         '花呗更改绑定银行卡',

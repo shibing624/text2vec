@@ -12,7 +12,7 @@ sys.path.append('..')
 from text2vec import SentenceModel, cos_sim, semantic_search, Similarity, EncoderType
 
 if __name__ == '__main__':
-    m = SentenceModel("shibing624/text2vec-base-chinese", encoder_type=EncoderType.FIRST_LAST_AVG)
+    m = SentenceModel("shibing624/text2vec-base-chinese", encoder_type="FIRST_LAST_AVG")
     # Corpus with example sentences
     corpus = [
         '花呗更改绑定银行卡',

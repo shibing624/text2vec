@@ -4,16 +4,18 @@
 @description: 
 """
 from enum import Enum
-from typing import List, Union, Optional
+from typing import List
+
 import numpy as np
 import torch
+from loguru import logger
 from numpy import ndarray
 from torch import Tensor
-from loguru import logger
-from text2vec.utils.tokenizer import JiebaTokenizer
-from text2vec.word2vec import Word2Vec
+
 from text2vec.sentence_model import SentenceModel, device, EncoderType
 from text2vec.utils.distance import cosine_distance
+from text2vec.utils.tokenizer import JiebaTokenizer
+from text2vec.word2vec import Word2Vec
 
 
 class SimilarityType(Enum):
@@ -107,7 +109,8 @@ class Similarity:
         Get similarity scores between sentences1 and sentences2
         :param sentences1: list, sentence1 list
         :param sentences2: list, sentence2 list
-        :param only_aligned: bool, default False return all scores, if True only return scores[i][i]
+        :param only_aligned: bool, default False return all scores, if True only return scores[i][i],
+            effective when EmbeddingType.WORD2VEC
         :return: return: Matrix with res[i][j]  = cos_sim(a[i], b[j])
         """
         if not sentences1 or not sentences2:

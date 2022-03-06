@@ -4,16 +4,18 @@
 @description: Create CoSENT model for text matching task
 """
 
-import os
-from loguru import logger
 import math
+import os
+
 import pandas as pd
 import torch
+from loguru import logger
 from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
-from text2vec.sentence_model import SentenceModel, EncoderType, device
+
 from text2vec.cosent_dataset import CosentTrainDataset, load_cosent_train_data, HFCosentTrainDataset
+from text2vec.sentence_model import SentenceModel, device
 from text2vec.text_matching_dataset import TextMatchingTestDataset, load_test_data, HFTextMatchingTestDataset
 from text2vec.utils.stats_util import set_seed
 
@@ -22,7 +24,7 @@ class CosentModel(SentenceModel):
     def __init__(
             self,
             model_name_or_path: str = "hfl/chinese-macbert-base",
-            encoder_type: EncoderType = EncoderType.FIRST_LAST_AVG,
+            encoder_type: str = "FIRST_LAST_AVG",
             max_seq_length: int = 128,
     ):
         """
