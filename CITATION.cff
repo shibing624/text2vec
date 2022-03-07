@@ -3,8 +3,8 @@ message: "If you use this software, please cite it as below."
 authors:
 - family-names: "Xu"
   given-names: "Ming"
-   orcid: "https://orcid.org/0000-0003-3402-7159"
+  orcid: "https://orcid.org/0000-0003-3402-7159"
 title: "Text2vec: Text to vector toolkit"
 url: "https://github.com/shibing624/text2vec"
 data-released: 2022-02-27
-version: 1.1.2
+version: 1.1.3
