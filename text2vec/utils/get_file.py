@@ -376,3 +376,60 @@ def http_get(url, path):
 
     os.rename(download_filepath, path)
     progress.close()
+
+
+def deprecated(reason):
+    """Decorator to mark functions as deprecated.
+
+    Calling a decorated function will result in a warning being emitted, using warnings.warn.
+    Adapted from https://stackoverflow.com/a/40301488/8001386.
+
+    Parameters
+    ----------
+    reason : str
+        Reason of deprecation.
+
+    Returns
+    -------
+    function
+        Decorated function
+
+    """
+    import warnings
+    import inspect
+    from functools import wraps
+
+    if isinstance(reason, str):
+        def decorator(func):
+            fmt = "Call to deprecated `{name}` ({reason})."
+
+            @wraps(func)
+            def new_func1(*args, **kwargs):
+                warnings.warn(
+                    fmt.format(name=func.__name__, reason=reason),
+                    category=DeprecationWarning,
+                    stacklevel=2
+                )
+                return func(*args, **kwargs)
+
+            return new_func1
+
+        return decorator
+
+    elif inspect.isclass(reason) or inspect.isfunction(reason):
+        func = reason
+        fmt = "Call to deprecated `{name}`."
+
+        @wraps(func)
+        def new_func2(*args, **kwargs):
+            warnings.warn(
+                fmt.format(name=func.__name__),
+                category=DeprecationWarning,
+                stacklevel=2
+            )
+            return func(*args, **kwargs)
+
+        return new_func2
+
+    else:
+        raise TypeError(repr(type(reason)))

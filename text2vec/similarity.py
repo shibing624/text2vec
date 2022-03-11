@@ -16,7 +16,7 @@ from text2vec.sentence_model import SentenceModel, device, EncoderType
 from text2vec.utils.distance import cosine_distance
 from text2vec.utils.tokenizer import JiebaTokenizer
 from text2vec.word2vec import Word2Vec
-
+from text2vec.utils.get_file import deprecated
 
 class SimilarityType(Enum):
     WMD = 0
@@ -79,6 +79,7 @@ class Similarity:
         return f"<Similarity> model : {self.model}, similarity_type: {self.similarity_type}, " \
                f"embedding_type: {self.embedding_type}"
 
+    @deprecated("Use similarities instead, `pip install similarities`")
     def get_score(self, sentence1: str, sentence2: str) -> float:
         """
         Get score between text1 and text2
@@ -102,6 +103,7 @@ class Similarity:
             res = 1. / (1. + self.model.w2v.wmdistance(token1, token2))
         return res
 
+    @deprecated("Use similarities instead, `pip install similarities`")
     def get_scores(
             self, sentences1: List[str], sentences2: List[str], only_aligned: bool = False
     ) -> ndarray:
