@@ -24,7 +24,7 @@ def compute_emb(model):
         'Sentences are passed as a list of string.',
         'The quick brown fox jumps over the lazy dog.'
     ]
-    sentence_embeddings = model.encode(sentences)
+    sentence_embeddings = model.encode(sentences, show_progress_bar=True)
     print(type(sentence_embeddings), sentence_embeddings.shape)
 
     # The result is a list of sentence embeddings as numpy arrays

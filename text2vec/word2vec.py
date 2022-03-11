@@ -11,6 +11,7 @@ from loguru import logger
 import numpy as np
 from numpy import ndarray
 from gensim.models import KeyedVectors
+from tqdm import tqdm
 from text2vec.utils.get_file import get_file
 from text2vec.utils.tokenizer import JiebaTokenizer
 
@@ -73,7 +74,10 @@ class Word2Vec:
             # Set new model_name_or_path
             old_model_name = model_name_or_path
             model_name_or_path = os.path.join(cache_folder, untar_filename)
-            logger.warning(f"{old_model_name} not found, Set default model name: {model_name_or_path}")
+            if old_model_name in self.model_key_map:
+                logger.info('Load pretrained model:{}, path:{}'.format(old_model_name, model_name_or_path))
+            else:
+                logger.warning(f"{old_model_name} not found, Set default model path: {model_name_or_path}")
             if not os.path.exists(model_name_or_path):
                 logger.debug(f"Downloading {url} to {model_name_or_path}")
                 os.makedirs(cache_folder, exist_ok=True)
@@ -94,14 +98,9 @@ class Word2Vec:
         return f"<Word2Vec, word count: {len(self.w2v.key_to_index)}, emb size: {self.w2v.vector_size}, " \
                f"stopwords count: {len(self.stopwords)}>"
 
-    def encode(self, sentences: Union[List[str], str]) -> Union[List, ndarray]:
+    def encode(self, sentences: Union[List[str], str], show_progress_bar: bool = False) -> ndarray:
         """
-        Encode embed sentences
-
-        Args:
-            sentences: Sentence list to embed
-        Returns:
-            vectorized sentence list
+        Encode sentences to vectors
         """
         if self.w2v is None:
             raise ValueError('No model for embed sentence')
@@ -112,7 +111,7 @@ class Word2Vec:
             input_is_string = True
 
         all_embeddings = []
-        for sentence in sentences:
+        for sentence in tqdm(sentences, desc='Word2Vec Embeddings', disable=not show_progress_bar):
             emb = []
             count = 0
             for word in sentence:

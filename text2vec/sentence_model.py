@@ -119,7 +119,7 @@ class SentenceModel:
                 input_mask_expanded.sum(1), min=1e-9)
             return final_encoding  # [batch, hid_size]
 
-    def encode(self, sentences: Union[str, List[str]], batch_size: int = 32):
+    def encode(self, sentences: Union[str, List[str]], batch_size: int = 32, show_progress_bar: bool = False):
         """
         Returns the embeddings for a batch of sentences.
         """
@@ -132,7 +132,7 @@ class SentenceModel:
         all_embeddings = []
         length_sorted_idx = np.argsort([-len(s) for s in sentences])
         sentences_sorted = [sentences[idx] for idx in length_sorted_idx]
-        for start_index in trange(0, len(sentences), batch_size, desc="Batches", disable=True):
+        for start_index in trange(0, len(sentences), batch_size, desc="Batches", disable=not show_progress_bar):
             sentences_batch = sentences_sorted[start_index: start_index + batch_size]
             # Tokenize sentences
             inputs = self.tokenizer(sentences_batch, max_length=self.max_seq_length, truncation=True,
