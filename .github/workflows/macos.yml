@@ -44,15 +44,17 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.config.py }}
-      - name: Install dependencies
+      - name: Install torch
         run: |
           python -m pip install --upgrade pip
           pip install Cython
           pip install torch
-          pip install -r requirements.txt
-          pip install .
       - name: Install from pypi
         run: |
-          pip uninstall -y text2vec
-          pip install -U text2vec # install from pypi
+          pip install -U text2vec
           python -c "import text2vec; print(text2vec.__version__)"
+          pip uninstall -y text2vec
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install .

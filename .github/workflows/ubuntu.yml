@@ -36,12 +36,16 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-
       - name: Install torch
         run: |
           python -m pip install --upgrade pip
           pip install Cython
           pip install torch
+      - name: Install from pypi
+        run: |
+          pip install -U text2vec
+          python -c "import text2vec; print(text2vec.__version__)"
+          pip uninstall -y text2vec
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
@@ -49,8 +53,3 @@ jobs:
       - name: PKG-TEST
         run: |
           python -m unittest discover tests/
-      - name: Install from pypi
-        run: |
-          pip uninstall -y text2vec
-          pip install -U text2vec
-          python -c "import text2vec; print(text2vec.__version__)"
