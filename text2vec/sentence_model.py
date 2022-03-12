@@ -42,7 +42,7 @@ class EncoderType(Enum):
 class SentenceModel:
     def __init__(
             self,
-            model_name_or_path: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+            model_name_or_path: str = "shibing624/text2vec-base-chinese",
             encoder_type: Union[str, EncoderType] = "MEAN",
             max_seq_length: int = 128
     ):

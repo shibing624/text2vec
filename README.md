@@ -220,7 +220,7 @@ DatasetDict({
 
 # Usage
 
-### 1. 计算文本向量
+## 文本向量表征
 
 基于`pretrained model`计算文本向量：
 
@@ -294,9 +294,10 @@ Embedding shape: (768,)
 - 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentences_size, model_embedding_size)`
 - `shibing624/text2vec-base-chinese`模型是CoSENT方法在中文STS-B数据集训练得到的，模型已经上传到huggingface的
 模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，
-可以通过上面示例方法 text2vec.SentenceModel 调用，或者如下所示直接用[transformers库](https://github.com/huggingface/transformers)调用，模型自动下载到本机路径：`~/.cache/huggingface/transformers`
-- `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`模型是Sentence-BERT的多语言句向量模型，适用于释义（paraphrase）识别，文本匹配，text2vec.SenteceModel 指定的默认模型。大家也可以通过[sentence-transformers库]((https://github.com/UKPLab/sentence-transformers))调用该模型
-text2vec.SenteceModel 指定的默认模型。大家也可以通过[sentence-transformers库]((https://github.com/UKPLab/sentence-transformers))调用该模型
+是`text2vec.SentenceModel`指定的默认模型，可以通过上面示例调用，或者如下所示用[transformers库](https://github.com/huggingface/transformers)调用，
+模型自动下载到本机路径：`~/.cache/huggingface/transformers`
+- `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`模型是Sentence-BERT的多语言句向量模型，
+适用于释义（paraphrase）识别，文本匹配，通过`text2vec.SentenceModel`和[sentence-transformers库]((https://github.com/UKPLab/sentence-transformers))都可以调用该模型
 - `w2v-light-tencent-chinese`是通过gensim加载的Word2Vec模型，使用腾讯词向量`Tencent_AILab_ChineseEmbedding.tar.gz`计算各字词的词向量，句子向量通过单词词
 向量取平均值得到，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
 
@@ -345,7 +346,8 @@ print(sentence_embeddings)
 
 
 
-### 2. 计算句子之间的相似度值
+## 下游任务
+### 1. 句子相似度计算
 
 example: [examples/semantic_text_similarity_demo.py](examples/semantic_text_similarity_demo.py)
 
@@ -395,7 +397,7 @@ The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 
 > 句子余弦相似度值`score`范围是[-1, 1]，值越大越相似。
 
-### 3. 计算句子与文档集之间的相似度值
+### 2. 文本匹配搜索
 
 一般在文档候选集中找与query最相似的文本，常用于QA场景的问句相似匹配、文本相似检索等任务。
 
@@ -481,8 +483,23 @@ A man is riding a white horse on an enclosed ground. (Score: 0.1733)
 A man is eating food. (Score: 0.0329)
 ```
 
-> `Score`的值范围[-1, 1]，值越大，表示该query与corpus中的句子相似度越近。
 
+#### similarities
+
+[推荐]文本相似度计算和文本匹配搜索任务，推荐使用 [similarities库](https://github.com/shibing624/similarities) ，兼容本项目release的
+Word2vec、SBERT、Cosent类语义匹配模型，还支持字面维度相似度计算、匹配搜索算法，支持文本、图像。
+
+安装：
+```pip install -U similarities```
+
+句子相似度计算：
+```python
+from similarities import Similarity
+
+m = Similarity()
+r = m.similarity('如何更换花呗绑定银行卡', '花呗更改绑定银行卡')
+print(f"similarity score: {float(r)}")  # similarity score: 0.855146050453186
+```
 
 # Models
 
@@ -503,7 +520,7 @@ Inference:
 <img src="docs/inference.png" width="300" />
 
 #### CoSENT 监督模型
-Train and predict:
+训练和预测，最简示例:
 
 ```python
 from text2vec import CosentModel
@@ -623,7 +640,7 @@ Inference:
 - Issue(建议)：[![GitHub issues](https://img.shields.io/github/issues/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/issues)
 - 邮件我：xuming: xuming624@qq.com
 - 微信我：
-加我*微信号：xuming624, 备注：个人名称-公司-NLP* 进NLP交流群。
+加我*微信号：xuming624, 备注：姓名-公司-NLP* 进NLP交流群。
 
 <img src="docs/wechat.jpeg" width="200" />
 
@@ -650,7 +667,7 @@ version = {1.1.2}
 # License
 
 
-授权协议为 [The Apache License 2.0](/LICENSE)，可免费用做商业用途。请在产品说明中附加text2vec的链接和授权协议。
+授权协议为 [The Apache License 2.0](LICENSE)，可免费用做商业用途。请在产品说明中附加text2vec的链接和授权协议。
 
 
 # Contribute

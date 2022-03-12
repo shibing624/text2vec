@@ -30,11 +30,11 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      - name: Cache transformers models
+      - name: Cache huggingface models
         uses: actions/cache@v2
         with:
-          path: ~/.cache/huggingface/transformers
-          key: ${{ runner.os }}-transformers-
+          path: ~/.cache/huggingface
+          key: ${{ runner.os }}-huggingface-
       - name: Cache text2vec models
         uses: actions/cache@v2
         with:
@@ -51,9 +51,6 @@ jobs:
           pip install torch
           pip install -r requirements.txt
           pip install .
-      - name: PKG-TEST
-        run: |
-          python -m unittest discover tests/
       - name: Install from pypi
         run: |
           pip uninstall -y text2vec

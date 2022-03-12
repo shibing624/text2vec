@@ -44,6 +44,7 @@ setup(
         "jieba>=0.39",
         "loguru",
         "transformers>=4.6.0",
+        "datasets",
         "tqdm",
         "scikit-learn",
         "gensim>=4.0.0",
