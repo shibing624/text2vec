@@ -27,14 +27,14 @@ class IssueTestCase(unittest.TestCase):
         b = '英汉互译比较语言学'
         r = sbert_sim_score(a, b)
         print(a, b, r)
-        self.assertTrue(abs(r - 0.1733) < 0.001)
+        self.assertTrue(abs(float(r) - 0.4098) < 0.001)
 
     def test_sim_same(self):
         a = '汉英翻译比较语言学'
         b = '英汉互译比较语言学'
         r = sbert_sim_score(a, b)
         print(a, b, r)
-        self.assertTrue(abs(r - 0.8639) < 0.001)
+        self.assertTrue(abs(float(r) - 0.8905) < 0.001)
 
     def test_search_sim(self):
         sentences = [
