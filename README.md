@@ -19,11 +19,10 @@ text2vec, Text to Vector.
 - [Question](#Question)
 - [Solution](#Solution)
 - [Feature](#Feature)
-- [Evaluate](#Evaluate)
+- [Evaluation](#Evaluation)
 - [Install](#install)
 - [Usage](#usage)
 - [Contact](#Contact)
-- [Citation](#Citation)
 - [Reference](#reference)
 
 # Question
@@ -97,15 +96,7 @@ Cross-Encoder适用于向量检索精排。
 - [SBERT(Sentence-BERT)](text2vec/sentence_bert)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
 - [CoSENT(Cosine Sentence)](text2vec/cosent)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
 
-### 文本相似度比较方法
-
-- 余弦相似（Cosine Similarity）：两向量求余弦
-- 点积（Dot Product）：两向量归一化后求内积
-- 词移距离（Word Mover’s Distance）：词移距离使用两文本间的词向量，测量其中一文本中的单词在语义空间中移动到另一文本单词所需要的最短距离
-- [RankBM25](text2vec/bm25.py)：BM25的变种算法，对query和文档之间的相似度打分，得到docs的rank排序
-- [SemanticSearch](https://github.com/shibing624/text2vec/blob/master/text2vec/similarity.py#L144)：向量相似检索，使用Cosine Similarty + topk高效计算，比一对一暴力计算快一个数量级
-
-# Evaluate
+# Evaluation
 
 ### 文本匹配
 
