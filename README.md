@@ -615,16 +615,11 @@ BERT文本匹配模型，原生BERT匹配网络结构，交互式句向量匹配
 
 Network structure:
 
-Training:
+Training and inference:
 
 <img src="docs/bert-fc-train.png" width="300" />
 
-
-Inference:
-
-<img src="docs/inference.png" width="300" />
-
-训练脚本同上。
+训练脚本同上[examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)。
 
 
 # Contact
