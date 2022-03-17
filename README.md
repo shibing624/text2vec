@@ -93,8 +93,8 @@ Cross-Encoder适用于向量检索精排。
 # Feature
 ### 文本向量表示模型
 - [Word2Vec](text2vec/word2vec.py)：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe）实现词向量检索，本项目实现了句子（词向量求平均）的word2vec向量表示
-- [SBERT(Sentence-BERT)](text2vec/sentence_bert)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
-- [CoSENT(Cosine Sentence)](text2vec/cosent)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
+- [SBERT(Sentence-BERT)](text2vec/sentencebert_model.py)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
+- [CoSENT(Cosine Sentence)](text2vec/cosent_model.py)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
 
 # Evaluation
 
@@ -219,7 +219,7 @@ DatasetDict({
 >>> from text2vec import SentenceModel
 >>> m = SentenceModel()
 >>> m.encode("如何更换花呗绑定银行卡")
-Embedding shape: (384,)
+Embedding shape: (768,)
 ```
 
 example: [examples/computing_embeddings_demo.py](examples/computing_embeddings_demo.py)
@@ -475,9 +475,10 @@ A man is eating food. (Score: 0.0329)
 ```
 
 
-#### similarities
+## 下游任务支持库
+**similarities库[推荐]**
 
-[推荐]文本相似度计算和文本匹配搜索任务，推荐使用 [similarities库](https://github.com/shibing624/similarities) ，兼容本项目release的
+文本相似度计算和文本匹配搜索任务，推荐使用 [similarities库](https://github.com/shibing624/similarities) ，兼容本项目release的
 Word2vec、SBERT、Cosent类语义匹配模型，还支持字面维度相似度计算、匹配搜索算法，支持文本、图像。
 
 安装：
