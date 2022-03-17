@@ -611,13 +611,13 @@ python3 training_unsup_text_matching_model_en.py --model_arch sentencebert --do_
 ```
 
 ## BERT-Match model
-BERT文本匹配模型，孪生网络结构，表征式句向量表示
+BERT文本匹配模型，原生BERT匹配网络结构，交互式句向量匹配模型
 
 Network structure:
 
 Training:
 
-<img src="docs/sim-bert-fc-train.png" width="300" />
+<img src="docs/bert-fc-train.png" width="300" />
 
 
 Inference:
