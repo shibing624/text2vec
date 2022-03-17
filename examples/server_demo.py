@@ -44,7 +44,7 @@ async def index():
 async def emb(q: str = Query(..., min_length=1, max_length=512, title='query')):
     try:
         embeddings = s_model.encode(q)
-        result_dict = str(embeddings)
+        result_dict = {'emb': embeddings.tolist()}
         logger.debug(f"Successfully get sentence embeddings, q:{q}")
         return result_dict
     except Exception as e:
