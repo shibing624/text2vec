@@ -162,8 +162,8 @@ python examples/gradio_demo.py
 
 # Install
 ```
-pip3 install torch # conda install pytorch
-pip3 install -U text2vec
+pip install torch # conda install pytorch
+pip install -U text2vec
 ```
 
 or
@@ -171,7 +171,7 @@ or
 ```
 git clone https://github.com/shibing624/text2vec.git
 cd text2vec
-python3 setup.py install
+python setup.py install
 ```
 
 ### 数据集
@@ -179,7 +179,7 @@ python3 setup.py install
 
 数据集使用示例：
 ```shell
-pip3 install datasets
+pip install datasets
 ```
 
 ```python
@@ -335,7 +335,28 @@ print("Sentence embeddings:")
 print(sentence_embeddings)
 ```
 
-#### 提供两种`Word2Vec`词向量，任选一个：
+#### Usage (sentence-transformers)
+sentence-transformers is a popular library to compute dense vector representations for sentences.
+
+Install sentence-transformers:
+```shell
+pip install -U sentence-transformers
+```
+Then load model and predict:
+```python
+from sentence_transformers import SentenceTransformer
+
+m = SentenceTransformer("shibing624/text2vec-base-chinese")
+sentences = ['如何更换花呗绑定银行卡', '花呗更改绑定银行卡']
+
+sentence_embeddings = m.encode(sentences)
+print("Sentence embeddings:")
+print(sentence_embeddings)
+```
+
+#### `Word2Vec`词向量
+
+提供两种`Word2Vec`词向量，任选一个：
 
   - 轻量版腾讯词向量 [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制，运行程序，自动下载到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
   - [腾讯词向量-官方全量](https://ai.tencent.com/ailab/nlp/zh/download.html), 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`，腾讯词向量主页：https://ai.tencent.com/ailab/nlp/zh/embedding.html 词向量下载地址：https://ai.tencent.com/ailab/nlp/zh/data/Tencent_AILab_ChineseEmbedding.tar.gz  更多查看[腾讯词向量介绍-wiki](https://github.com/shibing624/text2vec/wiki/%E8%85%BE%E8%AE%AF%E8%AF%8D%E5%90%91%E9%87%8F%E4%BB%8B%E7%BB%8D)
@@ -487,7 +508,7 @@ A man is eating food. (Score: 0.0329)
 Word2vec、SBERT、Cosent类语义匹配模型，还支持字面维度相似度计算、匹配搜索算法，支持文本、图像。
 
 安装：
-```pip3 install -U similarities```
+```pip install -U similarities```
 
 句子相似度计算：
 ```python
@@ -534,14 +555,14 @@ example: [examples/training_sup_text_matching_model.py](examples/training_sup_te
 
 ```shell
 cd examples
-python3 training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-cosent
+python training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-cosent
 ```
 
 - 在蚂蚁金融匹配数据集ATEC上训练和评估`MacBERT+CoSENT`模型
 
 支持这些中文匹配数据集的使用：'ATEC', 'STS-B', 'BQ', 'LCQMC', 'PAWSX'，具体参考HuggingFace datasets [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh)
 ```shell
-python3 training_sup_text_matching_model.py --task_name ATEC --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/ATEC-cosent
+python training_sup_text_matching_model.py --task_name ATEC --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/ATEC-cosent
 ```
 
 - 在自有中文数据集上训练模型
@@ -549,7 +570,7 @@ python3 training_sup_text_matching_model.py --task_name ATEC --model_arch cosent
 example: [examples/training_sup_text_matching_model_selfdata.py](examples/training_sup_text_matching_model_selfdata.py)
 
 ```shell
-python3 training_sup_text_matching_model_selfdata.py --do_train --do_predict
+python training_sup_text_matching_model_selfdata.py --do_train --do_predict
 ```
 
 - 在英文STS-B数据集训练和评估`BERT+CoSENT`模型
@@ -558,7 +579,7 @@ example: [examples/training_sup_text_matching_model_en.py](examples/training_sup
 
 ```shell
 cd examples
-python3 training_sup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased  --output_dir ./outputs/STS-B-en-cosent
+python training_sup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased  --output_dir ./outputs/STS-B-en-cosent
 ```
 
 #### CoSENT 无监督模型
@@ -568,7 +589,7 @@ example: [examples/training_unsup_text_matching_model_en.py](examples/training_u
 
 ```shell
 cd examples
-python3 training_unsup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-unsup-cosent
+python training_unsup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-unsup-cosent
 ```
 
 
@@ -594,7 +615,7 @@ example: [examples/training_sup_text_matching_model.py](examples/training_sup_te
 
 ```shell
 cd examples
-python3 training_sup_text_matching_model.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-sbert
+python training_sup_text_matching_model.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-sbert
 ```
 - 在英文STS-B数据集训练和评估`BERT+SBERT`模型
 
@@ -602,7 +623,7 @@ example: [examples/training_sup_text_matching_model_en.py](examples/training_sup
 
 ```shell
 cd examples
-python3 training_sup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-sbert
+python training_sup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-sbert
 ```
 
 #### SentenceBERT 无监督模型
@@ -612,7 +633,7 @@ example: [examples/training_unsup_text_matching_model_en.py](examples/training_u
 
 ```shell
 cd examples
-python3 training_unsup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-unsup-sbert
+python training_unsup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-unsup-sbert
 ```
 
 ## BERT-Match model
@@ -625,6 +646,17 @@ Training and inference:
 <img src="docs/bert-fc-train.png" width="300" />
 
 训练脚本同上[examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)。
+
+
+## 模型蒸馏（Model Distillation）
+
+由于text2vec训练的模型可以使用[sentence-transformers](https://github.com/UKPLab/sentence-transformers)库加载，此处
+复用其模型蒸馏方法[distillation](https://github.com/UKPLab/sentence-transformers/tree/master/examples/training/distillation)。
+
+1. 模型降维，参考[dimensionality_reduction.py](https://github.com/UKPLab/sentence-transformers/blob/master/examples/training/distillation/dimensionality_reduction.py)使用
+PCA对模型输出结果降维，可减少milvus等向量检索数据库的存储空间，还能轻微提升模型效果。
+2. 模型蒸馏，参考[model_distillation.py](https://github.com/UKPLab/sentence-transformers/blob/master/examples/training/distillation/model_distillation.py)使用
+蒸馏方法，将Teacher大模型蒸馏到更少layers层数的student模型中，在权衡效果的情况下，可大幅提升模型预测速度。
 
 
 # Contact
