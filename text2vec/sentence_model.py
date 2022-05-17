@@ -16,7 +16,6 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
 from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 os.environ["TOKENIZERS_PARALLELISM"] = "TRUE"
 
@@ -44,7 +43,8 @@ class SentenceModel:
             self,
             model_name_or_path: str = "shibing624/text2vec-base-chinese",
             encoder_type: Union[str, EncoderType] = "MEAN",
-            max_seq_length: int = 128
+            max_seq_length: int = 128,
+            device: Optional[str] = None,
     ):
         """
         Initializes the base sentence model.
@@ -53,6 +53,7 @@ class SentenceModel:
         :param encoder_type: The type of encoder to use, See the EncoderType enum for options:
             FIRST_LAST_AVG, LAST_AVG, CLS, POOLER(cls + dense), MEAN(mean of last_hidden_state)
         :param max_seq_length: The maximum sequence length.
+        :param device: Device (like 'cuda' / 'cpu') that should be used for computation. If None, checks if GPU.
 
         bert model: https://huggingface.co/transformers/model_doc/bert.html?highlight=bert#transformers.BertModel.forward
         BERT return: <last_hidden_state>, <pooler_output> [hidden_states, attentions]
@@ -67,7 +68,11 @@ class SentenceModel:
         self.max_seq_length = max_seq_length
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
         self.bert = AutoModel.from_pretrained(model_name_or_path)
-        self.bert.to(device)
+        if device is None:
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = torch.device(device)
+        logger.debug("Use device: {}".format(self.device))
+        self.bert.to(self.device)
         self.results = {}  # Save training process evaluation result
 
     def __str__(self):
@@ -119,11 +124,24 @@ class SentenceModel:
                 input_mask_expanded.sum(1), min=1e-9)
             return final_encoding  # [batch, hid_size]
 
-    def encode(self, sentences: Union[str, List[str]], batch_size: int = 32, show_progress_bar: bool = False):
+    def encode(
+            self,
+            sentences: Union[str, List[str]],
+            batch_size: int = 32,
+            show_progress_bar: bool = False,
+            device: str = None,
+    ):
         """
         Returns the embeddings for a batch of sentences.
+
+        :param sentences: str/list, Input sentences
+        :param batch_size: int, Batch size
+        :param show_progress_bar: bool, Whether to show a progress bar for the sentences
+        :param device: Which torch.device to use for the computation
         """
         self.bert.eval()
+        if device is None:
+            device = self.device
         input_is_string = False
         if isinstance(sentences, str) or not hasattr(sentences, "__len__"):
             sentences = [sentences]
@@ -134,16 +152,12 @@ class SentenceModel:
         sentences_sorted = [sentences[idx] for idx in length_sorted_idx]
         for start_index in trange(0, len(sentences), batch_size, desc="Batches", disable=not show_progress_bar):
             sentences_batch = sentences_sorted[start_index: start_index + batch_size]
-            # Tokenize sentences
-            inputs = self.tokenizer(sentences_batch, max_length=self.max_seq_length, truncation=True,
-                                    padding='max_length', return_tensors='pt')
-            input_ids = inputs.get('input_ids').squeeze(1).to(device)
-            attention_mask = inputs.get('attention_mask').squeeze(1).to(device)
-            token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
-
             # Compute sentences embeddings
             with torch.no_grad():
-                embeddings = self.get_sentence_embeddings(input_ids, attention_mask, token_type_ids)
+                embeddings = self.get_sentence_embeddings(
+                    **self.tokenizer(sentences_batch, max_length=self.max_seq_length,
+                                     padding=True, truncation=True, return_tensors='pt').to(device)
+                )
             embeddings = embeddings.detach().cpu()
             all_embeddings.extend(embeddings)
         all_embeddings = [all_embeddings[idx] for idx in np.argsort(length_sorted_idx)]
@@ -175,24 +189,24 @@ class SentenceModel:
         results = {}
 
         eval_dataloader = DataLoader(eval_dataset, batch_size=batch_size)
-        self.bert.to(device)
+        self.bert.to(self.device)
         self.bert.eval()
 
         batch_labels = []
         batch_preds = []
         for batch in tqdm(eval_dataloader, disable=False, desc="Running Evaluation"):
             source, target, labels = batch
-            labels = labels.to(device)
+            labels = labels.to(self.device)
             batch_labels.extend(labels.cpu().numpy())
             # source        [batch, 1, seq_len] -> [batch, seq_len]
-            source_input_ids = source.get('input_ids').squeeze(1).to(device)
-            source_attention_mask = source.get('attention_mask').squeeze(1).to(device)
-            source_token_type_ids = source.get('token_type_ids').squeeze(1).to(device)
+            source_input_ids = source.get('input_ids').squeeze(1).to(self.device)
+            source_attention_mask = source.get('attention_mask').squeeze(1).to(self.device)
+            source_token_type_ids = source.get('token_type_ids').squeeze(1).to(self.device)
 
             # target        [batch, 1, seq_len] -> [batch, seq_len]
-            target_input_ids = target.get('input_ids').squeeze(1).to(device)
-            target_attention_mask = target.get('attention_mask').squeeze(1).to(device)
-            target_token_type_ids = target.get('token_type_ids').squeeze(1).to(device)
+            target_input_ids = target.get('input_ids').squeeze(1).to(self.device)
+            target_attention_mask = target.get('attention_mask').squeeze(1).to(self.device)
+            target_token_type_ids = target.get('token_type_ids').squeeze(1).to(self.device)
 
             with torch.no_grad():
                 source_embeddings = self.get_sentence_embeddings(source_input_ids, source_attention_mask,

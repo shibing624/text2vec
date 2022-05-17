@@ -18,9 +18,10 @@ from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
 from text2vec.bertmatching_dataset import BertMatchingTestDataset, BertMatchingTrainDataset, \
     load_test_data, load_train_data, HFBertMatchingTrainDataset, HFBertMatchingTestDataset
-from text2vec.sentence_model import device
 from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr
 from text2vec.utils.stats_util import set_seed
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class BertMatchModule(nn.Module):
@@ -58,6 +59,7 @@ class BertMatchModel:
             max_seq_length: int = 128,
             num_classes: int = 2,
             encoder_type=None,
+
     ):
         """
         Initializes the base sentence model.

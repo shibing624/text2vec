@@ -15,7 +15,7 @@ from tqdm.auto import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
 from text2vec.cosent_dataset import CosentTrainDataset, load_cosent_train_data, HFCosentTrainDataset
-from text2vec.sentence_model import SentenceModel, device
+from text2vec.sentence_model import SentenceModel
 from text2vec.text_matching_dataset import TextMatchingTestDataset, load_test_data, HFTextMatchingTestDataset
 from text2vec.utils.stats_util import set_seed
 
@@ -26,6 +26,7 @@ class CosentModel(SentenceModel):
             model_name_or_path: str = "hfl/chinese-macbert-base",
             encoder_type: str = "FIRST_LAST_AVG",
             max_seq_length: int = 128,
+            device: str = None,
     ):
         """
         Initializes a CoSENT Model.
@@ -34,8 +35,9 @@ class CosentModel(SentenceModel):
             model_name_or_path: Default Transformer model name or path to a directory containing Transformer model file (pytorch_nodel.bin).
             encoder_type: Enum of type EncoderType.
             max_seq_length: The maximum total input sequence length after tokenization.
+            device: The device on which the model is allocated.
         """
-        super().__init__(model_name_or_path, encoder_type, max_seq_length)
+        super().__init__(model_name_or_path, encoder_type, max_seq_length, device)
 
     def __str__(self):
         return f"<CoSENTModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
@@ -136,7 +138,7 @@ class CosentModel(SentenceModel):
         y_pred = y_pred - (1 - y_true) * 1e12
         y_pred = y_pred.view(-1)
         # 这里加0是因为e^0 = 1相当于在log中加了1
-        y_pred = torch.cat((torch.tensor([0]).float().to(device), y_pred), dim=0)
+        y_pred = torch.cat((torch.tensor([0]).float().to(self.device), y_pred), dim=0)
         return torch.logsumexp(y_pred, dim=0)
 
     def train(
@@ -162,8 +164,8 @@ class CosentModel(SentenceModel):
         Utility function to be used by the train_model() method. Not intended to be used directly.
         """
         os.makedirs(output_dir, exist_ok=True)
-        logger.debug("Use pytorch device: {}".format(device))
-        self.bert.to(device)
+        logger.debug("Use device: {}".format(self.device))
+        self.bert.to(self.device)
         set_seed(seed)
 
         train_dataloader = DataLoader(train_dataset, shuffle=False, batch_size=batch_size)
@@ -233,11 +235,11 @@ class CosentModel(SentenceModel):
                     steps_trained_in_current_epoch -= 1
                     continue
                 inputs, labels = batch
-                labels = labels.to(device)
+                labels = labels.to(self.device)
                 # inputs        [batch, 1, seq_len] -> [batch, seq_len]
-                input_ids = inputs.get('input_ids').squeeze(1).to(device)
-                attention_mask = inputs.get('attention_mask').squeeze(1).to(device)
-                token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
+                input_ids = inputs.get('input_ids').squeeze(1).to(self.device)
+                attention_mask = inputs.get('attention_mask').squeeze(1).to(self.device)
+                token_type_ids = inputs.get('token_type_ids').squeeze(1).to(self.device)
                 output_embeddings = self.get_sentence_embeddings(input_ids, attention_mask, token_type_ids)
                 loss = self.calc_loss(labels, output_embeddings)
                 current_loss = loss.item()

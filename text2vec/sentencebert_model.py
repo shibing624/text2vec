@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
-from text2vec.sentence_model import SentenceModel, device
+from text2vec.sentence_model import SentenceModel
 from text2vec.text_matching_dataset import (
     TextMatchingTrainDataset,
     TextMatchingTestDataset,
@@ -34,6 +34,7 @@ class SentenceBertModel(SentenceModel):
             encoder_type: str = "MEAN",
             max_seq_length: int = 128,
             num_classes: int = 2,
+            device: str = None,
     ):
         """
         Initializes a SentenceBert Model.
@@ -43,9 +44,10 @@ class SentenceBertModel(SentenceModel):
             encoder_type: encoder type, set by model name
             max_seq_length: The maximum total input sequence length after tokenization.
             num_classes: Number of classes for classification.
+            device: CPU or GPU
         """
-        super().__init__(model_name_or_path, encoder_type, max_seq_length)
-        self.classifier = nn.Linear(self.bert.config.hidden_size * 3, num_classes).to(device)
+        super().__init__(model_name_or_path, encoder_type, max_seq_length, device)
+        self.classifier = nn.Linear(self.bert.config.hidden_size * 3, num_classes).to(self.device)
 
     def __str__(self):
         return f"<SentenceBertModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
@@ -172,8 +174,8 @@ class SentenceBertModel(SentenceModel):
         Utility function to be used by the train_model() method. Not intended to be used directly.
         """
         os.makedirs(output_dir, exist_ok=True)
-        logger.debug("Use pytorch device: {}".format(device))
-        self.bert.to(device)
+        logger.debug("Use pytorch device: {}".format(self.device))
+        self.bert.to(self.device)
         set_seed(seed)
 
         train_dataloader = DataLoader(train_dataset, shuffle=False, batch_size=batch_size)
@@ -244,14 +246,14 @@ class SentenceBertModel(SentenceModel):
                     continue
                 source, target, labels = batch
                 # source        [batch, 1, seq_len] -> [batch, seq_len]
-                source_input_ids = source.get('input_ids').squeeze(1).to(device)
-                source_attention_mask = source.get('attention_mask').squeeze(1).to(device)
-                source_token_type_ids = source.get('token_type_ids').squeeze(1).to(device)
+                source_input_ids = source.get('input_ids').squeeze(1).to(self.device)
+                source_attention_mask = source.get('attention_mask').squeeze(1).to(self.device)
+                source_token_type_ids = source.get('token_type_ids').squeeze(1).to(self.device)
                 # target        [batch, 1, seq_len] -> [batch, seq_len]
-                target_input_ids = target.get('input_ids').squeeze(1).to(device)
-                target_attention_mask = target.get('attention_mask').squeeze(1).to(device)
-                target_token_type_ids = target.get('token_type_ids').squeeze(1).to(device)
-                labels = labels.to(device)
+                target_input_ids = target.get('input_ids').squeeze(1).to(self.device)
+                target_attention_mask = target.get('attention_mask').squeeze(1).to(self.device)
+                target_token_type_ids = target.get('token_type_ids').squeeze(1).to(self.device)
+                labels = labels.to(self.device)
 
                 # get sentence embeddings of BERT encoder
                 source_embeddings = self.get_sentence_embeddings(source_input_ids, source_attention_mask,

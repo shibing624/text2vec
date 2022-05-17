@@ -12,11 +12,14 @@ from loguru import logger
 from numpy import ndarray
 from torch import Tensor
 
-from text2vec.sentence_model import SentenceModel, device, EncoderType
+from text2vec.sentence_model import SentenceModel, EncoderType
 from text2vec.utils.distance import cosine_distance
 from text2vec.utils.tokenizer import JiebaTokenizer
 from text2vec.word2vec import Word2Vec
 from text2vec.utils.get_file import deprecated
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 
 class SimilarityType(Enum):
     WMD = 0
