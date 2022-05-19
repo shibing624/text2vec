@@ -161,17 +161,20 @@ python examples/gradio_demo.py
 ```
 
 # Install
-```
+```shell
 pip install torch # conda install pytorch
 pip install -U text2vec
 ```
 
 or
 
-```
+```shell
+pip install torch # conda install pytorch
+pip install -r requirements.txt
+
 git clone https://github.com/shibing624/text2vec.git
 cd text2vec
-python setup.py install
+pip install --no-deps .
 ```
 
 ### 数据集
