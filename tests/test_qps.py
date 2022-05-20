@@ -14,6 +14,7 @@ from transformers import AutoTokenizer, AutoModel
 
 sys.path.append('..')
 from text2vec import Word2Vec, SentenceModel
+from sentence_transformers import SentenceTransformer
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -53,11 +54,49 @@ class TransformersEncoder:
         return sentence_embeddings
 
 
+class SentenceTransformersEncoder:
+    def __init__(self, model_name="shibing624/text2vec-base-chinese"):
+        self.model = SentenceTransformer(model_name)
+
+    def encode(self, sentences, convert_to_numpy=True):
+        sentence_embeddings = self.model.encode(sentences, convert_to_numpy)
+        return sentence_embeddings
+
+
 class QPSEncoderTestCase(unittest.TestCase):
     def test_cosent_speed(self):
         """测试cosent_speed"""
         logger.info("\n---- cosent:")
         model = SentenceModel('shibing624/text2vec-base-chinese')
+        logger.info(' convert_to_numpy=True:')
+        for j in range(repeat):
+            tmp = data * (2 ** j)
+            c_num_tokens = num_tokens * (2 ** j)
+            start_t = time.time()
+            r = model.encode(tmp, convert_to_numpy=True)
+            assert r is not None
+            if j == 0:
+                logger.info(f"result shape: {r.shape}, emb: {r[0][:10]}")
+            time_t = time.time() - start_t
+            logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
+                        (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
+        logger.info(' convert_to_numpy=False:')
+        for j in range(repeat):
+            tmp = data * (2 ** j)
+            c_num_tokens = num_tokens * (2 ** j)
+            start_t = time.time()
+            r = model.encode(tmp, convert_to_numpy=False)
+            assert r is not None
+            if j == 0:
+                logger.info(f"result shape: {r.shape}, emb: {r[0][:10]}")
+            time_t = time.time() - start_t
+            logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
+                        (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
+
+    def test_origin_transformers_speed(self):
+        """测试origin_transformers_speed"""
+        logger.info("\n---- origin transformers:")
+        model = TransformersEncoder('shibing624/text2vec-base-chinese')
         for j in range(repeat):
             tmp = data * (2 ** j)
             c_num_tokens = num_tokens * (2 ** j)
@@ -70,15 +109,28 @@ class QPSEncoderTestCase(unittest.TestCase):
             logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
                         (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
 
-    def test_origin_cosent_speed(self):
-        """测试origin_cosent_speed"""
-        logger.info("\n---- origin cosent:")
-        model = TransformersEncoder('shibing624/text2vec-base-chinese')
+    def test_origin_sentence_transformers_speed(self):
+        """测试origin_sentence_transformers_speed"""
+        logger.info("\n---- origin sentence_transformers:")
+        model = SentenceTransformersEncoder('shibing624/text2vec-base-chinese')
+        logger.info(' convert_to_numpy=True:')
         for j in range(repeat):
             tmp = data * (2 ** j)
             c_num_tokens = num_tokens * (2 ** j)
             start_t = time.time()
-            r = model.encode(tmp)
+            r = model.encode(tmp, convert_to_numpy=True)
+            assert r is not None
+            if j == 0:
+                logger.info(f"result shape: {r.shape}, emb: {r[0][:10]}")
+            time_t = time.time() - start_t
+            logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
+                        (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
+        logger.info(' convert_to_numpy=False:')
+        for j in range(repeat):
+            tmp = data * (2 ** j)
+            c_num_tokens = num_tokens * (2 ** j)
+            start_t = time.time()
+            r = model.encode(tmp, convert_to_numpy=False)
             assert r is not None
             if j == 0:
                 logger.info(f"result shape: {r.shape}, emb: {r[0][:10]}")

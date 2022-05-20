@@ -127,16 +127,18 @@ class SentenceModel:
     def encode(
             self,
             sentences: Union[str, List[str]],
-            batch_size: int = 32,
+            batch_size: int = 64,
             show_progress_bar: bool = False,
+            convert_to_numpy: bool = True,
             device: str = None,
-    ):
+        ):
         """
         Returns the embeddings for a batch of sentences.
 
         :param sentences: str/list, Input sentences
         :param batch_size: int, Batch size
         :param show_progress_bar: bool, Whether to show a progress bar for the sentences
+        :param convert_to_numpy: bool, Whether to convert the output to numpy, instead of a pytorch tensor
         :param device: Which torch.device to use for the computation
         """
         self.bert.eval()
@@ -158,10 +160,15 @@ class SentenceModel:
                     **self.tokenizer(sentences_batch, max_length=self.max_seq_length,
                                      padding=True, truncation=True, return_tensors='pt').to(device)
                 )
-            embeddings = embeddings.detach().cpu()
+            embeddings = embeddings.detach()
+            if convert_to_numpy:
+                embeddings = embeddings.cpu()
             all_embeddings.extend(embeddings)
         all_embeddings = [all_embeddings[idx] for idx in np.argsort(length_sorted_idx)]
-        all_embeddings = np.asarray([emb.numpy() for emb in all_embeddings])
+        if convert_to_numpy:
+            all_embeddings = np.asarray([emb.numpy() for emb in all_embeddings])
+        else:
+            all_embeddings = torch.stack(all_embeddings)
         if input_is_string:
             all_embeddings = all_embeddings[0]
 
