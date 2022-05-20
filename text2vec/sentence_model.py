@@ -130,6 +130,7 @@ class SentenceModel:
             batch_size: int = 64,
             show_progress_bar: bool = False,
             convert_to_numpy: bool = True,
+            convert_to_tensor: bool = False,
             device: str = None,
         ):
         """
@@ -138,12 +139,15 @@ class SentenceModel:
         :param sentences: str/list, Input sentences
         :param batch_size: int, Batch size
         :param show_progress_bar: bool, Whether to show a progress bar for the sentences
-        :param convert_to_numpy: bool, Whether to convert the output to numpy, instead of a pytorch tensor
+        :param convert_to_numpy: If true, the output is a list of numpy vectors. Else, it is a list of pytorch tensors.
+        :param convert_to_tensor: If true, you get one large tensor as return. Overwrites any setting from convert_to_numpy
         :param device: Which torch.device to use for the computation
         """
         self.bert.eval()
         if device is None:
             device = self.device
+        if convert_to_tensor:
+            convert_to_numpy = False
         input_is_string = False
         if isinstance(sentences, str) or not hasattr(sentences, "__len__"):
             sentences = [sentences]
@@ -165,10 +169,11 @@ class SentenceModel:
                 embeddings = embeddings.cpu()
             all_embeddings.extend(embeddings)
         all_embeddings = [all_embeddings[idx] for idx in np.argsort(length_sorted_idx)]
-        if convert_to_numpy:
-            all_embeddings = np.asarray([emb.numpy() for emb in all_embeddings])
-        else:
+        if convert_to_tensor:
             all_embeddings = torch.stack(all_embeddings)
+        elif convert_to_numpy:
+            all_embeddings = np.asarray([emb.numpy() for emb in all_embeddings])
+
         if input_is_string:
             all_embeddings = all_embeddings[0]
 

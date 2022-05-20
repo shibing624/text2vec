@@ -88,7 +88,7 @@ class QPSEncoderTestCase(unittest.TestCase):
             r = model.encode(tmp, convert_to_numpy=False)
             assert r is not None
             if j == 0:
-                logger.info(f"result shape: {r.shape}, emb: {r[0][:10]}")
+                logger.info(f"result shape: {len(r)}, emb: {r[0][:10]}")
             time_t = time.time() - start_t
             logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
                         (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
@@ -134,7 +134,7 @@ class QPSEncoderTestCase(unittest.TestCase):
             r = model.encode(tmp, convert_to_numpy=False)
             assert r is not None
             if j == 0:
-                logger.info(f"result shape: {r.shape}, emb: {r[0][:10]}")
+                logger.info(f"result shape: {len(r)}, emb: {r[0][:10]}")
             time_t = time.time() - start_t
             logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
                         (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
