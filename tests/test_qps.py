@@ -59,7 +59,7 @@ class SentenceTransformersEncoder:
         self.model = SentenceTransformer(model_name)
 
     def encode(self, sentences, convert_to_numpy=True):
-        sentence_embeddings = self.model.encode(sentences, convert_to_numpy)
+        sentence_embeddings = self.model.encode(sentences, convert_to_numpy=convert_to_numpy)
         return sentence_embeddings
 
 
@@ -125,6 +125,7 @@ class QPSEncoderTestCase(unittest.TestCase):
             time_t = time.time() - start_t
             logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
                         (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
+
         logger.info(' convert_to_numpy=False:')
         for j in range(repeat):
             tmp = data * (2 ** j)
