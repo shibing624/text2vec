@@ -25,6 +25,8 @@ data = ['如何更换花呗绑定银行卡',
         '花呗更改绑定银行卡']
 print("data:", data)
 num_tokens = sum([len(i) for i in data])
+use_cuda = torch.cuda.is_available()
+repeat = 10 if use_cuda else 1
 
 
 class TransformersEncoder:
@@ -56,13 +58,14 @@ class QPSEncoderTestCase(unittest.TestCase):
         """测试cosent_speed"""
         logger.info("\n---- cosent:")
         model = SentenceModel('shibing624/text2vec-base-chinese')
-        for j in range(10):
+        for j in range(repeat):
             tmp = data * (2 ** j)
             c_num_tokens = num_tokens * (2 ** j)
             start_t = time.time()
             r = model.encode(tmp)
             assert r is not None
-            print('result shape', r.shape)
+            if j == 0:
+                logger.info(f"result shape: {r.shape}, emb: {r[0][:10]}")
             time_t = time.time() - start_t
             logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
                         (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
@@ -71,15 +74,15 @@ class QPSEncoderTestCase(unittest.TestCase):
         """测试origin_cosent_speed"""
         logger.info("\n---- origin cosent:")
         model = TransformersEncoder('shibing624/text2vec-base-chinese')
-        for j in range(10):
+        for j in range(repeat):
             tmp = data * (2 ** j)
             c_num_tokens = num_tokens * (2 ** j)
             start_t = time.time()
             r = model.encode(tmp)
             assert r is not None
-            print('result shape', r.shape)
+            if j == 0:
+                logger.info(f"result shape: {r.shape}, emb: {r[0][:10]}")
             time_t = time.time() - start_t
-            logger.info("----\ncosent:")
             logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
                         (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
 
@@ -87,13 +90,14 @@ class QPSEncoderTestCase(unittest.TestCase):
         """测试sbert_speed"""
         logger.info("\n---- sbert:")
         model = SentenceModel('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
-        for j in range(10):
+        for j in range(repeat):
             tmp = data * (2 ** j)
             c_num_tokens = num_tokens * (2 ** j)
             start_t = time.time()
             r = model.encode(tmp)
             assert r is not None
-            print('result shape', r.shape)
+            if j == 0:
+                logger.info(f"result shape: {r.shape}, emb: {r[0][:10]}")
             time_t = time.time() - start_t
             logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
                         (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
@@ -102,13 +106,14 @@ class QPSEncoderTestCase(unittest.TestCase):
         """测试w2v_speed"""
         logger.info("\n---- w2v:")
         model = Word2Vec()
-        for j in range(10):
+        for j in range(repeat):
             tmp = data * (2 ** j)
             c_num_tokens = num_tokens * (2 ** j)
             start_t = time.time()
             r = model.encode(tmp)
             assert r is not None
-            print('result shape', r.shape)
+            if j == 0:
+                logger.info(f"result shape: {r.shape}, emb: {r[0][:10]}")
             time_t = time.time() - start_t
             logger.info('encoding %d sentences, spend %.2fs, %4d samples/s, %6d tokens/s' %
                         (len(tmp), time_t, int(len(tmp) / time_t), int(c_num_tokens / time_t)))
