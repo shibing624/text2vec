@@ -663,7 +663,7 @@ Training and inference:
 提供两种部署模型，搭建服务的方法： 1）基于Jina搭建gRPC服务【推荐】；2）基于FastAPI搭建原生Http服务。
 
 ### Jina服务
-采用C/S模式搭建高性能服务，支持docker云原生，gRPC，多个模型同时预测，GPU多卡处理。
+采用C/S模式搭建高性能服务，支持docker云原生，gRPC/HTTP/WebSocket，支持多个模型同时预测，GPU多卡处理。
 
 - 安装：
 ```pip install jina```
@@ -685,9 +685,11 @@ with f:
     f.block()
 ```
 
+该模型预测方法（executor）已经上传到Jina Hub：https://hub.jina.ai/executor/eq45c9uq，里面包括docker、k8s部署方法。
+
 - 调用服务：
 
-example: [examples/jina_client_demo.py](examples/jina_client_demo.py)
+
 ```python
 from jina import Client
 from docarray import Document, DocumentArray
@@ -704,7 +706,10 @@ r = c.post('/', inputs=DocumentArray([Document(text='如何更换花呗绑定银
 print(r.embeddings)
 ```
 
-#### FastAPI服务
+批量调用方法见example: [examples/jina_client_demo.py](examples/jina_client_demo.py)
+
+
+### FastAPI服务
 
 - 安装：
 ```pip install fastapi uvicorn```
