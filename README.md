@@ -685,7 +685,7 @@ with f:
     f.block()
 ```
 
-该模型预测方法（executor）已经上传到Jina Hub：https://hub.jina.ai/executor/eq45c9uq，里面包括docker、k8s部署方法。
+该模型预测方法（executor）已经上传到[JinaHub](https://hub.jina.ai/executor/eq45c9uq)，里面包括docker、k8s部署方法。
 
 - 调用服务：
 
