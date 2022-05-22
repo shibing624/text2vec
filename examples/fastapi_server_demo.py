@@ -18,7 +18,7 @@ from text2vec import SentenceModel
 pwd_path = os.path.abspath(os.path.dirname(__file__))
 use_cuda = torch.cuda.is_available()
 logger.info(f'use_cuda:{use_cuda}')
-# Use finetuned model
+# Use fine-tuned model
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_name_or_path", type=str, default="shibing624/text2vec-base-chinese",
                     help="Model save dir or model name")

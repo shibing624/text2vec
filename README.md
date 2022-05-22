@@ -658,6 +658,71 @@ Training and inference:
 1. 模型降维，参考[dimensionality_reduction.py](https://github.com/UKPLab/sentence-transformers/blob/master/examples/training/distillation/dimensionality_reduction.py)使用PCA对模型输出embedding降维，可减少milvus等向量检索数据库的存储压力，还能轻微提升模型效果。
 2. 模型蒸馏，参考[model_distillation.py](https://github.com/UKPLab/sentence-transformers/blob/master/examples/training/distillation/model_distillation.py)使用蒸馏方法，将Teacher大模型蒸馏到更少layers层数的student模型中，在权衡效果的情况下，可大幅提升模型预测速度。
 
+## 模型部署
+
+提供两种部署模型，搭建服务的方法： 1）基于Jina搭建gRPC服务【推荐】；2）基于FastAPI搭建原生Http服务。
+
+### Jina服务
+采用C/S模式搭建高性能服务，支持docker云原生，gRPC，多个模型同时预测，GPU多卡处理。
+
+- 安装：
+```pip install jina```
+
+- 启动服务：
+
+example: [examples/jina_server_demo.py](examples/jina_server_demo.py)
+```python
+from jina import Flow
+
+port = 50001
+f = Flow(port=port).add(
+    uses='jinahub://Text2vecEncoder',
+    uses_with={'model_name': 'shibing624/text2vec-base-chinese'}
+)
+
+with f:
+    # backend server forever
+    f.block()
+```
+
+- 调用服务：
+
+example: [examples/jina_client_demo.py](examples/jina_client_demo.py)
+```python
+from jina import Client
+from docarray import Document, DocumentArray
+
+port = 50001
+
+c = Client(port=port)
+
+data = ['如何更换花呗绑定银行卡',
+        '花呗更改绑定银行卡']
+print("data:", data)
+print('data embs:')
+r = c.post('/', inputs=DocumentArray([Document(text='如何更换花呗绑定银行卡'), Document(text='花呗更改绑定银行卡')]))
+print(r.embeddings)
+```
+
+#### FastAPI服务
+
+- 安装：
+```pip install fastapi uvicorn```
+
+- 启动服务：
+
+example: [examples/fastapi_server_demo.py](examples/fastapi_server_demo.py)
+```shell
+cd examples
+python fastapi_server_demo.py
+```
+
+- 调用服务：
+```shell
+curl -X 'GET' \
+  'http://0.0.0.0:8001/emb?q=hello' \
+  -H 'accept: application/json'
+```
 
 # Contact
 
