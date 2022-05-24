@@ -52,6 +52,14 @@ class SBERTEmbeddingsTestCase(unittest.TestCase):
         r = use_transformers()
         print(r.shape)
 
+    def test_sbert_encode_text(self):
+        """测试test_sbert_encode_text"""
+        a = '如何更换花呗绑定银行卡'
+        m = SentenceModel('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+        emb = m.encode(a)
+        print(a)
+        self.assertEqual(emb.shape, (384,))
+
 
 if __name__ == '__main__':
     unittest.main()
