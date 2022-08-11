@@ -121,7 +121,7 @@ class CosentModel(SentenceModel):
 
     def calc_loss(self, y_true, y_pred):
         """
-        CoSENT的排序loss，refer：https://kexue.fm/archives/8847
+        矩阵计算batch内的cos loss
         """
         # 1. 取出真实的标签
         y_true = y_true[::2]  # tensor([1, 0, 1]) 真实的标签

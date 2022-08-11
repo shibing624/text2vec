@@ -750,11 +750,13 @@ Xu, M. Text2vec: Text to vector toolkit (Version 1.1.2) [Computer software]. htt
 
 BibTeX:
 ```latex
-@software{Xu_Text2vec_Text_to,
-author = {Xu, Ming},
-title = {{Text2vec: Text to vector toolkit}},
-url = {https://github.com/shibing624/text2vec},
-version = {1.1.2}
+@misc{Text2vec,
+  author = {Xu, Ming},
+  title = {Text2vec: Text to vector toolkit},
+  year = {2022},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/shibing624/text2vec}},
 }
 ```
 
