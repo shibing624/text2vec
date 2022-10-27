@@ -148,7 +148,7 @@ Cross-Encoder适用于向量检索精排。
 
 # Demo
 
-Official Demo: http://42.193.145.218/product/short_text_sim/
+Official Demo: https://www.mulanai.com/product/short_text_sim/
 
 HuggingFace Demo: https://huggingface.co/spaces/shibing624/text2vec
 
