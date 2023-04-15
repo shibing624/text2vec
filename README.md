@@ -16,8 +16,6 @@ text2vec, Text to Vector.
 
 
 **Guide**
-- [Question](#Question)
-- [Solution](#Solution)
 - [Feature](#Feature)
 - [Evaluation](#Evaluation)
 - [Install](#install)
@@ -25,70 +23,6 @@ text2vec, Text to Vector.
 - [Contact](#Contact)
 - [Reference](#reference)
 
-# Question
-文本向量表示咋做？文本匹配任务用哪个模型效果好？
-
-许多NLP任务的成功离不开训练优质有效的文本表示向量。特别是文本语义匹配（Semantic Textual Similarity，如paraphrase检测、QA的问题对匹配）、文本向量检索（Dense Text Retrieval）等任务。
-# Solution
-### 传统方法：基于特征的匹配
-
-- 基于TF-IDF、BM25、Jaccord、SimHash、LDA等算法抽取两个文本的词汇、主题等层面的特征，然后使用机器学习模型（LR, xgboost）训练分类模型
-- 优点：可解释性较好
-- 缺点：依赖人工寻找特征，泛化能力一般，而且由于特征数量的限制，模型的效果比较一般
-
-代表模型：
-- BM25
-
-BM25算法，通过候选句子的字段对qurey字段的覆盖程度来计算两者间的匹配得分，得分越高的候选项与query的匹配度更好，主要解决词汇层面的相似度问题。
-
-### 深度方法：基于表征的匹配
-- 基于表征的匹配方式，初始阶段对两个文本各自单独处理，通过深层的神经网络进行编码（encode），得到文本的表征（embedding），再对两个表征进行相似度计算的函数得到两个文本的相似度
-- 优点：基于BERT的模型通过有监督的Fine-tune在文本表征和文本匹配任务取得了不错的性能
-- 缺点：BERT自身导出的句向量（不经过Fine-tune，对所有词向量求平均）质量较低，甚至比不上Glove的结果，因而难以反映出两个句子的语义相似度
-
-> 主要原因是：
-> 
-> 1.BERT对所有的句子都倾向于编码到一个较小的空间区域内，这使得大多数的句子对都具有较高的相似度分数，即使是那些语义上完全无关的句子对。
-> 
-> 2.BERT句向量表示的聚集现象和句子中的高频词有关。具体来说，当通过平均词向量的方式计算句向量时，那些高频词的词向量将会主导句向量，使之难以体现其原本的语义。当计算句向量时去除若干高频词时，聚集现象可以在一定程度上得到缓解，但表征能力会下降。
-
-
-代表模型：
-
-- [DSSM(2013)](https://posenhuang.github.io/papers/cikm2013_DSSM_fullversion.pdf)
-- [CDSSM(2014)](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/www2014_cdssm_p07.pdf)
-- [ARC I(2014)](https://arxiv.org/pdf/1503.03244.pdf)
-- [Siamese Network(2016)](https://www.aclweb.org/anthology/W16-1617.pdf)
-- [InferSent(2017)](https://arxiv.org/pdf/1705.02364.pdf)
-- [BERT(2018)](https://arxiv.org/pdf/1810.04805.pdf)
-- [Sentence-BERT(2019)](https://arxiv.org/abs/1908.10084)
-- [BERT-flow(2020)](https://arxiv.org/abs/2011.05864)
-- [SimCSE(2021)](https://arxiv.org/abs/2104.08821)
-- [ConSERT(2021)](https://aclanthology.org/2021.acl-long.393/)
-- [CoSENT(2022)](https://kexue.fm/archives/8847)
-
-由于2018年BERT模型在NLP界带来了翻天覆地的变化，此处不讨论和比较2018年之前的模型（如果有兴趣了解的同学，可以参考中科院开源的[MatchZoo](https://github.com/NTMC-Community/MatchZoo) 和[MatchZoo-py](https://github.com/NTMC-Community/MatchZoo-py)）。
-
-所以，本项目主要调研以下比原生BERT更优、适合文本匹配的向量表示模型：Sentence-BERT(2019)、BERT-flow(2020)、SimCSE(2021)、CoSENT(2022)。
-
-### 深度方法：基于交互的匹配
-
-- 基于交互的匹配方式，则认为在最后阶段才计算文本的相似度会过于依赖文本表征的质量，同时也会丢失基础的文本特征（比如词法、句法等），所以提出尽可能早的对文本特征进行交互，捕获更基础的特征，最后在高层基于这些基础匹配特征计算匹配分数
-- 优点：基于交互的匹配模型端到端处理，效果好
-- 缺点：这类模型（Cross-Encoder）的输入要求是两个句子，输出的是句子对的相似度值，模型不会产生句子向量表示（sentence embedding），我们也无法把单个句子输入给模型。因此，对于需要文本向量表示的任务来说，这类模型并不实用
-
-
-代表模型：
-
-- [ARC II(2014)](https://arxiv.org/pdf/1503.03244.pdf)
-- [MV-LSTM(2015)](https://arxiv.org/pdf/1511.08277.pdf)
-- [MatchPyramid(2016)](https://arxiv.org/pdf/1602.06359.pdf)
-- [DRMM(2016)](https://www.bigdatalab.ac.cn/~gjf/papers/2016/CIKM2016a_guo.pdf)
-- [Conv-KNRM(2018)](https://www.cs.cmu.edu/~zhuyund/papers/WSDM_2018_Dai.pdf)
-- [RE2(2019)](https://www.aclweb.org/anthology/P19-1465.pdf)
-- [Keyword-BERT(2020)](https://arxiv.org/ftp/arxiv/papers/2003/2003.11516.pdf)
-
-Cross-Encoder适用于向量检索精排。
 
 # Feature
 ### 文本向量表示模型
@@ -177,46 +111,6 @@ cd text2vec
 pip install --no-deps .
 ```
 
-### 数据集
-中文语义匹配数据集已经上传到huggingface datasets [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh)
-
-数据集使用示例：
-```shell
-pip install datasets
-```
-
-```python
-from datasets import load_dataset
-
-dataset = load_dataset("shibing624/nli_zh", "STS-B") # ATEC or BQ or LCQMC or PAWSX or STS-B
-print(dataset)
-print(dataset['test'][0])
-```
-
-output:
-```shell
-DatasetDict({
-    train: Dataset({
-        features: ['sentence1', 'sentence2', 'label'],
-        num_rows: 5231
-    })
-    validation: Dataset({
-        features: ['sentence1', 'sentence2', 'label'],
-        num_rows: 1458
-    })
-    test: Dataset({
-        features: ['sentence1', 'sentence2', 'label'],
-        num_rows: 1361
-    })
-})
-{'sentence1': '一个女孩在给她的头发做发型。', 'sentence2': '一个女孩在梳头。', 'label': 2}
-```
-
-常见中文语义匹配数据集，包含[ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)、[BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)、
-[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)、[PAWSX](https://arxiv.org/abs/1908.11828)、[STS-B](https://github.com/pluto-junzeng/CNSD)共5个任务。
-可以从数据集对应的链接自行下载，也可以从[百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ)下载。
-其中senteval_cn目录是评测数据集汇总，senteval_cn.zip是senteval目录的打包，两者下其一就好。
-
 # Usage
 
 ## 文本向量表征
@@ -236,7 +130,7 @@ example: [examples/computing_embeddings_demo.py](examples/computing_embeddings_d
 import sys
 
 sys.path.append('..')
-from text2vec import SentenceModel, EncoderType
+from text2vec import SentenceModel
 from text2vec import Word2Vec
 
 
@@ -264,13 +158,11 @@ def compute_emb(model):
 
 if __name__ == "__main__":
     # 中文句向量模型(CoSENT)，中文语义匹配任务推荐，支持fine-tune继续训练
-    t2v_model = SentenceModel("shibing624/text2vec-base-chinese",
-                              encoder_type=EncoderType.FIRST_LAST_AVG)
+    t2v_model = SentenceModel("shibing624/text2vec-base-chinese")
     compute_emb(t2v_model)
 
     # 支持多语言的句向量模型（Sentence-BERT），英文语义匹配任务推荐，支持fine-tune继续训练
-    sbert_model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-                                encoder_type=EncoderType.MEAN)
+    sbert_model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     compute_emb(sbert_model)
 
     # 中文词向量模型(word2vec)，中文字面匹配任务和冷启动适用
@@ -290,7 +182,7 @@ Embedding shape: (768,)
  ... 
 ```
 
-- 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentences_size, model_embedding_size)`
+- 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentences_size, model_embedding_size)`，三个模型任选一种即可，推荐用第一个。
 - `shibing624/text2vec-base-chinese`模型是CoSENT方法在中文STS-B数据集训练得到的，模型已经上传到huggingface的
 模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，
 是`text2vec.SentenceModel`指定的默认模型，可以通过上面示例调用，或者如下所示用[transformers库](https://github.com/huggingface/transformers)调用，
@@ -541,16 +433,7 @@ Inference:
 <img src="docs/inference.png" width="300" />
 
 #### CoSENT 监督模型
-训练和预测，最简示例:
-
-```python
-from text2vec import CosentModel
-m = CosentModel("bert-base-chinese")
-print(m)
-m.train_model(use_hf_dataset=True, num_epochs=1, output_dir="./temp")
-r = m.encode(["我爱北京天安门"])
-print(r)
-```
+训练和预测CoSENT模型：
 
 - 在中文STS-B数据集训练和评估`MacBERT+CoSENT`模型
 
@@ -576,7 +459,7 @@ example: [examples/training_sup_text_matching_model_selfdata.py](examples/traini
 python training_sup_text_matching_model_selfdata.py --do_train --do_predict
 ```
 
-- 在英文STS-B数据集训练和评估`BERT+CoSENT`模型
+- 在英文STS-B数据集训练和评估`CoSENT`模型
 
 example: [examples/training_sup_text_matching_model_en.py](examples/training_sup_text_matching_model_en.py)
 
@@ -586,7 +469,7 @@ python training_sup_text_matching_model_en.py --model_arch cosent --do_train --d
 ```
 
 #### CoSENT 无监督模型
-- 在英文NLI数据集训练`BERT+CoSENT`模型，在STS-B测试集评估效果
+- 在英文NLI数据集训练`CoSENT`模型，在STS-B测试集评估效果
 
 example: [examples/training_unsup_text_matching_model_en.py](examples/training_unsup_text_matching_model_en.py)
 
@@ -612,7 +495,7 @@ Inference:
 <img src="docs/sbert_inference.png" width="300" />
 
 #### SentenceBERT 监督模型
-- 在中文STS-B数据集训练和评估`MacBERT+SBERT`模型
+- 在中文STS-B数据集训练和评估`SBERT`模型
 
 example: [examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)
 
@@ -620,7 +503,7 @@ example: [examples/training_sup_text_matching_model.py](examples/training_sup_te
 cd examples
 python training_sup_text_matching_model.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-sbert
 ```
-- 在英文STS-B数据集训练和评估`BERT+SBERT`模型
+- 在英文STS-B数据集训练和评估`SBERT`模型
 
 example: [examples/training_sup_text_matching_model_en.py](examples/training_sup_text_matching_model_en.py)
 
@@ -630,7 +513,7 @@ python training_sup_text_matching_model_en.py --model_arch sentencebert --do_tra
 ```
 
 #### SentenceBERT 无监督模型
-- 在英文NLI数据集训练`BERT+SBERT`模型，在STS-B测试集评估效果
+- 在英文NLI数据集训练`SBERT`模型，在STS-B测试集评估效果
 
 example: [examples/training_unsup_text_matching_model_en.py](examples/training_unsup_text_matching_model_en.py)
 
@@ -728,6 +611,119 @@ curl -X 'GET' \
   'http://0.0.0.0:8001/emb?q=hello' \
   -H 'accept: application/json'
 ```
+
+
+## 数据集
+中文语义匹配数据集已经上传到huggingface datasets [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh)
+
+数据集使用示例：
+```shell
+pip install datasets
+```
+
+```python
+from datasets import load_dataset
+
+dataset = load_dataset("shibing624/nli_zh", "STS-B") # ATEC or BQ or LCQMC or PAWSX or STS-B
+print(dataset)
+print(dataset['test'][0])
+```
+
+output:
+```shell
+DatasetDict({
+    train: Dataset({
+        features: ['sentence1', 'sentence2', 'label'],
+        num_rows: 5231
+    })
+    validation: Dataset({
+        features: ['sentence1', 'sentence2', 'label'],
+        num_rows: 1458
+    })
+    test: Dataset({
+        features: ['sentence1', 'sentence2', 'label'],
+        num_rows: 1361
+    })
+})
+{'sentence1': '一个女孩在给她的头发做发型。', 'sentence2': '一个女孩在梳头。', 'label': 2}
+```
+
+常见中文语义匹配数据集，包含[ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)、[BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)、
+[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)、[PAWSX](https://arxiv.org/abs/1908.11828)、[STS-B](https://github.com/pluto-junzeng/CNSD)共5个任务。
+可以从数据集对应的链接自行下载，也可以从[百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ)下载。
+其中senteval_cn目录是评测数据集汇总，senteval_cn.zip是senteval目录的打包，两者下其一就好。
+
+<details>
+<summary>文本向量方法介绍</summary>
+
+# Question
+文本向量表示咋做？文本匹配任务用哪个模型效果好？
+
+许多NLP任务的成功离不开训练优质有效的文本表示向量。特别是文本语义匹配（Semantic Textual Similarity，如paraphrase检测、QA的问题对匹配）、文本向量检索（Dense Text Retrieval）等任务。
+# Solution
+### 传统方法：基于特征的匹配
+
+- 基于TF-IDF、BM25、Jaccord、SimHash、LDA等算法抽取两个文本的词汇、主题等层面的特征，然后使用机器学习模型（LR, xgboost）训练分类模型
+- 优点：可解释性较好
+- 缺点：依赖人工寻找特征，泛化能力一般，而且由于特征数量的限制，模型的效果比较一般
+
+代表模型：
+- BM25
+
+BM25算法，通过候选句子的字段对qurey字段的覆盖程度来计算两者间的匹配得分，得分越高的候选项与query的匹配度更好，主要解决词汇层面的相似度问题。
+
+### 深度方法：基于表征的匹配
+- 基于表征的匹配方式，初始阶段对两个文本各自单独处理，通过深层的神经网络进行编码（encode），得到文本的表征（embedding），再对两个表征进行相似度计算的函数得到两个文本的相似度
+- 优点：基于BERT的模型通过有监督的Fine-tune在文本表征和文本匹配任务取得了不错的性能
+- 缺点：BERT自身导出的句向量（不经过Fine-tune，对所有词向量求平均）质量较低，甚至比不上Glove的结果，因而难以反映出两个句子的语义相似度
+
+> 主要原因是：
+> 
+> 1.BERT对所有的句子都倾向于编码到一个较小的空间区域内，这使得大多数的句子对都具有较高的相似度分数，即使是那些语义上完全无关的句子对。
+> 
+> 2.BERT句向量表示的聚集现象和句子中的高频词有关。具体来说，当通过平均词向量的方式计算句向量时，那些高频词的词向量将会主导句向量，使之难以体现其原本的语义。当计算句向量时去除若干高频词时，聚集现象可以在一定程度上得到缓解，但表征能力会下降。
+
+
+代表模型：
+
+- [DSSM(2013)](https://posenhuang.github.io/papers/cikm2013_DSSM_fullversion.pdf)
+- [CDSSM(2014)](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/www2014_cdssm_p07.pdf)
+- [ARC I(2014)](https://arxiv.org/pdf/1503.03244.pdf)
+- [Siamese Network(2016)](https://www.aclweb.org/anthology/W16-1617.pdf)
+- [InferSent(2017)](https://arxiv.org/pdf/1705.02364.pdf)
+- [BERT(2018)](https://arxiv.org/pdf/1810.04805.pdf)
+- [Sentence-BERT(2019)](https://arxiv.org/abs/1908.10084)
+- [BERT-flow(2020)](https://arxiv.org/abs/2011.05864)
+- [SimCSE(2021)](https://arxiv.org/abs/2104.08821)
+- [ConSERT(2021)](https://aclanthology.org/2021.acl-long.393/)
+- [CoSENT(2022)](https://kexue.fm/archives/8847)
+
+由于2018年BERT模型在NLP界带来了翻天覆地的变化，此处不讨论和比较2018年之前的模型（如果有兴趣了解的同学，可以参考中科院开源的[MatchZoo](https://github.com/NTMC-Community/MatchZoo) 和[MatchZoo-py](https://github.com/NTMC-Community/MatchZoo-py)）。
+
+所以，本项目主要调研以下比原生BERT更优、适合文本匹配的向量表示模型：Sentence-BERT(2019)、BERT-flow(2020)、SimCSE(2021)、CoSENT(2022)。
+
+### 深度方法：基于交互的匹配
+
+- 基于交互的匹配方式，则认为在最后阶段才计算文本的相似度会过于依赖文本表征的质量，同时也会丢失基础的文本特征（比如词法、句法等），所以提出尽可能早的对文本特征进行交互，捕获更基础的特征，最后在高层基于这些基础匹配特征计算匹配分数
+- 优点：基于交互的匹配模型端到端处理，效果好
+- 缺点：这类模型（Cross-Encoder）的输入要求是两个句子，输出的是句子对的相似度值，模型不会产生句子向量表示（sentence embedding），我们也无法把单个句子输入给模型。因此，对于需要文本向量表示的任务来说，这类模型并不实用
+
+
+代表模型：
+
+- [ARC II(2014)](https://arxiv.org/pdf/1503.03244.pdf)
+- [MV-LSTM(2015)](https://arxiv.org/pdf/1511.08277.pdf)
+- [MatchPyramid(2016)](https://arxiv.org/pdf/1602.06359.pdf)
+- [DRMM(2016)](https://www.bigdatalab.ac.cn/~gjf/papers/2016/CIKM2016a_guo.pdf)
+- [Conv-KNRM(2018)](https://www.cs.cmu.edu/~zhuyund/papers/WSDM_2018_Dai.pdf)
+- [RE2(2019)](https://www.aclweb.org/anthology/P19-1465.pdf)
+- [Keyword-BERT(2020)](https://arxiv.org/ftp/arxiv/papers/2003/2003.11516.pdf)
+
+Cross-Encoder适用于向量检索精排。
+
+</details>
+
+
 
 # Contact
 

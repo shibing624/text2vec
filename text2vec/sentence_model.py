@@ -2,7 +2,7 @@
 """
 @author:XuMing(xuming624@qq.com)
 @description: Base sentence model function, add encode function.
-Parts of this file is adapted from the sentence-transformers library at https://github.com/UKPLab/sentence-transformers.
+Parts of this file is adapted from the sentence-transformers: https://github.com/UKPLab/sentence-transformers
 """
 import os
 from enum import Enum
