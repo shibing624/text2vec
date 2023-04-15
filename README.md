@@ -117,7 +117,7 @@ pip install --no-deps .
 
 基于`pretrained model`计算文本向量：
 
-```shell
+```zsh
 >>> from text2vec import SentenceModel
 >>> m = SentenceModel()
 >>> m.encode("如何更换花呗绑定银行卡")
@@ -435,7 +435,7 @@ Inference:
 #### CoSENT 监督模型
 训练和预测CoSENT模型：
 
-- 在中文STS-B数据集训练和评估`MacBERT+CoSENT`模型
+- 在中文STS-B数据集训练和评估`CoSENT`模型
 
 example: [examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)
 
@@ -444,7 +444,7 @@ cd examples
 python training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-cosent
 ```
 
-- 在蚂蚁金融匹配数据集ATEC上训练和评估`MacBERT+CoSENT`模型
+- 在蚂蚁金融匹配数据集ATEC上训练和评估`CoSENT`模型
 
 支持这些中文匹配数据集的使用：'ATEC', 'STS-B', 'BQ', 'LCQMC', 'PAWSX'，具体参考HuggingFace datasets [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh)
 ```shell
