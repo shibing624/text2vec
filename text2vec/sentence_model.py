@@ -141,7 +141,7 @@ class SentenceModel:
         :param show_progress_bar: bool, Whether to show a progress bar for the sentences
         :param convert_to_numpy: If true, the output is a list of numpy vectors. Else, it is a list of pytorch tensors.
         :param convert_to_tensor: If true, you get one large tensor as return. Overwrites any setting from convert_to_numpy
-        :param device: Which torch.device to use for the computation
+        :param device: Which device to use for the computation
         """
         self.bert.eval()
         if device is None:
