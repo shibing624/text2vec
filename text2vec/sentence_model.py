@@ -77,7 +77,7 @@ class SentenceModel:
 
     def __str__(self):
         return f"<SentenceModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
-               f"max_seq_length: {self.max_seq_length}>"
+               f"max_seq_length: {self.max_seq_length}, emb_dim: {self.get_sentence_embedding_dimension()}>"
 
     def get_sentence_embedding_dimension(self):
         """

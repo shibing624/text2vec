@@ -38,6 +38,7 @@ def compute_emb(model):
 if __name__ == "__main__":
     # 中文句向量模型(CoSENT)，中文语义匹配任务推荐，支持fine-tune继续训练
     t2v_model = SentenceModel("shibing624/text2vec-base-chinese")
+    print(t2v_model)
     compute_emb(t2v_model)
 
     # 支持多语言的句向量模型（Sentence-BERT），英文语义匹配任务推荐，支持fine-tune继续训练
