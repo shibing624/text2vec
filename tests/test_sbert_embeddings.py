@@ -62,6 +62,18 @@ class SBERTEmbeddingsTestCase(unittest.TestCase):
         print(a)
         self.assertEqual(emb.shape, (384,))
 
+    def test_sbert_dim(self):
+        m = SentenceModel('shibing624/text2vec-base-chinese')
+        print('dim:', m.bert.pooler.dense.out_features)
+        def get_sentence_embedding_dimension(model):
+            if model:
+                sent_embedding_dim_method = getattr(model.bert.pooler.dense, "out_features", None)
+                if sent_embedding_dim_method:
+                    return sent_embedding_dim_method
+            return None
+        dim = get_sentence_embedding_dimension(m)
+        print(dim)
+
 
 if __name__ == '__main__':
     unittest.main()

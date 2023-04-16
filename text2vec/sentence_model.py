@@ -79,6 +79,18 @@ class SentenceModel:
         return f"<SentenceModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
                f"max_seq_length: {self.max_seq_length}>"
 
+    def get_sentence_embedding_dimension(self):
+        """
+        Get the dimension of the sentence embeddings.
+
+        Returns
+        -------
+        int or None
+            The dimension of the sentence embeddings, or None if it cannot be determined.
+        """
+        # Use getattr to safely access the out_features attribute of the pooler's dense layer
+        return getattr(self.bert.pooler.dense, "out_features", None)
+
     def get_sentence_embeddings(self, input_ids, attention_mask, token_type_ids):
         """
         Returns the model output by encoder_type as embeddings.
@@ -132,7 +144,7 @@ class SentenceModel:
             convert_to_numpy: bool = True,
             convert_to_tensor: bool = False,
             device: str = None,
-        ):
+    ):
         """
         Returns the embeddings for a batch of sentences.
 
