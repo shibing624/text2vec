@@ -35,7 +35,7 @@ class EmbeddingType(Enum):
 class Similarity:
     def __init__(
             self,
-            model_name_or_path="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+            model_name_or_path="shibing624/text2vec-base-chinese",
             similarity_type=SimilarityType.COSINE,
             embedding_type=EmbeddingType.BERT,
             encoder_type=EncoderType.MEAN
