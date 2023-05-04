@@ -16,7 +16,7 @@ sys.path.append('..')
 from text2vec import SentenceModel, cos_sim, semantic_search, BM25
 import torch
 
-embedder = SentenceModel()
+embedder = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
 
 # Corpus with example sentences
 corpus = [
