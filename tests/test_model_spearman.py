@@ -4,16 +4,16 @@
 @description: 
 """
 
+import os
 import sys
 import unittest
 from time import time
-import os
 
 sys.path.append('..')
 from text2vec import Similarity, SimilarityType, EmbeddingType, compute_spearmanr
 
-
 pwd_path = os.path.abspath(os.path.dirname(__file__))
+
 
 def load_test_data(path):
     sents1, sents2, labels = [], [], []
@@ -30,7 +30,6 @@ def load_test_data(path):
             if len(sents1) > 10:
                 break
     return sents1, sents2, labels
-
 
 
 class SimModelTestCase(unittest.TestCase):
@@ -117,7 +116,12 @@ class SimModelTestCase(unittest.TestCase):
         """测试sbert_sim_each_batch"""
         model_name = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'
         print(model_name)
-        m = Similarity(model_name, similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.BERT)
+        m = Similarity(
+            model_name,
+            similarity_type=SimilarityType.COSINE,
+            embedding_type=EmbeddingType.BERT,
+            encoder_type="FIRST_LAST_AVG"
+        )
         test_path = os.path.join(pwd_path, '../examples/data/STS-B/STS-B.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()
@@ -194,7 +198,12 @@ class SimModelTestCase(unittest.TestCase):
 
     def test_set_sim_model_batch(self):
         """测试test_set_sim_model_batch"""
-        m = Similarity('shibing624/text2vec-base-chinese', similarity_type=SimilarityType.COSINE, embedding_type=EmbeddingType.BERT)
+        m = Similarity(
+            'shibing624/text2vec-base-chinese',
+            similarity_type=SimilarityType.COSINE,
+            embedding_type=EmbeddingType.BERT,
+            encoder_type="FIRST_LAST_AVG"
+        )
         test_path = os.path.join(pwd_path, '../examples/data/STS-B/STS-B.test.data')
         sents1, sents2, labels = load_test_data(test_path)
         t1 = time()

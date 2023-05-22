@@ -61,12 +61,13 @@ text2vec, Text to Vector.
 
 - 本项目release模型的中文匹配评测结果：
 
-| Arch | Backbone | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
-| :-- | :--- | :---- | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| Word2Vec | word2vec | w2v-light-tencent-chinese | 20.00 | 31.49 | 59.46 | 2.57 | 55.78 | 33.86 | 23769 |
-| SBERT | xlm-roberta-base | paraphrase-multilingual-MiniLM-L12-v2 | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 | 41.99 | 3138 |
+| Arch | Backbone | Model Name | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |    Avg    | QPS |
+| :-- | :--- | :---- |:-----:|:-----:|:-----:|:-----:|:-----:|:---------:| :-: |
+| Word2Vec | word2vec | w2v-light-tencent-chinese | 20.00 | 31.49 | 59.46 | 2.57  | 55.78 |   33.86   | 23769 |
+| SBERT | xlm-roberta-base | paraphrase-multilingual-MiniLM-L12-v2 | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 |   41.99   | 3138 |
 | CoSENT | hfl/chinese-macbert-base | [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese) | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | **48.25** | 3008 |
-| CoSENT | hfl/chinese-lert-large | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese) | - | - | - | - | - | - | - |
+| CoSENT | hfl/chinese-lert-large | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese) | 32.61 | 44.59 | 69.30 | 14.51 | 79.44 |   48.08   | 1046 |
+
 
 说明：
 - 结果值均使用spearman系数
@@ -78,6 +79,7 @@ text2vec, Text to Vector.
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--model_name hfl/chinese-macbert-base` 或者roberta模型：`--model_name uer/roberta-medium-wwm-chinese-cluecorpussmall`
 - 中文匹配数据集下载[链接见下方](#数据集)
 - 中文匹配任务实验表明，pooling最优是`first_last_avg`，即 SentenceModel 的`EncoderType.FIRST_LAST_AVG`，其与`EncoderType.MEAN`的方法在预测效果上差异很小
+- 中文匹配评测结果复现，可以下载数据集到`examples/data`，运行[tests/test_model_spearman.py](https://github.com/shibing624/text2vec/blob/master/tests/test_model_spearman.py)代码复现结果
 - QPS的GPU测试环境是Tesla V100，显存32GB
 
 # Demo
