@@ -72,14 +72,14 @@ text2vec, Text to Vector.
 说明：
 - 结果值均使用spearman系数
 - 结果均只用该数据集的train训练，在test上评估得到的表现，没用外部数据
-- [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，并在中文STS-B测试集评估达到SOTA，运行[examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)代码可复现结果，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，中文语义匹配任务推荐使用
-- `SBERT-macbert-base`模型，是用SBERT方法训练，运行[examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)代码复现结果
+- [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，并在中文STS-B测试集评估达到SOTA，运行[examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)代码可训练模型，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，中文语义匹配任务推荐使用
+- `SBERT-macbert-base`模型，是用SBERT方法训练，运行[examples/training_sup_text_matching_model.py](examples/training_sup_text_matching_model.py)代码可训练模型
 - `paraphrase-multilingual-MiniLM-L12-v2`模型名称是[sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)，是用SBERT训练，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，支持中文、英文等
 - `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用，适用于中文字面匹配任务和缺少数据的冷启动情况
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--model_name hfl/chinese-macbert-base` 或者roberta模型：`--model_name uer/roberta-medium-wwm-chinese-cluecorpussmall`
 - 中文匹配数据集下载[链接见下方](#数据集)
 - 中文匹配任务实验表明，pooling最优是`first_last_avg`，即 SentenceModel 的`EncoderType.FIRST_LAST_AVG`，其与`EncoderType.MEAN`的方法在预测效果上差异很小
-- 中文匹配评测结果复现，可以下载数据集到`examples/data`，运行[tests/test_model_spearman.py](https://github.com/shibing624/text2vec/blob/master/tests/test_model_spearman.py)代码复现结果
+- 中文匹配评测结果复现，可以下载中文匹配数据集到`examples/data`，运行[tests/test_model_spearman.py](https://github.com/shibing624/text2vec/blob/master/tests/test_model_spearman.py)代码复现评测结果
 - QPS的GPU测试环境是Tesla V100，显存32GB
 
 # Demo
@@ -627,6 +627,11 @@ curl -X 'GET' \
 | PAWSX              | 中文PAWS(Paraphrase Adversaries from Word Scrambling)数据集，Q-Qpair数据集   | [PAWSX](https://arxiv.org/abs/1908.11828)|
 | STS-B              | 中文STS-B数据集，中文自然语言推理数据集，从英文STS-B翻译为中文的数据集                              | [STS-B](https://github.com/pluto-junzeng/CNSD)|
 
+中文语义匹配数据集`shibing624/nli_zh`，包含[ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)、[BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)、
+[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)、[PAWSX](https://arxiv.org/abs/1908.11828)、[STS-B](https://github.com/pluto-junzeng/CNSD)共5个任务。
+可以从数据集对应的链接自行下载，也可以从[百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ)下载。
+其中senteval_cn目录是评测数据集汇总，senteval_cn.zip是senteval目录的打包，两者下其一就好。
+
 
 数据集使用示例：
 ```shell
@@ -660,10 +665,6 @@ DatasetDict({
 {'sentence1': '一个女孩在给她的头发做发型。', 'sentence2': '一个女孩在梳头。', 'label': 2}
 ```
 
-常见中文语义匹配数据集，包含[ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)、[BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)、
-[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)、[PAWSX](https://arxiv.org/abs/1908.11828)、[STS-B](https://github.com/pluto-junzeng/CNSD)共5个任务。
-可以从数据集对应的链接自行下载，也可以从[百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ)下载。
-其中senteval_cn目录是评测数据集汇总，senteval_cn.zip是senteval目录的打包，两者下其一就好。
 
 <details>
 <summary>文本向量方法介绍</summary>
