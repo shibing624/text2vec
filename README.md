@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://github.com/shibing624/text2vec">
-    <img src="https://github.com/shibing624/text2vec/blob/master/docs/t2v-logo.png" width="120" alt="Logo">
+    <img src="https://github.com/shibing624/text2vec/blob/master/docs/t2v-logo.png" height="150" alt="Logo">
   </a>
 </div>
 
