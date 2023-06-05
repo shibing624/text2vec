@@ -17,11 +17,9 @@
 [![GitHub issues](https://img.shields.io/github/issues/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/issues)
 [![Wechat Group](http://vlog.sfyc.ltd/wechat_everyday/wxgroup_logo.png?imageView2/0/w/60/h/20)](#Contact)
 
+**Text2vec**: Text to Vector, Get Sentence Embeddings. Text vectorization, representing text (including words, sentences, paragraphs) as a vector matrix.
 
-**Text2vec**: Text to Vector, Get Sentence Embeddings. 文本向量化，把文本(包括词、句子、段落)表征为向量矩阵。
-
-**text2vec**实现了Word2Vec、RankBM25、BERT、Sentence-BERT、CoSENT等多种文本表征、文本相似度计算模型，并在文本语义匹配（相似度计算）任务上比较了各模型的效果。
-
+**text2vec** implements Word2Vec, RankBM25, BERT, Sentence-BERT, CoSENT and other text representation and text similarity calculation models, and compares the effects of each model on the text semantic matching (similarity calculation) task.
 
 **Guide**
 - [Feature](#Feature)
@@ -34,10 +32,9 @@
 
 # Feature
 ### 文本向量表示模型
-- [Word2Vec](https://github.com/shibing624/text2vec/blob/master/text2vec/word2vec.py)：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe）实现词向量检索，本项目实现了句子（词向量求平均）的word2vec向量表示
-- [SBERT(Sentence-BERT)](https://github.com/shibing624/text2vec/blob/master/text2vec/sentencebert_model.py)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
-- [CoSENT(Cosine Sentence)](https://github.com/shibing624/text2vec/blob/master/text2vec/cosent_model.py)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
-
+- [Word2Vec](https://github.com/shibing624/text2vec/blob/master/text2vec/word2vec.py): large-scale high-quality Chinese [word vector data (8 million Chinese words light weight) through Tencent AI Lab open source version)](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (file name: light_Tencent_AILab_ChineseEmbedding.bin password: tawe) to achieve word vector retrieval, this project realizes word2vec vector representation of sentences (word vector average)
+- [SBERT(Sentence-BERT)](https://github.com/shibing624/text2vec/blob/master/text2vec/sentencebert_model.py): A sentence vector representation model that balances performance and efficiency, and supervises the upper layer during training Classification function, direct sentence vector as cosine when text matching prediction, this project reproduces the training and prediction of Sentence-BERT model based on PyTorch
+- [CoSENT(Cosine Sentence)](https://github.com/shibing624/text2vec/blob/master/text2vec/cosent_model.py): The CoSENT model proposes a sorted loss function to make the training process closer to the prediction, The model convergence speed and effect are better than Sentence-BERT. This project implements the training and prediction of the CoSENT model based on PyTorch
 # Evaluation
 
 ### 文本匹配
@@ -56,7 +53,7 @@
 | CoSENT | bert-base-uncased | CoSENT-base-first_last_avg | 69.93 |
 | CoSENT | sentence-transformers/bert-base-nli-mean-tokens | CoSENT-base-nli-first_last_avg | 79.68 |
 
-- 中文匹配数据集的评测结果：
+- Evaluation results of Chinese matching dataset:
 
 | Arch | Backbone | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
 | :-- | :--- | :--- | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
@@ -68,7 +65,7 @@
 | CoSENT | hfl/chinese-roberta-wwm-ext | CoSENT-roberta-ext | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
 | SBERT | hfl/chinese-roberta-wwm-ext | SBERT-roberta-ext | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
 
-- 本项目release模型的中文匹配评测结果：
+- Chinese matching evaluation results of the release model of this project:
 
 | Arch | Backbone | Model Name | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |    Avg    | QPS |
 | :-- | :--- | :---- |:-----:|:-----:|:-----:|:-----:|:-----:|:---------:| :-: |
@@ -78,19 +75,18 @@
 | CoSENT | hfl/chinese-lert-large | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese) | 32.61 | 44.59 | 69.30 | 14.51 | 79.44 |   48.08   | 1046 |
 
 
-说明：
-- 结果值均使用spearman系数
-- 结果均只用该数据集的train训练，在test上评估得到的表现，没用外部数据
-- [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，并在中文STS-B测试集评估达到SOTA，运行[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)代码可训练模型，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，中文语义匹配任务推荐使用
-- `SBERT-macbert-base`模型，是用SBERT方法训练，运行[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)代码可训练模型
-- `paraphrase-multilingual-MiniLM-L12-v2`模型名称是[sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)，是用SBERT训练，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，支持中文、英文等
-- `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用，适用于中文字面匹配任务和缺少数据的冷启动情况
-- 各预训练模型均可以通过transformers调用，如MacBERT模型：`--model_name hfl/chinese-macbert-base` 或者roberta模型：`--model_name uer/roberta-medium-wwm-chinese-cluecorpussmall`
-- 中文匹配数据集下载[链接见下方](#数据集)
-- 中文匹配任务实验表明，pooling最优是`first_last_avg`，即 SentenceModel 的`EncoderType.FIRST_LAST_AVG`，其与`EncoderType.MEAN`的方法在预测效果上差异很小
-- 中文匹配评测结果复现，可以下载中文匹配数据集到`examples/data`，运行[tests/test_model_spearman.py](https://github.com/shibing624/text2vec/blob/master/tests/test_model_spearman.py)代码复现评测结果
-- QPS的GPU测试环境是Tesla V100，显存32GB
-
+Evaluation conclusion:
+- The result values are all using the spearman coefficient
+- The results only use the train training of the data set, and evaluate the performance obtained on the test, without using external data
+- [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese) model is trained with CoSENT method, based on MacBERT in Chinese STS-B data training, and in Chinese STS -B test set evaluation reaches SOTA, run [examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py) code to train the model, the model file has been uploaded to huggingface The model library [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese), recommended for Chinese semantic matching tasks
+- The `SBERT-macbert-base` model is trained with the SBERT method, and the code can be trained by running [examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py) Model
+- `paraphrase-multilingual-MiniLM-L12-v2` model name is [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12 -v2), trained with SBERT, is a multilingual version of the `paraphrase-MiniLM-L12-v2` model, supports Chinese, English, etc.
+- `w2v-light-tencent-chinese` is the Word2Vec model of Tencent word vectors, which is loaded and used by CPU, and is suitable for Chinese literal matching tasks and cold start situations with lack of data
+- Each pre-trained model can be called through transformers, such as MacBERT model: `--model_name hfl/chinese-macbert-base` or roberta model: `--model_name uer/roberta-medium-wwm-chinese-cluecorpussmall`
+- Chinese matching data set download [link below] (#data set)
+- The Chinese matching task experiment shows that the optimal pooling is `first_last_avg`, that is, `EncoderType.FIRST_LAST_AVG` of SentenceModel, which has little difference in prediction effect from the method of `EncoderType.MEAN`
+- Chinese matching evaluation results are reappearing, you can download the Chinese matching dataset to `examples/data`, run [tests/test_model_spearman.py](https://github.com/shibing624/text2vec/blob/master/tests/test_model_spearman. py) code to reproduce the evaluation results
+- The GPU test environment of QPS is Tesla V100 with 32GB of video memory
 # Demo
 
 Official Demo: https://www.mulanai.com/product/short_text_sim/
@@ -125,7 +121,7 @@ pip install --no-deps .
 
 ## 文本向量表征
 
-基于`pretrained model`计算文本向量：
+Compute text vectors based on `pretrained model`:
 
 ```zsh
 >>> from text2vec import SentenceModel
@@ -192,16 +188,15 @@ Embedding shape: (768,)
  ... 
 ```
 
-- 返回值`embeddings`是`numpy.ndarray`类型，shape为`(sentences_size, model_embedding_size)`，三个模型任选一种即可，推荐用第一个。
-- `shibing624/text2vec-base-chinese`模型是CoSENT方法在中文STS-B数据集训练得到的，模型已经上传到huggingface的
-模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，
-是`text2vec.SentenceModel`指定的默认模型，可以通过上面示例调用，或者如下所示用[transformers库](https://github.com/huggingface/transformers)调用，
-模型自动下载到本机路径：`~/.cache/huggingface/transformers`
-- `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`模型是Sentence-BERT的多语言句向量模型，
-适用于释义（paraphrase）识别，文本匹配，通过`text2vec.SentenceModel`和[sentence-transformers库]((https://github.com/UKPLab/sentence-transformers))都可以调用该模型
-- `w2v-light-tencent-chinese`是通过gensim加载的Word2Vec模型，使用腾讯词向量`Tencent_AILab_ChineseEmbedding.tar.gz`计算各字词的词向量，句子向量通过单词词
-向量取平均值得到，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
-
+- The return value `embeddings` is of `numpy.ndarray` type, and the shape is `(sentences_size, model_embedding_size)`. You can choose one of the three models, and the first one is recommended.
+- The `shibing624/text2vec-base-chinese` model is trained by the CoSENT method on the Chinese STS-B dataset, and the model has been uploaded to huggingface
+Model library [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese),
+It is the default model specified by `text2vec.SentenceModel`, which can be called by the above example, or by [transformers library](https://github.com/huggingface/transformers) as shown below,
+The model is automatically downloaded to the local path: `~/.cache/huggingface/transformers`
+- The `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` model is a multilingual sentence vector model of Sentence-BERT,
+Suitable for paraphrase recognition and text matching, the model can be called through `text2vec.SentenceModel` and [sentence-transformers library]((https://github.com/UKPLab/sentence-transformers))
+- `w2v-light-tencent-chinese` is a Word2Vec model loaded by gensim, using the Tencent word vector `Tencent_AILab_ChineseEmbedding.tar.gz` to calculate the word vector of each word, and the sentence vector through the word word
+The average value of the vector is obtained, and the model is automatically downloaded to the local path: `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
 #### Usage (HuggingFace Transformers)
 Without [text2vec](https://github.com/shibing624/text2vec), you can use the model like this: 
 
@@ -259,17 +254,14 @@ print("Sentence embeddings:")
 print(sentence_embeddings)
 ```
 
-#### `Word2Vec`词向量
+#### `Word2Vec` word vector model
+Two `Word2Vec` word vectors are provided, choose one:
 
-提供两种`Word2Vec`词向量，任选一个：
+   - Lightweight version of Tencent Word Vector [Baidu Cloud Disk-Password: tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) or [Google Cloud Disk](https://drive.google.com/u/ 0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download), binary file, 111M, is a simplified high-frequency 143613 words, each word vector is still 200 dimensions (same as the original version), run the program, and automatically download to `~/ .text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+   - Tencent word vector - official full volume, 6.78G put: `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`, Tencent word vector homepage: https://ai.tencent.com/ailab/nlp/zh/index.html Word vector download address: https://ai.tencent.com/ailab/nlp/en/download.html For more information, see [Tencent Word Vector Introduction-wiki](https://github.com/shibing624/text2vec/wiki/ %E8%85%BE%E8%AE%AF%E8%AF%8D%E5%90%91%E9%87%8F%E4%BB%8B%E7%BB%8D)
 
-  - 轻量版腾讯词向量 [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制文件，111M，是简化后的高频143613个词，每个词向量还是200维（跟原版一样），运行程序，自动下载到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
-  - 腾讯词向量-官方全量, 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`，腾讯词向量主页：https://ai.tencent.com/ailab/nlp/zh/index.html 词向量下载地址：https://ai.tencent.com/ailab/nlp/en/download.html  更多查看[腾讯词向量介绍-wiki](https://github.com/shibing624/text2vec/wiki/%E8%85%BE%E8%AE%AF%E8%AF%8D%E5%90%91%E9%87%8F%E4%BB%8B%E7%BB%8D)
-
-
-
-## 下游任务
-### 1. 句子相似度计算
+## Downstream tasks
+### 1. Sentence similarity calculation
 
 example: [examples/semantic_text_similarity_demo.py](https://github.com/shibing624/text2vec/blob/master/examples/semantic_text_similarity_demo.py)
 
@@ -317,11 +309,11 @@ The new movie is awesome 		 A woman watches TV 		 Score: 0.1321
 The new movie is awesome 		 The new movie is so great 		 Score: 0.9591
 ```
 
-> 句子余弦相似度值`score`范围是[-1, 1]，值越大越相似。
+> Sentence cosine similarity value `score` ranges from [-1, 1], the larger the value, the more similar it is.
 
-### 2. 文本匹配搜索
+### 2. Text matching search
 
-一般在文档候选集中找与query最相似的文本，常用于QA场景的问句相似匹配、文本相似检索等任务。
+Generally, the text that is most similar to the query is found in the document candidate set, which is often used in tasks such as question similarity matching and text similarity retrieval in QA scenarios.
 
 
 example: [examples/semantic_search_demo.py](https://github.com/shibing624/text2vec/blob/master/examples/semantic_search_demo.py)
@@ -406,16 +398,16 @@ A man is eating food. (Score: 0.0329)
 ```
 
 
-## 下游任务支持库
-**similarities库[推荐]**
+## Downstream task support library
+**similarities library [recommended]**
 
-文本相似度计算和文本匹配搜索任务，推荐使用 [similarities库](https://github.com/shibing624/similarities) ，兼容本项目release的
-Word2vec、SBERT、Cosent类语义匹配模型，还支持字面维度相似度计算、匹配搜索算法，支持文本、图像。
+For text similarity calculation and text matching search tasks, it is recommended to use [similarities library](https://github.com/shibing624/similarities), which is compatible with the release of this project
+Word2vec, SBERT, and Cosent semantic matching models also support literal dimension similarity calculations, matching search algorithms, and text and images.
 
-安装：
+Install:
 ```pip install -U similarities```
 
-句子相似度计算：
+Sentence similarity calculation:
 ```python
 from similarities import Similarity
 
@@ -428,7 +420,7 @@ print(f"similarity score: {float(r)}")  # similarity score: 0.855146050453186
 
 ## CoSENT model
 
-CoSENT（Cosine Sentence）文本匹配模型，在Sentence-BERT上改进了CosineRankLoss的句向量方案
+CoSENT (Cosine Sentence) text matching model, improved the sentence vector scheme of CosineRankLoss on Sentence-BERT
 
 
 Network structure:
@@ -442,10 +434,10 @@ Inference:
 
 <img src="docs/inference.png" width="300" />
 
-#### CoSENT 监督模型
-训练和预测CoSENT模型：
+#### CoSENT Supervised Model
+Train and predict CoSENT model:
 
-- 在中文STS-B数据集训练和评估`CoSENT`模型
+- Train and evaluate the `CoSENT` model on the Chinese STS-B dataset
 
 example: [examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)
 
@@ -454,14 +446,14 @@ cd examples
 python training_sup_text_matching_model.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-cosent
 ```
 
-- 在蚂蚁金融匹配数据集ATEC上训练和评估`CoSENT`模型
+- Train and evaluate the `CoSENT` model on the Ant Financial matching dataset ATEC
 
-支持这些中文匹配数据集的使用：'ATEC', 'STS-B', 'BQ', 'LCQMC', 'PAWSX'，具体参考HuggingFace datasets [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh)
+Support the use of these Chinese matching datasets: 'ATEC', 'STS-B', 'BQ', 'LCQMC', 'PAWSX', for details refer to HuggingFace datasets [https://huggingface.co/datasets/shibing624/nli_zh] (https://huggingface.co/datasets/shibing624/nli_zh)
 ```shell
 python training_sup_text_matching_model.py --task_name ATEC --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/ATEC-cosent
 ```
 
-- 在自有中文数据集上训练模型
+- Train the model on our own Chinese dataset
 
 example: [examples/training_sup_text_matching_model_selfdata.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model_selfdata.py)
 
@@ -469,7 +461,7 @@ example: [examples/training_sup_text_matching_model_selfdata.py](https://github.
 python training_sup_text_matching_model_selfdata.py --do_train --do_predict
 ```
 
-- 在英文STS-B数据集训练和评估`CoSENT`模型
+- Train and evaluate the `CoSENT` model on the English STS-B dataset
 
 example: [examples/training_sup_text_matching_model_en.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model_en.py)
 
@@ -478,8 +470,8 @@ cd examples
 python training_sup_text_matching_model_en.py --model_arch cosent --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased  --output_dir ./outputs/STS-B-en-cosent
 ```
 
-#### CoSENT 无监督模型
-- 在英文NLI数据集训练`CoSENT`模型，在STS-B测试集评估效果
+#### CoSENT Unsupervised Model
+- Train the `CoSENT` model on the English NLI dataset and evaluate the effect on the STS-B test set
 
 example: [examples/training_unsup_text_matching_model_en.py](https://github.com/shibing624/text2vec/blob/master/examples/training_unsup_text_matching_model_en.py)
 
@@ -491,7 +483,7 @@ python training_unsup_text_matching_model_en.py --model_arch cosent --do_train -
 
 ## Sentence-BERT model
 
-Sentence-BERT文本匹配模型，表征式句向量表示方案
+Sentence-BERT text matching model, representational sentence vector representation scheme
 
 Network structure:
 
@@ -504,8 +496,8 @@ Inference:
 
 <img src="docs/sbert_inference.png" width="300" />
 
-#### SentenceBERT 监督模型
-- 在中文STS-B数据集训练和评估`SBERT`模型
+#### SentenceBERT Supervised Model
+- Train and evaluate the `SBERT` model on the Chinese STS-B dataset
 
 example: [examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)
 
@@ -513,7 +505,7 @@ example: [examples/training_sup_text_matching_model.py](https://github.com/shibi
 cd examples
 python training_sup_text_matching_model.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name hfl/chinese-macbert-base --output_dir ./outputs/STS-B-sbert
 ```
-- 在英文STS-B数据集训练和评估`SBERT`模型
+- Train and evaluate the `SBERT` model on the English STS-B dataset
 
 example: [examples/training_sup_text_matching_model_en.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model_en.py)
 
@@ -522,8 +514,8 @@ cd examples
 python training_sup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-sbert
 ```
 
-#### SentenceBERT 无监督模型
-- 在英文NLI数据集训练`SBERT`模型，在STS-B测试集评估效果
+#### SentenceBERT Unsupervised Model
+- Train the `SBERT` model on the English NLI dataset and evaluate the effect on the STS-B test set
 
 example: [examples/training_unsup_text_matching_model_en.py](https://github.com/shibing624/text2vec/blob/master/examples/training_unsup_text_matching_model_en.py)
 
@@ -533,35 +525,34 @@ python training_unsup_text_matching_model_en.py --model_arch sentencebert --do_t
 ```
 
 ## BERT-Match model
-BERT文本匹配模型，原生BERT匹配网络结构，交互式句向量匹配模型
+BERT text matching model, native BERT matching network structure, interactive sentence vector matching model
 
 Network structure:
 
 Training and inference:
 
 <img src="docs/bert-fc-train.png" width="300" />
+The training script is the same as above [examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py).
 
-训练脚本同上[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)。
 
+## Model Distillation
 
-## 模型蒸馏（Model Distillation）
+Since the model trained by text2vec can be loaded using the [sentence-transformers](https://github.com/UKPLab/sentence-transformers) library, its model distillation method [distillation](https://github.com/ UKPLab/sentence-transformers/tree/master/examples/training/distillation).
 
-由于text2vec训练的模型可以使用[sentence-transformers](https://github.com/UKPLab/sentence-transformers)库加载，此处复用其模型蒸馏方法[distillation](https://github.com/UKPLab/sentence-transformers/tree/master/examples/training/distillation)。
+1. Model dimension reduction, refer to [dimensionality_reduction.py](https://github.com/UKPLab/sentence-transformers/blob/master/examples/training/distillation/dimensionality_reduction.py) use PCA to reduce the dimensionality of the model output embedding, It can reduce the storage pressure of vector retrieval databases such as milvus and slightly improve the model effect.
+2. For model distillation, refer to [model_distillation.py](https://github.com/UKPLab/sentence-transformers/blob/master/examples/training/distillation/model_distillation.py) and use the distillation method to distill the Teacher model to In the student model with fewer layers, the prediction speed of the model can be greatly improved under the condition of weighing the effect.
 
-1. 模型降维，参考[dimensionality_reduction.py](https://github.com/UKPLab/sentence-transformers/blob/master/examples/training/distillation/dimensionality_reduction.py)使用PCA对模型输出embedding降维，可减少milvus等向量检索数据库的存储压力，还能轻微提升模型效果。
-2. 模型蒸馏，参考[model_distillation.py](https://github.com/UKPLab/sentence-transformers/blob/master/examples/training/distillation/model_distillation.py)使用蒸馏方法，将Teacher大模型蒸馏到更少layers层数的student模型中，在权衡效果的情况下，可大幅提升模型预测速度。
+## Model Deployment
 
-## 模型部署
+Provide two deployment models and methods of building services: 1) Building gRPC services based on Jina [recommended]; 2) Building native Http services based on FastAPI.
 
-提供两种部署模型，搭建服务的方法： 1）基于Jina搭建gRPC服务【推荐】；2）基于FastAPI搭建原生Http服务。
+### Jina Service
+It adopts C/S mode to build high-performance services, supports docker cloud native, gRPC/HTTP/WebSocket, supports simultaneous prediction of multiple models, and multi-GPU processing.
 
-### Jina服务
-采用C/S模式搭建高性能服务，支持docker云原生，gRPC/HTTP/WebSocket，支持多个模型同时预测，GPU多卡处理。
-
-- 安装：
+- Install:
 ```pip install jina```
 
-- 启动服务：
+- Start the service:
 
 example: [examples/jina_server_demo.py](examples/jina_server_demo.py)
 ```python
@@ -578,9 +569,9 @@ with f:
     f.block()
 ```
 
-该模型预测方法（executor）已经上传到[JinaHub](https://hub.jina.ai/executor/eq45c9uq)，里面包括docker、k8s部署方法。
+The model prediction method (executor) has been uploaded to [JinaHub](https://hub.jina.ai/executor/eq45c9uq), which includes docker and k8s deployment methods.
 
-- 调用服务：
+- call service:
 
 
 ```python
@@ -599,15 +590,15 @@ r = c.post('/', inputs=DocumentArray([Document(text='如何更换花呗绑定银
 print(r.embeddings)
 ```
 
-批量调用方法见example: [examples/jina_client_demo.py](https://github.com/shibing624/text2vec/blob/master/examples/jina_client_demo.py)
+See example for batch call method: [examples/jina_client_demo.py](https://github.com/shibing624/text2vec/blob/master/examples/jina_client_demo.py)
 
 
-### FastAPI服务
+### Fast API service
 
-- 安装：
+- Install:
 ```pip install fastapi uvicorn```
 
-- 启动服务：
+- Start the service:
 
 example: [examples/fastapi_server_demo.py](https://github.com/shibing624/text2vec/blob/master/examples/fastapi_server_demo.py)
 ```shell
@@ -623,9 +614,9 @@ curl -X 'GET' \
 ```
 
 
-## 数据集
+## Dataset
 
-- 本项目release的数据集：
+- The data set of this project release:
 
 | Dataset           | Introduce                                                           | Download Link                                                                                                                                                                                                                                                                                         |
 |:------------------|:--------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -636,13 +627,13 @@ curl -X 'GET' \
 | PAWSX              | 中文PAWS(Paraphrase Adversaries from Word Scrambling)数据集，Q-Qpair数据集   | [PAWSX](https://arxiv.org/abs/1908.11828)|
 | STS-B              | 中文STS-B数据集，中文自然语言推理数据集，从英文STS-B翻译为中文的数据集                              | [STS-B](https://github.com/pluto-junzeng/CNSD)|
 
-中文语义匹配数据集`shibing624/nli_zh`，包含[ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)、[BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)、
-[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)、[PAWSX](https://arxiv.org/abs/1908.11828)、[STS-B](https://github.com/pluto-junzeng/CNSD)共5个任务。
-可以从数据集对应的链接自行下载，也可以从[百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ)下载。
-其中senteval_cn目录是评测数据集汇总，senteval_cn.zip是senteval目录的打包，两者下其一就好。
+Chinese semantic matching dataset `shibing624/nli_zh`, including [ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC), [BQ](http://icrc.hitsz.edu.cn /info/1037/1162.htm),
+[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html), [PAWSX](https://arxiv.org/abs/1908.11828), [STS-B](https: //github.com/pluto-junzeng/CNSD) a total of 5 tasks.
+You can download it yourself from the link corresponding to the dataset, or you can download it from [Baidu Netdisk (extraction code: qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ).
+Among them, the senteval_cn directory is a summary of the evaluation data set, and senteval_cn.zip is the packaging of the senteval directory, whichever is better.
 
 
-数据集使用示例：
+Dataset usage example:
 ```shell
 pip install datasets
 ```
@@ -676,37 +667,36 @@ DatasetDict({
 
 
 <details>
-<summary>文本向量方法介绍</summary>
+<summary>Introduction to text vector methods</summary>
 
 # Question
-文本向量表示咋做？文本匹配任务用哪个模型效果好？
+What about text vector representation? Which model is better for text matching tasks?
 
-许多NLP任务的成功离不开训练优质有效的文本表示向量。特别是文本语义匹配（Semantic Textual Similarity，如paraphrase检测、QA的问题对匹配）、文本向量检索（Dense Text Retrieval）等任务。
+The success of many NLP tasks is inseparable from training high-quality and effective text representation vectors. Especially text semantic matching (Semantic Textual Similarity, such as paraphrase detection, QA question pair matching), text vector retrieval (Dense Text Retrieval) and other tasks.
 # Solution
-### 传统方法：基于特征的匹配
+### Traditional Approach: Feature-Based Matching
 
-- 基于TF-IDF、BM25、Jaccord、SimHash、LDA等算法抽取两个文本的词汇、主题等层面的特征，然后使用机器学习模型（LR, xgboost）训练分类模型
-- 优点：可解释性较好
-- 缺点：依赖人工寻找特征，泛化能力一般，而且由于特征数量的限制，模型的效果比较一般
+- Based on TF-IDF, BM25, Jaccord, SimHash, LDA and other algorithms to extract the vocabulary, topic and other features of the two texts, and then use the machine learning model (LR, xgboost) to train the classification model
+- Pros: better interpretability
+- Disadvantages: Rely on manual search for features, generalization ability is average, and due to the limitation of the number of features, the effect of the model is relatively average
 
-代表模型：
+Representative model:
 - BM25
 
-BM25算法，通过候选句子的字段对qurey字段的覆盖程度来计算两者间的匹配得分，得分越高的候选项与query的匹配度更好，主要解决词汇层面的相似度问题。
+The BM25 algorithm calculates the matching score between the fields of the candidate sentence by the degree of coverage of the qurey field. The candidate with a higher score has a better matching degree with the query, and it mainly solves the problem of similarity at the lexical level.
 
-### 深度方法：基于表征的匹配
-- 基于表征的匹配方式，初始阶段对两个文本各自单独处理，通过深层的神经网络进行编码（encode），得到文本的表征（embedding），再对两个表征进行相似度计算的函数得到两个文本的相似度
-- 优点：基于BERT的模型通过有监督的Fine-tune在文本表征和文本匹配任务取得了不错的性能
-- 缺点：BERT自身导出的句向量（不经过Fine-tune，对所有词向量求平均）质量较低，甚至比不上Glove的结果，因而难以反映出两个句子的语义相似度
+### Deep Methods: Representation-Based Matching
+- Based on the representation matching method, the two texts are processed separately in the initial stage, and the deep neural network is used to encode (encode) to obtain the text representation (embedding), and then perform similarity calculation on the two representations to obtain two text similarity
+- Advantages: The BERT-based model has achieved good performance in text representation and text matching tasks through supervised Fine-tune
+- Disadvantage: The sentence vector derived by BERT itself (without Fine-tune, averaging all word vectors) is of low quality, even inferior to the result of Glove, so it is difficult to reflect the semantic similarity of two sentences
 
-> 主要原因是：
-> 
-> 1.BERT对所有的句子都倾向于编码到一个较小的空间区域内，这使得大多数的句子对都具有较高的相似度分数，即使是那些语义上完全无关的句子对。
-> 
-> 2.BERT句向量表示的聚集现象和句子中的高频词有关。具体来说，当通过平均词向量的方式计算句向量时，那些高频词的词向量将会主导句向量，使之难以体现其原本的语义。当计算句向量时去除若干高频词时，聚集现象可以在一定程度上得到缓解，但表征能力会下降。
+> The main reasons are:
+>
+> 1.BERT tends to encode all sentences into a small spatial region, which makes most sentence pairs have high similarity scores, even those semantically completely unrelated sentence pairs.
+>
+> 2. The aggregation phenomenon represented by the BERT sentence vector is related to the high-frequency words in the sentence. Specifically, when the sentence vector is calculated by means of the average word vector, the word vector of those high-frequency words will dominate the sentence vector, making it difficult to reflect its original semantics. When some high-frequency words are removed when calculating sentence vectors, the aggregation phenomenon can be alleviated to a certain extent, but the representation ability will be reduced.
 
-
-代表模型：
+Models：
 
 - [DSSM(2013)](https://posenhuang.github.io/papers/cikm2013_DSSM_fullversion.pdf)
 - [CDSSM(2014)](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/www2014_cdssm_p07.pdf)
@@ -720,18 +710,18 @@ BM25算法，通过候选句子的字段对qurey字段的覆盖程度来计算�
 - [ConSERT(2021)](https://aclanthology.org/2021.acl-long.393/)
 - [CoSENT(2022)](https://kexue.fm/archives/8847)
 
-由于2018年BERT模型在NLP界带来了翻天覆地的变化，此处不讨论和比较2018年之前的模型（如果有兴趣了解的同学，可以参考中科院开源的[MatchZoo](https://github.com/NTMC-Community/MatchZoo) 和[MatchZoo-py](https://github.com/NTMC-Community/MatchZoo-py)）。
+Since the BERT model brought about earth-shaking changes in the NLP industry in 2018, the models before 2018 will not be discussed and compared here (if you are interested in learning, you can refer to the open source [MatchZoo] of the Chinese Academy of Sciences (https://github.com /NTMC-Community/MatchZoo) and [MatchZoo-py](https://github.com/NTMC-Community/MatchZoo-py)).
 
-所以，本项目主要调研以下比原生BERT更优、适合文本匹配的向量表示模型：Sentence-BERT(2019)、BERT-flow(2020)、SimCSE(2021)、CoSENT(2022)。
+Therefore, this project mainly investigates the following vector representation models that are better than native BERT and suitable for text matching: Sentence-BERT (2019), BERT-flow (2020), SimCSE (2021), CoSENT (2022).
 
-### 深度方法：基于交互的匹配
+### Deep Approach: Interaction-Based Matching
 
-- 基于交互的匹配方式，则认为在最后阶段才计算文本的相似度会过于依赖文本表征的质量，同时也会丢失基础的文本特征（比如词法、句法等），所以提出尽可能早的对文本特征进行交互，捕获更基础的特征，最后在高层基于这些基础匹配特征计算匹配分数
-- 优点：基于交互的匹配模型端到端处理，效果好
-- 缺点：这类模型（Cross-Encoder）的输入要求是两个句子，输出的是句子对的相似度值，模型不会产生句子向量表示（sentence embedding），我们也无法把单个句子输入给模型。因此，对于需要文本向量表示的任务来说，这类模型并不实用
+- Based on the interactive matching method, it is believed that calculating the similarity of the text in the final stage will be too dependent on the quality of the text representation, and will also lose the basic text features (such as morphology, syntax, etc.), so it is proposed to match the text as early as possible. Features interact, capture more basic features, and finally calculate a matching score based on these basic matching features at a high level
+- Advantages: end-to-end processing of interaction-based matching model, good effect
+- Disadvantage: The input requirement of this type of model (Cross-Encoder) is two sentences, and the output is the similarity value of the sentence pair. The model will not generate sentence embedding (sentence embedding), and we cannot input a single sentence to the model . Therefore, such models are not practical for tasks that require text vector representations
 
 
-代表模型：
+Models:
 
 - [ARC II(2014)](https://arxiv.org/pdf/1503.03244.pdf)
 - [MV-LSTM(2015)](https://arxiv.org/pdf/1511.08277.pdf)
@@ -741,7 +731,7 @@ BM25算法，通过候选句子的字段对qurey字段的覆盖程度来计算�
 - [RE2(2019)](https://www.aclweb.org/anthology/P19-1465.pdf)
 - [Keyword-BERT(2020)](https://arxiv.org/ftp/arxiv/papers/2003/2003.11516.pdf)
 
-Cross-Encoder适用于向量检索精排。
+Cross-Encoder is suitable for vector retrieval fine sorting.
 
 </details>
 
@@ -749,16 +739,16 @@ Cross-Encoder适用于向量检索精排。
 
 # Contact
 
-- Issue(建议)：[![GitHub issues](https://img.shields.io/github/issues/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/issues)
-- 邮件我：xuming: xuming624@qq.com
-- 微信我：加我*微信号：xuming624, 备注：姓名-公司-NLP* 进NLP交流群。
+- Issue (suggestion): [![GitHub issues](https://img.shields.io/github/issues/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/issues)
+- Email me: xuming: xuming624@qq.com
+- WeChat me: Add me *Wechat ID: xuming624, Remarks: Name-Company-NLP* Enter the NLP exchange group.
 
 <img src="docs/wechat.jpeg" width="200" />
 
 
 # Citation
 
-如果你在研究中使用了text2vec，请按如下格式引用：
+If you use text2vec in your research, please cite it in the following format:
 
 APA:
 ```latex
@@ -778,18 +768,16 @@ BibTeX:
 ```
 
 # License
-
-
-授权协议为 [The Apache License 2.0](LICENSE)，可免费用做商业用途。请在产品说明中附加text2vec的链接和授权协议。
+The authorization agreement is [The Apache License 2.0](LICENSE), which can be used for commercial purposes free of charge. Please attach text2vec's link and license agreement in the product description.
 
 
 # Contribute
-项目代码还很粗糙，如果大家对代码有所改进，欢迎提交回本项目，在提交之前，注意以下两点：
+The project code is still very rough. If you have improved the code, you are welcome to submit it back to this project. Before submitting, please pay attention to the following two points:
 
- - 在`tests`添加相应的单元测试
- - 使用`python -m pytest -v`来运行所有单元测试，确保所有单测都是通过的
+  - Add corresponding unit tests in `tests`
+  - Use `python -m pytest -v` to run all unit tests to ensure that all unit tests are passed
 
-之后即可提交PR。
+Then you can submit a PR.
 
 # Reference
 - [将句子表示为向量（上）：无监督句子表示学习（sentence embedding）](https://www.cnblogs.com/llhthinker/p/10335164.html)
