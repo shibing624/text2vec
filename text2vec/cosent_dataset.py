@@ -5,10 +5,11 @@
 """
 
 import os
-from torch.utils.data import Dataset
-from loguru import logger
-from transformers import PreTrainedTokenizer
+
 from datasets import load_dataset
+from loguru import logger
+from torch.utils.data import Dataset
+from transformers import PreTrainedTokenizer
 
 
 def load_cosent_train_data(path):

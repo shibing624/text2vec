@@ -44,7 +44,7 @@
 
 - 英文匹配数据集的评测结果：
 
-| Arch | Backbone | Model Name | English-STS-B | 
+| Arch | Backbone | Model  | English-STS-B | 
 | :-- | :--- | :--- | :-: |
 | GloVe | glove | Avg_word_embeddings_glove_6B_300d | 61.77 |
 | BERT | bert-base-uncased | BERT-base-cls | 20.29 |
@@ -58,7 +58,7 @@
 
 - 中文匹配数据集的评测结果：
 
-| Arch | Backbone | Model Name | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
+| Arch | Backbone | Model  | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
 | :-- | :--- | :--- | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
 | CoSENT | hfl/chinese-macbert-base | CoSENT-macbert-base | 50.39 | **72.93** | **79.17** | **60.86** | **80.51** | **68.77**  | 3008 |
 | CoSENT | Langboat/mengzi-bert-base | CoSENT-mengzi-base | **50.52** | 72.27 | 78.69 | 12.89 | 80.15 | 58.90 | 2502 |
@@ -70,12 +70,12 @@
 
 - 本项目release模型的中文匹配评测结果：
 
-| Arch | Backbone | Model Name | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |    Avg    | QPS |
-| :-- | :--- | :---- |:-----:|:-----:|:-----:|:-----:|:-----:|:---------:| :-: |
-| Word2Vec | word2vec | w2v-light-tencent-chinese | 20.00 | 31.49 | 59.46 | 2.57  | 55.78 |   33.86   | 23769 |
-| SBERT | xlm-roberta-base | paraphrase-multilingual-MiniLM-L12-v2 | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 |   41.99   | 3138 |
-| CoSENT | hfl/chinese-macbert-base | [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese) | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | **48.25** | 3008 |
-| CoSENT | hfl/chinese-lert-large | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese) | 32.61 | 44.59 | 69.30 | 14.51 | 79.44 |   48.08   | 1046 |
+| Arch | Backbone | Model                                                                                                                                          | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |    Avg    | QPS |
+| :-- | :--- |:---------------------------------------------------------------------------------------------------------------------------------------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:---------:| :-: |
+| Word2Vec | word2vec | [w2v-light-tencent-chinese](https://ai.tencent.com/ailab/nlp/en/download.html)                                                                     | 20.00 | 31.49 | 59.46 | 2.57  | 55.78 |   33.86   | 23769 |
+| SBERT | xlm-roberta-base | [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)  | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 |   41.99   | 3138 |
+| CoSENT | hfl/chinese-macbert-base | [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)                                                        | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | **48.25** | 3008 |
+| CoSENT | hfl/chinese-lert-large | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese)                                                    | 32.61 | 44.59 | 69.30 | 14.51 | 79.44 |   48.08   | 1046 |
 
 
 说明：
@@ -83,7 +83,7 @@
 - 结果均只用该数据集的train训练，在test上评估得到的表现，没用外部数据
 - [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，并在中文STS-B测试集评估达到SOTA，运行[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)代码可训练模型，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，中文语义匹配任务推荐使用
 - `SBERT-macbert-base`模型，是用SBERT方法训练，运行[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)代码可训练模型
-- `paraphrase-multilingual-MiniLM-L12-v2`模型名称是[sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)，是用SBERT训练，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，支持中文、英文等
+- [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)模型是用SBERT训练，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，支持中文、英文等
 - `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用，适用于中文字面匹配任务和缺少数据的冷启动情况
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--model_name hfl/chinese-macbert-base` 或者roberta模型：`--model_name uer/roberta-medium-wwm-chinese-cluecorpussmall`
 - 中文匹配数据集下载[链接见下方](#数据集)

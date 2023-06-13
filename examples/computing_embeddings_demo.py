@@ -9,8 +9,7 @@ generate sentence embeddings for a given list of sentences.
 import sys
 
 sys.path.append('..')
-from text2vec import SentenceModel, EncoderType
-from text2vec import Word2Vec
+from text2vec import SentenceModel, Word2Vec
 
 
 def compute_emb(model):
