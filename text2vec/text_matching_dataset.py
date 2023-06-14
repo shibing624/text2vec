@@ -22,7 +22,7 @@ def load_text_matching_train_data(path):
     """
     data = []
     if not os.path.isfile(path):
-        logger.error(f'file not exist: {path}')
+        logger.warning(f'file not exist: {path}')
         return data
 
     def get_field_names(data_item):
@@ -66,7 +66,7 @@ def load_text_matching_test_data(path):
     """
     data = []
     if not os.path.isfile(path):
-        logger.error(f'file not exist: {path}')
+        logger.warning(f'file not exist: {path}')
         return data
 
     def get_field_names(data_item):

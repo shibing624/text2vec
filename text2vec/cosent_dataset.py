@@ -17,7 +17,7 @@ from text2vec.utils.io_util import load_jsonl
 def load_cosent_train_data(path):
     data = []
     if not os.path.isfile(path):
-        logger.error(f'file not exist: {path}')
+        logger.warning(f'file not exist: {path}')
         return data
 
     def get_field_names(data_item):
