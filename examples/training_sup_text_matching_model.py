@@ -6,14 +6,14 @@
 import argparse
 import sys
 import time
+
 import numpy as np
-from loguru import logger
 from datasets import load_dataset
+from loguru import logger
 
 sys.path.append('..')
 
-from text2vec import CosentModel
-from text2vec import SentenceBertModel, BertMatchModel
+from text2vec import CosentModel, SentenceBertModel, BertMatchModel
 from text2vec import cos_sim, compute_spearmanr, EncoderType
 
 

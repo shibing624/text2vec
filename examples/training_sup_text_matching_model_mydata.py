@@ -13,8 +13,7 @@ from loguru import logger
 sys.path.append('..')
 
 from text2vec import CosentModel, SentenceBertModel, BertMatchModel
-from text2vec import load_test_data
-from text2vec import cos_sim, compute_spearmanr, EncoderType
+from text2vec import cos_sim, compute_spearmanr, EncoderType, load_text_matching_test_data
 
 
 def calc_similarity_scores(model, sents1, sents2, labels):
@@ -85,7 +84,7 @@ def main():
         else:
             model = BertMatchModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
                                    max_seq_length=args.max_seq_length)
-        test_data = load_test_data(args.test_file)
+        test_data = load_text_matching_test_data(args.test_file)
 
         # Predict embeddings
         srcs = []

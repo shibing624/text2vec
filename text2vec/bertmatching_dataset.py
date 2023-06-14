@@ -4,42 +4,11 @@
 @description: 
 """
 
-import os
-from torch.utils.data import Dataset
-from loguru import logger
-from transformers import PreTrainedTokenizer
+
 from datasets import load_dataset
+from torch.utils.data import Dataset
+from transformers import PreTrainedTokenizer
 
-
-def load_train_data(path):
-    data = []
-    if not os.path.isfile(path):
-        return data
-    with open(path, 'r', encoding='utf8') as f:
-        for line in f:
-            line = line.strip().split('\t')
-            if len(line) != 3:
-                logger.warning(f'line size not match, pass: {line}')
-                continue
-            score = int(line[2])
-            if 'STS' in path.upper():
-                score = int(score > 2.5)
-            data.append((line[0], line[1], score))
-    return data
-
-
-def load_test_data(path):
-    data = []
-    if not os.path.isfile(path):
-        return data
-    with open(path, 'r', encoding='utf8') as f:
-        for line in f:
-            line = line.strip().split('\t')
-            if len(line) != 3:
-                logger.warning(f'line size not match, pass: {line}')
-                continue
-            data.append((line[0], line[1], int(line[2])))
-    return data
 
 
 class BertMatchingTrainDataset(Dataset):

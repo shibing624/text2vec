@@ -5,18 +5,19 @@
 It generates sentence embeddings that can be compared using cosine-similarity to measure the similarity.
 """
 import argparse
-import sys
 import csv
 import gzip
+import os
+import sys
 import time
+
 import numpy as np
 from loguru import logger
-import os
 
 sys.path.append('..')
-from text2vec import CosentModel, compute_spearmanr, EncoderType, CosentTrainDataset
+from text2vec import CosentModel, compute_spearmanr, SentenceBertModel, BertMatchModel
 from text2vec import cos_sim, http_get
-from text2vec import SentenceBertModel, BertMatchModel, TextMatchingTrainDataset, TextMatchingTestDataset
+from text2vec import TextMatchingTrainDataset, TextMatchingTestDataset, EncoderType, CosentTrainDataset
 
 
 def calc_similarity_scores(model, sents1, sents2, labels):

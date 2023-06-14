@@ -4,9 +4,9 @@
 @description: Create BERT model for text matching task
 """
 
-import math
 import os
 
+import math
 import pandas as pd
 import torch
 from loguru import logger
@@ -16,10 +16,14 @@ from tqdm.auto import tqdm, trange
 from transformers import BertForSequenceClassification, BertTokenizer
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
-from text2vec.bertmatching_dataset import BertMatchingTestDataset, BertMatchingTrainDataset, \
-    load_test_data, load_train_data, HFBertMatchingTrainDataset, HFBertMatchingTestDataset
-from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr
-from text2vec.utils.stats_util import set_seed
+from text2vec.bertmatching_dataset import (
+    BertMatchingTestDataset,
+    BertMatchingTrainDataset,
+    HFBertMatchingTrainDataset,
+    HFBertMatchingTestDataset
+)
+from text2vec.text_matching_dataset import load_text_matching_train_data, load_text_matching_test_data
+from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr, set_seed
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -101,6 +105,7 @@ class BertMatchModel:
             max_steps: int = -1,
             use_hf_dataset: bool = False,
             hf_dataset_name: str = "STS-B",
+            save_model_every_epoch: bool = True,
     ):
         """
         Trains the model on 'train_file'
@@ -122,6 +127,7 @@ class BertMatchModel:
             max_steps (optional): If > 0: set total number of training steps to perform. Override num_epochs.
             use_hf_dataset (optional): Whether to use the HuggingFace datasets for training.
             hf_dataset_name (optional): Name of the dataset to use for the HuggingFace datasets.
+            save_model_every_epoch (optional): Save model checkpoint every epoch.
         Returns:
             global_step: Number of global steps trained
             training_details: Full training progress scores
@@ -134,8 +140,10 @@ class BertMatchModel:
         elif train_file is not None:
             logger.info(
                 f"Hf_dataset_name: {hf_dataset_name} will be ignored when use_hf_dataset is False, load train_file: {train_file}")
-            train_dataset = BertMatchingTrainDataset(self.tokenizer, load_train_data(train_file), self.max_seq_length)
-            eval_dataset = BertMatchingTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
+            train_dataset = BertMatchingTrainDataset(self.tokenizer, load_text_matching_train_data(train_file),
+                                                     self.max_seq_length)
+            eval_dataset = BertMatchingTestDataset(self.tokenizer, load_text_matching_test_data(eval_file),
+                                                   self.max_seq_length)
         else:
             raise ValueError("Error, train_file|use_hf_dataset must be specified")
 
@@ -153,7 +161,8 @@ class BertMatchModel:
             eps=eps,
             gradient_accumulation_steps=gradient_accumulation_steps,
             max_grad_norm=max_grad_norm,
-            max_steps=max_steps
+            max_steps=max_steps,
+            save_model_every_epoch=save_model_every_epoch,
         )
         logger.info(f" Training model done. Saved to {output_dir}.")
 
@@ -174,7 +183,8 @@ class BertMatchModel:
             eps: float = 1e-6,
             gradient_accumulation_steps: int = 1,
             max_grad_norm: float = 1.0,
-            max_steps: int = -1
+            max_steps: int = -1,
+            save_model_every_epoch: bool = True,
     ):
         """
         Trains the model on train_dataset.
@@ -278,7 +288,8 @@ class BertMatchModel:
             epoch_number += 1
             output_dir_current = os.path.join(output_dir, "checkpoint-{}-epoch-{}".format(global_step, epoch_number))
             results = self.eval_model(eval_dataset, output_dir_current, verbose=verbose, batch_size=batch_size)
-            self.save_model(output_dir_current, model=self.model.bert, results=results)
+            if save_model_every_epoch:
+                self.save_model(output_dir_current, model=self.model.bert, results=results)
             training_progress_scores["global_step"].append(global_step)
             training_progress_scores["train_loss"].append(current_loss)
             for key in results:

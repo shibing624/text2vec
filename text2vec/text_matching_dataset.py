@@ -11,35 +11,90 @@ from loguru import logger
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizer
 
+from text2vec.utils.io_util import load_jsonl
 
-def load_train_data(path):
+
+def load_text_matching_train_data(path):
+    """
+    Load train data from file.
+        args: file path
+        return: list of (text_a, text_b, score)
+    """
     data = []
     if not os.path.isfile(path):
+        logger.error(f'file not exist: {path}')
         return data
-    with open(path, 'r', encoding='utf8') as f:
-        for line in f:
-            line = line.strip().split('\t')
-            if len(line) != 3:
-                logger.warning(f'line size not match, pass: {line}')
+
+    def get_field_names(data_item):
+        if "text1" in data_item and "text2" in data_item:
+            return "text1", "text2"
+        elif "sentence1" in data_item and "sentence2" in data_item:
+            return "sentence1", "sentence2"
+        else:
+            return None, None
+
+    if path.endswith('.jsonl'):
+        data_list = load_jsonl(path)
+        for entry in data_list:
+            field1, field2 = get_field_names(entry)
+            if not field1 or not field2:
                 continue
-            score = int(line[2])
+
+            text_a, text_b, score = entry[field1], entry[field2], int(entry["label"])
             if 'STS' in path.upper():
                 score = int(score > 2.5)
-            data.append((line[0], line[1], score))
+            data.append((text_a, text_b, score))
+    else:
+        with open(path, 'r', encoding='utf8') as f:
+            for line in f:
+                line = line.strip().split('\t')
+                if len(line) != 3:
+                    logger.warning(f'line size not match, pass: {line}')
+                    continue
+                score = int(line[2])
+                if 'STS' in path.upper():
+                    score = int(score > 2.5)
+                data.append((line[0], line[1], score))
     return data
 
 
-def load_test_data(path):
+def load_text_matching_test_data(path):
+    """
+    Load test data from file.
+        args: file path
+        return: list of (text_a, text_b, score)
+    """
     data = []
     if not os.path.isfile(path):
+        logger.error(f'file not exist: {path}')
         return data
-    with open(path, 'r', encoding='utf8') as f:
-        for line in f:
-            line = line.strip().split('\t')
-            if len(line) != 3:
-                logger.warning(f'line size not match, pass: {line}')
+
+    def get_field_names(data_item):
+        if "text1" in data_item and "text2" in data_item:
+            return "text1", "text2"
+        elif "sentence1" in data_item and "sentence2" in data_item:
+            return "sentence1", "sentence2"
+        else:
+            return None, None
+
+    if path.endswith('.jsonl'):
+        data_list = load_jsonl(path)
+        for entry in data_list:
+            field1, field2 = get_field_names(entry)
+            if not field1 or not field2:
                 continue
-            data.append((line[0], line[1], int(line[2])))
+
+            text_a, text_b, score = entry[field1], entry[field2], int(entry["label"])
+            data.append((text_a, text_b, score))
+    else:
+        with open(path, 'r', encoding='utf8') as f:
+            for line in f:
+                line = line.strip().split('\t')
+                if len(line) != 3:
+                    logger.warning(f'line size not match, pass: {line}')
+                    continue
+                score = int(line[2])
+                data.append((line[0], line[1], score))
     return data
 
 

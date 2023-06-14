@@ -5,8 +5,10 @@
 """
 import os
 from typing import List, Union
-from loguru import logger
+
 import numpy as np
+from loguru import logger
+
 from text2vec.utils.get_file import get_file
 
 

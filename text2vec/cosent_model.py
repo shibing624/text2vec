@@ -4,9 +4,9 @@
 @description: Create CoSENT model for text matching task
 """
 
-import math
 import os
 
+import math
 import pandas as pd
 import torch
 from loguru import logger
@@ -16,7 +16,8 @@ from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
 from text2vec.cosent_dataset import CosentTrainDataset, load_cosent_train_data, HFCosentTrainDataset
 from text2vec.sentence_model import SentenceModel
-from text2vec.text_matching_dataset import TextMatchingTestDataset, load_test_data, HFTextMatchingTestDataset
+from text2vec.text_matching_dataset import TextMatchingTestDataset, load_text_matching_test_data, \
+    HFTextMatchingTestDataset
 from text2vec.utils.stats_util import set_seed
 
 
@@ -61,6 +62,7 @@ class CosentModel(SentenceModel):
             max_steps: int = -1,
             use_hf_dataset: bool = False,
             hf_dataset_name: str = "STS-B",
+            save_model_every_epoch: bool = True,
     ):
         """
         Trains the model on 'train_file'
@@ -82,6 +84,7 @@ class CosentModel(SentenceModel):
             max_steps (optional): If > 0: set total number of training steps to perform. Override num_epochs.
             use_hf_dataset (optional): Whether to use the HF dataset.
             hf_dataset_name (optional): Name of the dataset to use for the HuggingFace datasets.
+            save_model_every_epoch (optional): Save model checkpoint every epoch.
         Returns:
             global_step: Number of global steps trained
             training_details: full training progress scores
@@ -95,7 +98,8 @@ class CosentModel(SentenceModel):
             logger.info(
                 f"Hf_dataset_name: {hf_dataset_name} will be ignored when use_hf_dataset is False, load train_file: {train_file}")
             train_dataset = CosentTrainDataset(self.tokenizer, load_cosent_train_data(train_file), self.max_seq_length)
-            eval_dataset = TextMatchingTestDataset(self.tokenizer, load_test_data(eval_file), self.max_seq_length)
+            eval_dataset = TextMatchingTestDataset(self.tokenizer, load_text_matching_test_data(eval_file),
+                                                   self.max_seq_length)
         else:
             raise ValueError("Error, train_file|use_hf_dataset must be specified")
 
@@ -113,7 +117,8 @@ class CosentModel(SentenceModel):
             eps=eps,
             gradient_accumulation_steps=gradient_accumulation_steps,
             max_grad_norm=max_grad_norm,
-            max_steps=max_steps
+            max_steps=max_steps,
+            save_model_every_epoch=save_model_every_epoch,
         )
         logger.info(f" Training model done. Saved to {output_dir}.")
 
@@ -156,7 +161,8 @@ class CosentModel(SentenceModel):
             eps: float = 1e-6,
             gradient_accumulation_steps: int = 1,
             max_grad_norm: float = 1.0,
-            max_steps: int = -1
+            max_steps: int = -1,
+            save_model_every_epoch: bool = True,
     ):
         """
         Trains the model on train_dataset.
@@ -260,7 +266,8 @@ class CosentModel(SentenceModel):
             epoch_number += 1
             output_dir_current = os.path.join(output_dir, "checkpoint-{}-epoch-{}".format(global_step, epoch_number))
             results = self.eval_model(eval_dataset, output_dir_current, verbose=verbose, batch_size=batch_size)
-            self.save_model(output_dir_current, model=self.bert, results=results)
+            if save_model_every_epoch:
+                self.save_model(output_dir_current, model=self.bert, results=results)
             training_progress_scores["global_step"].append(global_step)
             training_progress_scores["train_loss"].append(current_loss)
             for key in results:

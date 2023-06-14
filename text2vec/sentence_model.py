@@ -266,7 +266,7 @@ class SentenceModel:
         :param results:
         :return:
         """
-        logger.info(f"Saving model checkpoint to {output_dir}")
+        logger.debug(f"Saving model checkpoint to {output_dir}")
         os.makedirs(output_dir, exist_ok=True)
         model_to_save = model.module if hasattr(model, "module") else model
         model_to_save.save_pretrained(output_dir)

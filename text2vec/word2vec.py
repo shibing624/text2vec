@@ -44,7 +44,6 @@ class Word2Vec:
         # 轻量版腾讯词向量，二进制，111MB
         'w2v-light-tencent-chinese': {
             'tar_filename': 'light_Tencent_AILab_ChineseEmbedding.bin',
-            # 'url': 'http://42.193.145.218/light_Tencent_AILab_ChineseEmbedding.bin',
             'url': 'https://github.com/shibing624/text2vec/releases/download/1.1.4/light_Tencent_AILab_ChineseEmbedding.bin',
             'binary': True,
             'untar_filename': 'light_Tencent_AILab_ChineseEmbedding.bin'},

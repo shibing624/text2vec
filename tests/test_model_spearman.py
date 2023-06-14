@@ -301,13 +301,32 @@ class SimModelTestCase(unittest.TestCase):
 
     def test_ernie3_0_base_model(self):
         # nghuyong/ernie-3.0-base-zh
+        # training with first_last_avg pooling and inference with mean pooling
         # STS-B spearman corr: 0.7981
         # ATEC spearman corr: 0.2965
         # BQ spearman corr: 0.3535
         # LCQMC spearman corr: 0.7184
         # PAWSX spearman corr: 0.1453
-        # avg: 0.5476
+        # avg: 0.4619
         # V100 QPS: 1547
+
+        # training with first_last_avg pooling and inference with first_last_avg pooling
+        # STS-B spearman corr: 0.7931
+        # ATEC spearman corr: 0.2997
+        # BQ spearman corr: 0.3749
+        # LCQMC spearman corr: 0.7110
+        # PAWSX spearman corr: 0.1326
+        # avg: 0.4421
+        # V100 QPS: 1613
+
+        # training with mean pooling and inference with mean pooling
+        # STS-B spearman corr: 0.8153
+        # ATEC spearman corr: 0.3319
+        # BQ spearman corr: 0.4284
+        # LCQMC spearman corr: 0.7293
+        # PAWSX spearman corr: 0.1499
+        # avg: 0.4909   (best)
+        # V100 QPS: 1588
         pass
 
     def test_ernie3_0_xbase_model(self):
@@ -334,6 +353,7 @@ class SimModelTestCase(unittest.TestCase):
 
     def test_hfl_chinese_roberta_wwm_ext_model(self):
         # hfl/chinese-roberta-wwm-ext
+        # training with first_last_avg pooling and inference with mean pooling
         # STS-B spearman corr: 0.7894
         # ATEC spearman corr: 0.3241
         # BQ spearman corr: 0.4362
@@ -343,7 +363,7 @@ class SimModelTestCase(unittest.TestCase):
         # V100 QPS: 1472
 
         # hfl/chinese-roberta-wwm-ext
-        # first_last_avg pooling
+        # training with first_last_avg pooling and inference with first_last_avg pooling
         # STS-B spearman corr: 0.7854
         # ATEC spearman corr: 0.3234
         # BQ spearman corr: 0.4402
@@ -351,6 +371,16 @@ class SimModelTestCase(unittest.TestCase):
         # PAWSX spearman corr: 0.1295
         # avg: 0.4739
         # V100 QPS: 1581
+
+        # hfl/chinese-roberta-wwm-ext
+        # training with mean pooling and inference with mean pooling
+        # STS-B spearman corr: 0.7996
+        # ATEC spearman corr: 0.3315
+        # BQ spearman corr: 0.4364
+        # LCQMC spearman corr: 0.7175
+        # PAWSX spearman corr: 0.1472
+        # avg: 0.4864
+        # V100 QPS: 1487
         pass
 
     def test_hfl_chinese_macbert_large_model(self):
