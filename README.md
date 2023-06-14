@@ -38,6 +38,7 @@
 - [SBERT(Sentence-BERT)](https://github.com/shibing624/text2vec/blob/master/text2vec/sentencebert_model.py)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
 - [CoSENT(Cosine Sentence)](https://github.com/shibing624/text2vec/blob/master/text2vec/cosent_model.py)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
 
+详细文本向量表示方法见wiki[文本向量表示方法](https://github.com/shibing624/text2vec/wiki/%E6%96%87%E6%9C%AC%E5%90%91%E9%87%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95)
 # Evaluation
 
 ### 文本匹配
@@ -627,19 +628,26 @@ curl -X 'GET' \
 
 - 本项目release的数据集：
 
-| Dataset           | Introduce                                                           | Download Link                                                                                                                                                                                                                                                                                         |
-|:------------------|:--------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| shibing624/nli_zh | 中文语义匹配数据集，整合了中文ATEC、BQ、LCQMC、PAWSX、STS-B共5个任务的数据集                   | [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh) </br> or </br> [百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ) </br> or </br> [github](https://github.com/shibing624/text2vec/releases/download/1.1.2/senteval_cn.zip) </br> |
-| ATEC              | 中文ATEC数据集，蚂蚁金服Q-Qpair数据集                                            | [ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)|
-| BQ                | 中文BQ(Bank Question)数据集，银行Q-Qpair数据集                                 | [BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)|
-| LCQMC              | 中文LCQMC(large-scale Chinese question matching corpus)数据集，Q-Qpair数据集 | [LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)|
-| PAWSX              | 中文PAWS(Paraphrase Adversaries from Word Scrambling)数据集，Q-Qpair数据集   | [PAWSX](https://arxiv.org/abs/1908.11828)|
-| STS-B              | 中文STS-B数据集，中文自然语言推理数据集，从英文STS-B翻译为中文的数据集                              | [STS-B](https://github.com/pluto-junzeng/CNSD)|
+| Dataset               | Introduce                                                           | Download Link                                                                                                                                                                                                                                                                                         |
+|:----------------------|:--------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| shibing624/nli-zh-all | 中文语义匹配数据合集，整合了文本推理，相似，摘要，问答，指令微调等任务的820万高质量数据，并转化为匹配格式数据集           | [https://huggingface.co/datasets/shibing624/nli-zh-all](https://huggingface.co/datasets/shibing624/nli-zh-all)                                                                                                                                                                                        |
+| shibing624/snli-zh    | 中文SNLI和MultiNLI数据集，翻译自英文SNLI和MultiNLI                                       | [https://huggingface.co/datasets/shibing624/snli-zh](https://huggingface.co/datasets/shibing624/snli-zh)                                                                                                                                                                                              |
+| shibing624/nli_zh     | 中文语义匹配数据集，整合了中文ATEC、BQ、LCQMC、PAWSX、STS-B共5个任务的数据集                   | [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh) </br> or </br> [百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ) </br> or </br> [github](https://github.com/shibing624/text2vec/releases/download/1.1.2/senteval_cn.zip) </br> |
+| ATEC                  | 中文ATEC数据集，蚂蚁金服Q-Qpair数据集                                            | [ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)                                                                                                                                                                                                                                 |
+| BQ                    | 中文BQ(Bank Question)数据集，银行Q-Qpair数据集                                 | [BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)                                                                                                                                                                                                                                                     |
+| LCQMC                 | 中文LCQMC(large-scale Chinese question matching corpus)数据集，Q-Qpair数据集 | [LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)                                                                                                                                                                                                                                               |
+| PAWSX                 | 中文PAWS(Paraphrase Adversaries from Word Scrambling)数据集，Q-Qpair数据集   | [PAWSX](https://arxiv.org/abs/1908.11828)                                                                                                                                                                                                                                                             |
+| STS-B                 | 中文STS-B数据集，中文自然语言推理数据集，从英文STS-B翻译为中文的数据集                            | [STS-B](https://github.com/pluto-junzeng/CNSD)                                                                                                                                                                                                                                                        |
 
-中文语义匹配数据集`shibing624/nli_zh`，包含[ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)、[BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)、
-[LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)、[PAWSX](https://arxiv.org/abs/1908.11828)、[STS-B](https://github.com/pluto-junzeng/CNSD)共5个任务。
-可以从数据集对应的链接自行下载，也可以从[百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ)下载。
-其中senteval_cn目录是评测数据集汇总，senteval_cn.zip是senteval目录的打包，两者下其一就好。
+
+常用英文匹配数据集：
+
+- 大名鼎鼎的multi_nli和snli: https://huggingface.co/datasets/multi_nli
+- 大名鼎鼎的multi_nli和snli: https://huggingface.co/datasets/snli
+- https://huggingface.co/datasets/metaeval/cnli
+- https://huggingface.co/datasets/mteb/stsbenchmark-sts
+- https://huggingface.co/datasets/JeremiahZ/simcse_sup_nli
+- https://huggingface.co/datasets/MoritzLaurer/multilingual-NLI-26lang-2mil7
 
 
 数据集使用示例：
@@ -675,75 +683,6 @@ DatasetDict({
 ```
 
 
-<details>
-<summary>文本向量方法介绍</summary>
-
-# Question
-文本向量表示咋做？文本匹配任务用哪个模型效果好？
-
-许多NLP任务的成功离不开训练优质有效的文本表示向量。特别是文本语义匹配（Semantic Textual Similarity，如paraphrase检测、QA的问题对匹配）、文本向量检索（Dense Text Retrieval）等任务。
-# Solution
-### 传统方法：基于特征的匹配
-
-- 基于TF-IDF、BM25、Jaccord、SimHash、LDA等算法抽取两个文本的词汇、主题等层面的特征，然后使用机器学习模型（LR, xgboost）训练分类模型
-- 优点：可解释性较好
-- 缺点：依赖人工寻找特征，泛化能力一般，而且由于特征数量的限制，模型的效果比较一般
-
-代表模型：
-- BM25
-
-BM25算法，通过候选句子的字段对qurey字段的覆盖程度来计算两者间的匹配得分，得分越高的候选项与query的匹配度更好，主要解决词汇层面的相似度问题。
-
-### 深度方法：基于表征的匹配
-- 基于表征的匹配方式，初始阶段对两个文本各自单独处理，通过深层的神经网络进行编码（encode），得到文本的表征（embedding），再对两个表征进行相似度计算的函数得到两个文本的相似度
-- 优点：基于BERT的模型通过有监督的Fine-tune在文本表征和文本匹配任务取得了不错的性能
-- 缺点：BERT自身导出的句向量（不经过Fine-tune，对所有词向量求平均）质量较低，甚至比不上Glove的结果，因而难以反映出两个句子的语义相似度
-
-> 主要原因是：
-> 
-> 1.BERT对所有的句子都倾向于编码到一个较小的空间区域内，这使得大多数的句子对都具有较高的相似度分数，即使是那些语义上完全无关的句子对。
-> 
-> 2.BERT句向量表示的聚集现象和句子中的高频词有关。具体来说，当通过平均词向量的方式计算句向量时，那些高频词的词向量将会主导句向量，使之难以体现其原本的语义。当计算句向量时去除若干高频词时，聚集现象可以在一定程度上得到缓解，但表征能力会下降。
-
-
-代表模型：
-
-- [DSSM(2013)](https://posenhuang.github.io/papers/cikm2013_DSSM_fullversion.pdf)
-- [CDSSM(2014)](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/www2014_cdssm_p07.pdf)
-- [ARC I(2014)](https://arxiv.org/pdf/1503.03244.pdf)
-- [Siamese Network(2016)](https://www.aclweb.org/anthology/W16-1617.pdf)
-- [InferSent(2017)](https://arxiv.org/pdf/1705.02364.pdf)
-- [BERT(2018)](https://arxiv.org/pdf/1810.04805.pdf)
-- [Sentence-BERT(2019)](https://arxiv.org/abs/1908.10084)
-- [BERT-flow(2020)](https://arxiv.org/abs/2011.05864)
-- [SimCSE(2021)](https://arxiv.org/abs/2104.08821)
-- [ConSERT(2021)](https://aclanthology.org/2021.acl-long.393/)
-- [CoSENT(2022)](https://kexue.fm/archives/8847)
-
-由于2018年BERT模型在NLP界带来了翻天覆地的变化，此处不讨论和比较2018年之前的模型（如果有兴趣了解的同学，可以参考中科院开源的[MatchZoo](https://github.com/NTMC-Community/MatchZoo) 和[MatchZoo-py](https://github.com/NTMC-Community/MatchZoo-py)）。
-
-所以，本项目主要调研以下比原生BERT更优、适合文本匹配的向量表示模型：Sentence-BERT(2019)、BERT-flow(2020)、SimCSE(2021)、CoSENT(2022)。
-
-### 深度方法：基于交互的匹配
-
-- 基于交互的匹配方式，则认为在最后阶段才计算文本的相似度会过于依赖文本表征的质量，同时也会丢失基础的文本特征（比如词法、句法等），所以提出尽可能早的对文本特征进行交互，捕获更基础的特征，最后在高层基于这些基础匹配特征计算匹配分数
-- 优点：基于交互的匹配模型端到端处理，效果好
-- 缺点：这类模型（Cross-Encoder）的输入要求是两个句子，输出的是句子对的相似度值，模型不会产生句子向量表示（sentence embedding），我们也无法把单个句子输入给模型。因此，对于需要文本向量表示的任务来说，这类模型并不实用
-
-
-代表模型：
-
-- [ARC II(2014)](https://arxiv.org/pdf/1503.03244.pdf)
-- [MV-LSTM(2015)](https://arxiv.org/pdf/1511.08277.pdf)
-- [MatchPyramid(2016)](https://arxiv.org/pdf/1602.06359.pdf)
-- [DRMM(2016)](https://www.bigdatalab.ac.cn/~gjf/papers/2016/CIKM2016a_guo.pdf)
-- [Conv-KNRM(2018)](https://www.cs.cmu.edu/~zhuyund/papers/WSDM_2018_Dai.pdf)
-- [RE2(2019)](https://www.aclweb.org/anthology/P19-1465.pdf)
-- [Keyword-BERT(2020)](https://arxiv.org/ftp/arxiv/papers/2003/2003.11516.pdf)
-
-Cross-Encoder适用于向量检索精排。
-
-</details>
 
 
 
