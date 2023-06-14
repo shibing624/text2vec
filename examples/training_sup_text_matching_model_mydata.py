@@ -52,38 +52,58 @@ def main():
     parser.add_argument('--num_epochs', default=10, type=int, help='Number of training epochs')
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='Learning rate')
-    parser.add_argument('--encoder_type', default='FIRST_LAST_AVG', type=lambda t: EncoderType[t],
+    parser.add_argument('--encoder_type', default='MEAN', type=lambda t: EncoderType[t],
                         choices=list(EncoderType), help='Encoder type, string name of EncoderType')
     args = parser.parse_args()
     logger.info(args)
 
     if args.do_train:
         if args.model_arch == 'cosent':
-            model = CosentModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
-                                max_seq_length=args.max_seq_length)
+            model = CosentModel(
+                model_name_or_path=args.model_name,
+                encoder_type=args.encoder_type,
+                max_seq_length=args.max_seq_length
+            )
         elif args.model_arch == 'sentencebert':
-            model = SentenceBertModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
-                                      max_seq_length=args.max_seq_length)
+            model = SentenceBertModel(
+                model_name_or_path=args.model_name,
+                encoder_type=args.encoder_type,
+                max_seq_length=args.max_seq_length
+            )
         else:
-            model = BertMatchModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
-                                   max_seq_length=args.max_seq_length)
-        model.train_model(args.train_file,
-                          args.output_dir,
-                          eval_file=args.valid_file,
-                          num_epochs=args.num_epochs,
-                          batch_size=args.batch_size,
-                          lr=args.learning_rate)
+            model = BertMatchModel(
+                model_name_or_path=args.model_name,
+                encoder_type=args.encoder_type,
+                max_seq_length=args.max_seq_length
+            )
+        model.train_model(
+            args.train_file,
+            args.output_dir,
+            eval_file=args.valid_file,
+            num_epochs=args.num_epochs,
+            batch_size=args.batch_size,
+            lr=args.learning_rate
+        )
         logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:
         if args.model_arch == 'cosent':
-            model = CosentModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
-                                max_seq_length=args.max_seq_length)
+            model = CosentModel(
+                model_name_or_path=args.output_dir,
+                encoder_type=args.encoder_type,
+                max_seq_length=args.max_seq_length
+            )
         elif args.model_arch == 'sentencebert':
-            model = SentenceBertModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
-                                      max_seq_length=args.max_seq_length)
+            model = SentenceBertModel(
+                model_name_or_path=args.output_dir,
+                encoder_type=args.encoder_type,
+                max_seq_length=args.max_seq_length
+            )
         else:
-            model = BertMatchModel(model_name_or_path=args.output_dir, encoder_type=args.encoder_type,
-                                   max_seq_length=args.max_seq_length)
+            model = BertMatchModel(
+                model_name_or_path=args.output_dir,
+                encoder_type=args.encoder_type,
+                max_seq_length=args.max_seq_length
+            )
         test_data = load_text_matching_test_data(args.test_file)
 
         # Predict embeddings
