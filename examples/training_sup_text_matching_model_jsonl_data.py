@@ -43,6 +43,7 @@ def main():
     parser.add_argument('--model_name', default='nghuyong/ernie-3.0-base-zh', type=str,
                         help='Transformers model model or path')
     parser.add_argument('--train_file', default='data/snli_zh_50.jsonl', type=str, help='Train data path')
+    parser.add_argument('--valid_file', default='data/snli_zh_50.jsonl', type=str, help='Train data path')
     parser.add_argument('--test_file', default='data/snli_zh_50.jsonl', type=str, help='Test data path')
     parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
     parser.add_argument("--do_predict", action="store_true", help="Whether to run predict.")
@@ -51,6 +52,7 @@ def main():
     parser.add_argument('--num_epochs', default=10, type=int, help='Number of training epochs')
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='Learning rate')
+    parser.add_argument('--save_model_every_epoch', action="store_true", help="Whether to save model after each epoch")
     parser.add_argument('--encoder_type', default='MEAN', type=lambda t: EncoderType[t],
                         choices=list(EncoderType), help='Encoder type, string name of EncoderType')
     args = parser.parse_args()
@@ -66,12 +68,15 @@ def main():
         else:
             model = BertMatchModel(model_name_or_path=args.model_name, encoder_type=args.encoder_type,
                                    max_seq_length=args.max_seq_length)
-        model.train_model(args.train_file,
-                          args.output_dir,
-                          eval_file=args.valid_file,
-                          num_epochs=args.num_epochs,
-                          batch_size=args.batch_size,
-                          lr=args.learning_rate)
+        model.train_model(
+            args.train_file,
+            args.output_dir,
+            eval_file=args.valid_file,
+            num_epochs=args.num_epochs,
+            batch_size=args.batch_size,
+            lr=args.learning_rate,
+            save_model_every_epoch=args.save_model_every_epoch,
+        )
         logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:
         if args.model_arch == 'cosent':

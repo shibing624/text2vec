@@ -5,7 +5,7 @@
 """
 from text2vec.bertmatching_model import BertMatchModel
 from text2vec.bm25 import BM25
-from text2vec.cosent_dataset import CosentTrainDataset, HFCosentTrainDataset
+from text2vec.cosent_dataset import CosentTrainDataset, HFCosentTrainDataset, load_cosent_train_data
 from text2vec.cosent_model import CosentModel
 from text2vec.ngram import NGram
 from text2vec.sentence_model import SentenceModel, EncoderType
