@@ -38,7 +38,7 @@
 - [SBERT(Sentence-BERT)](https://github.com/shibing624/text2vec/blob/master/text2vec/sentencebert_model.py)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
 - [CoSENT(Cosine Sentence)](https://github.com/shibing624/text2vec/blob/master/text2vec/cosent_model.py)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
 
-详细文本向量表示方法见wiki[文本向量表示方法](https://github.com/shibing624/text2vec/wiki/%E6%96%87%E6%9C%AC%E5%90%91%E9%87%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95)
+详细文本向量表示方法见wiki: [文本向量表示方法](https://github.com/shibing624/text2vec/wiki/%E6%96%87%E6%9C%AC%E5%90%91%E9%87%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95)
 # Evaluation
 
 ### 文本匹配
@@ -464,11 +464,23 @@ python training_sup_text_matching_model.py --task_name ATEC --model_arch cosent 
 
 - 在自有中文数据集上训练模型
 
-example: [examples/training_sup_text_matching_model_selfdata.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model_selfdata.py)
+example: [examples/training_sup_text_matching_model_mydata.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model_mydata.py)
 
 ```shell
-python training_sup_text_matching_model_selfdata.py --do_train --do_predict
+python training_sup_text_matching_model_mydata.py --do_train --do_predict
 ```
+
+训练集格式参考[examples/data/STS-B/STS-B.valid.data](https://github.com/shibing624/text2vec/blob/master/examples/data/STS-B/STS-B.valid.data)
+
+```shell
+sentence1   sentence2   label
+一个女孩在给她的头发做发型。	一个女孩在梳头。	2
+一群男人在海滩上踢足球。	一群男孩在海滩上踢足球。	3
+一个女人在测量另一个女人的脚踝。	女人测量另一个女人的脚踝。	5
+```
+
+`label`可以是0，1标签，0代表两个句子不相似，1代表相似；也可以是0-5的评分，评分越高，表示两个句子越相似。模型都能支持。
+
 
 - 在英文STS-B数据集训练和评估`CoSENT`模型
 

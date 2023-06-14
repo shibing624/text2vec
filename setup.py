@@ -37,9 +37,9 @@ setup(
     ],
     keywords='word embedding,text2vec,Chinese Text Similarity Calculation Tool,similarity,word2vec',
     install_requires=[
-        "jieba>=0.39",
+        "jieba",
         "loguru",
-        "transformers>=4.6.0",
+        "transformers",
         "datasets",
         "tqdm",
         "scikit-learn",

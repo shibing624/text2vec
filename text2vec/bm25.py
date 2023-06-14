@@ -5,6 +5,7 @@
 """
 
 from typing import List, Union, Tuple, Optional
+
 from text2vec.utils.rank_bm25 import BM25Okapi
 from text2vec.utils.tokenizer import JiebaTokenizer
 

@@ -6,12 +6,14 @@
 
 import os
 import time
-from typing import List, Union, Optional, Dict
-from loguru import logger
+from typing import List, Union, Dict
+
 import numpy as np
-from numpy import ndarray
 from gensim.models import KeyedVectors
+from loguru import logger
+from numpy import ndarray
 from tqdm import tqdm
+
 from text2vec.utils.get_file import get_file
 from text2vec.utils.tokenizer import JiebaTokenizer
 

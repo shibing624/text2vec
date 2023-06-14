@@ -7,13 +7,15 @@ Parts of this file is adapted from the sentence-transformers: https://github.com
 import os
 from enum import Enum
 from typing import List, Union, Optional
-from tqdm.autonotebook import trange
+
 import numpy as np
 import torch
-from transformers import AutoTokenizer, AutoModel
 from loguru import logger
 from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm, trange
+from tqdm.autonotebook import trange
+from transformers import AutoTokenizer, AutoModel
+
 from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"

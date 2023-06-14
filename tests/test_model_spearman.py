@@ -278,6 +278,93 @@ class SimModelTestCase(unittest.TestCase):
         print('sbert_batch_sim PAWSX spearman corr:', corr)
         print('spend time:', spend_time, ' seconds count:', len(sents1) * 2, 'qps:', len(sents1) * 2 / spend_time)
 
+    def test_uer_sbert_nli_model(self):
+        # uer/sbert-base-chinese-nli
+        # STS-B spearman corr: 0.7179
+        # ATEC spearman corr: 0.2953
+        # BQ spearman corr: 0.4332
+        # LCQMC spearman corr: 0.6239
+        # PAWSX spearman corr: 0.1345
+        # avg: 0.44096
+        pass
+
+    def test_ernie3_0_nano_model(self):
+        # nghuyong/ernie-3.0-nano-zh
+        # STS-B spearman corr: 0.6677
+        # ATEC spearman corr: 0.2331
+        # BQ spearman corr: 0.3716
+        # LCQMC spearman corr: 0.6007
+        # PAWSX spearman corr: 0.0970
+        # avg: 0.3918
+        # V100 QPS: 2858
+        pass
+
+    def test_ernie3_0_base_model(self):
+        # nghuyong/ernie-3.0-base-zh
+        # STS-B spearman corr: 0.7981
+        # ATEC spearman corr: 0.2965
+        # BQ spearman corr: 0.3535
+        # LCQMC spearman corr: 0.7184
+        # PAWSX spearman corr: 0.1453
+        # avg: 0.5476
+        # V100 QPS: 1547
+        pass
+
+    def test_ernie3_0_xbase_model(self):
+        # nghuyong/ernie-3.0-xbase-zh
+        # STS-B spearman corr: 0.7827
+        # ATEC spearman corr: 0.3463
+        # BQ spearman corr: 0.4267
+        # LCQMC spearman corr: 0.7181
+        # PAWSX spearman corr: 0.1318
+        # avg: 0.4777
+        # V100 QPS: 468
+        pass
+
+    def test_hfl_chinese_bert_wwm_ext_model(self):
+        # hfl/chinese-bert-wwm-ext
+        # STS-B spearman corr: 0.7635
+        # ATEC spearman corr: 0.2708
+        # BQ spearman corr: 0.3480
+        # LCQMC spearman corr: 0.7056
+        # PAWSX spearman corr: 0.1699
+        # avg: 0.4515
+        # V100 QPS: 1507
+        pass
+
+    def test_hfl_chinese_roberta_wwm_ext_model(self):
+        # hfl/chinese-roberta-wwm-ext
+        # STS-B spearman corr: 0.7894
+        # ATEC spearman corr: 0.3241
+        # BQ spearman corr: 0.4362
+        # LCQMC spearman corr: 0.7107
+        # PAWSX spearman corr: 0.1446
+        # avg: 0.4808
+        # V100 QPS: 1472
+
+        # hfl/chinese-roberta-wwm-ext
+        # first_last_avg pooling
+        # STS-B spearman corr: 0.7854
+        # ATEC spearman corr: 0.3234
+        # BQ spearman corr: 0.4402
+        # LCQMC spearman corr: 0.7029
+        # PAWSX spearman corr: 0.1295
+        # avg: 0.4739
+        # V100 QPS: 1581
+        pass
+
+    def test_hfl_chinese_macbert_large_model(self):
+        # hfl/chinese-macbert-large
+        # STS-B spearman corr: 0.7495
+        # ATEC spearman corr: 0.3222
+        # BQ spearman corr: 0.4608
+        # LCQMC spearman corr: 0.6784
+        # PAWSX spearman corr: 0.1081
+        # avg: 0.4634
+        # V100 QPS: 672
+        pass
+
+
 
 if __name__ == '__main__':
     unittest.main()
