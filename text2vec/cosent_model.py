@@ -174,7 +174,7 @@ class CosentModel(SentenceModel):
         self.bert.to(self.device)
         set_seed(seed)
 
-        train_dataloader = DataLoader(train_dataset, shuffle=False, batch_size=batch_size)
+        train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size)
         total_steps = len(train_dataloader) * num_epochs
         param_optimizer = list(self.bert.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
