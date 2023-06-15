@@ -63,7 +63,7 @@ class SentenceBertModel(SentenceModel):
             num_epochs: int = 1,
             weight_decay: float = 0.01,
             seed: int = 42,
-            warmup_ratio: float = 0.1,
+            warmup_ratio: float = 0.05,
             lr: float = 2e-5,
             eps: float = 1e-6,
             gradient_accumulation_steps: int = 1,
@@ -106,8 +106,10 @@ class SentenceBertModel(SentenceModel):
         elif train_file is not None:
             logger.info(
                 f"Hf_dataset_name: {hf_dataset_name} will be ignored when use_hf_dataset is False, load train_file: {train_file}")
-            train_dataset = TextMatchingTrainDataset(self.tokenizer, load_text_matching_train_data(train_file), self.max_seq_length)
-            eval_dataset = TextMatchingTestDataset(self.tokenizer, load_text_matching_test_data(eval_file), self.max_seq_length)
+            train_dataset = TextMatchingTrainDataset(self.tokenizer, load_text_matching_train_data(train_file),
+                                                     self.max_seq_length)
+            eval_dataset = TextMatchingTestDataset(self.tokenizer, load_text_matching_test_data(eval_file),
+                                                   self.max_seq_length)
         else:
             raise ValueError("Error, train_file|use_hf_dataset must be specified")
 
@@ -164,7 +166,7 @@ class SentenceBertModel(SentenceModel):
             num_epochs: int = 1,
             weight_decay: float = 0.01,
             seed: int = 42,
-            warmup_ratio: float = 0.1,
+            warmup_ratio: float = 0.05,
             lr: float = 2e-5,
             eps: float = 1e-6,
             gradient_accumulation_steps: int = 1,
@@ -182,7 +184,7 @@ class SentenceBertModel(SentenceModel):
         self.bert.to(self.device)
         set_seed(seed)
 
-        train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size)
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)  # keep the order of the data, not shuffle
         total_steps = len(train_dataloader) * num_epochs
         param_optimizer = list(self.bert.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']

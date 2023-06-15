@@ -54,7 +54,7 @@ class CosentModel(SentenceModel):
             num_epochs: int = 1,
             weight_decay: float = 0.01,
             seed: int = 42,
-            warmup_ratio: float = 0.1,
+            warmup_ratio: float = 0.05,
             lr: float = 2e-5,
             eps: float = 1e-6,
             gradient_accumulation_steps: int = 1,
@@ -156,7 +156,7 @@ class CosentModel(SentenceModel):
             num_epochs: int = 1,
             weight_decay: float = 0.01,
             seed: int = 42,
-            warmup_ratio: float = 0.1,
+            warmup_ratio: float = 0.05,
             lr: float = 2e-5,
             eps: float = 1e-6,
             gradient_accumulation_steps: int = 1,
@@ -174,7 +174,7 @@ class CosentModel(SentenceModel):
         self.bert.to(self.device)
         set_seed(seed)
 
-        train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size)
+        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)  # keep the order of the data, not shuffle
         total_steps = len(train_dataloader) * num_epochs
         param_optimizer = list(self.bert.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
