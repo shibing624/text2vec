@@ -330,7 +330,7 @@ class SimModelTestCase(unittest.TestCase):
 
         # training with mean pooling and inference with mean pooling
         # training data: STS-B + ATEC + BQ + LCQMC + PAWSX
-        # STS-B spearman corr: 0.80700
+        # STS-B spearman corr: 0.8070
         # ATEC spearman corr: 0.5126
         # BQ spearman corr: 0.6872
         # LCQMC spearman corr: 0.7913
