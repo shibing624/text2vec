@@ -22,6 +22,11 @@
 
 **text2vec**实现了Word2Vec、RankBM25、BERT、Sentence-BERT、CoSENT等多种文本表征、文本相似度计算模型，并在文本语义匹配（相似度计算）任务上比较了各模型的效果。
 
+## News
+[2023/06/15] v1.2.0版本: 发布了中文匹配模型[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese-nli)，基于ERNIE-3.0-base模型，使用了中文NLI数据集[https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh)的全部语料训练的CoSENT文本匹配模型，在各评估集表现提升明显，详见[Release-v1.2.0](https://github.com/shibing624/MedicalGPT/releases/tag/1.2.0)
+
+[2022/03/12] v1.1.4版本: 发布了中文匹配模型[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，基于中文STS训练集训练的CoSENT匹配模型。详见[Release-v1.1.4](https://github.com/shibing624/MedicalGPT/releases/tag/1.1.4)
+
 
 **Guide**
 - [Feature](#Feature)
@@ -71,24 +76,25 @@
 
 - 本项目release模型的中文匹配评测结果：
 
-| Arch | Backbone | Model                                                                                                                                          | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |    Avg    | QPS |
-| :-- | :--- |:---------------------------------------------------------------------------------------------------------------------------------------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:---------:| :-: |
-| Word2Vec | word2vec | [w2v-light-tencent-chinese](https://ai.tencent.com/ailab/nlp/en/download.html)                                                                     | 20.00 | 31.49 | 59.46 | 2.57  | 55.78 |   33.86   | 23769 |
-| SBERT | xlm-roberta-base | [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)  | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 |   41.99   | 3138 |
-| CoSENT | hfl/chinese-macbert-base | [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)                                                        | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | **48.25** | 3008 |
-| CoSENT | hfl/chinese-lert-large | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese)                                                    | 32.61 | 44.59 | 69.30 | 14.51 | 79.44 |   48.08   | 1046 |
+| Arch | BaseModel                    | Model                                                                                                                                             | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |    Avg    |  QPS  |
+| :-- |:-----------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:---------:|:-----:|
+| Word2Vec | word2vec                     | [w2v-light-tencent-chinese](https://ai.tencent.com/ailab/nlp/en/download.html)                                                                    | 20.00 | 31.49 | 59.46 | 2.57  | 55.78 |   33.86   | 23769 |
+| SBERT | xlm-roberta-base             | [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2) | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 |   41.99   | 3138  |
+| CoSENT | hfl/chinese-macbert-base     | [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)                                                       | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | 48.25 | 3008  |
+| CoSENT | hfl/chinese-lert-large       | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese)                                                   | 32.61 | 44.59 | 69.30 | 14.51 | 79.44 |   48.08   | 2092  |
+| CoSENT | nghuyong/ernie-3.0-base-zh   | [shibing624/text2vec-base-chinese-nli](https://huggingface.co/shibing624/text2vec-base-chinese-nli)                                               | 51.26 | 68.72 | 79.13 | 34.28 | 80.70 |   **62.81**   | 3066  |
 
 
 说明：
 - 结果值均使用spearman系数
 - 结果均只用该数据集的train训练，在test上评估得到的表现，没用外部数据
-- [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，并在中文STS-B测试集评估达到SOTA，运行[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)代码可训练模型，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，中文语义匹配任务推荐使用
+- `shibing624/text2vec-base-chinese`模型，是用CoSENT方法训练，基于MacBERT在中文STS-B数据训练得到，并在中文STS-B测试集评估达到SOTA，运行[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)代码可训练模型，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，中文语义匹配任务推荐使用
 - `SBERT-macbert-base`模型，是用SBERT方法训练，运行[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)代码可训练模型
-- [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2)模型是用SBERT训练，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，支持中文、英文等
+- `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`模型是用SBERT训练，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，支持中文、英文等
 - `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用，适用于中文字面匹配任务和缺少数据的冷启动情况
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--model_name hfl/chinese-macbert-base` 或者roberta模型：`--model_name uer/roberta-medium-wwm-chinese-cluecorpussmall`
 - 中文匹配数据集下载[链接见下方](#数据集)
-- 中文匹配任务实验表明，pooling最优是`first_last_avg`，即 SentenceModel 的`EncoderType.FIRST_LAST_AVG`，其与`EncoderType.MEAN`的方法在预测效果上差异很小
+- 中文匹配任务实验表明，pooling最优是`EncoderType.FIRST_LAST_AVG`和`EncoderType.MEAN`，两者预测效果差异很小
 - 中文匹配评测结果复现，可以下载中文匹配数据集到`examples/data`，运行[tests/test_model_spearman.py](https://github.com/shibing624/text2vec/blob/master/tests/test_model_spearman.py)代码复现评测结果
 - QPS的GPU测试环境是Tesla V100，显存32GB
 

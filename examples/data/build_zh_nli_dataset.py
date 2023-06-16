@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 @author:XuMing(xuming624@qq.com)
-@description:
+@description: build zh nli dataset
+
+part of this code is adapted from https://github.com/wangyuxinwhy/uniem/blob/main/scripts/process_zh_datasets.py
 """
 import string
 from dataclasses import dataclass

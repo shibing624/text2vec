@@ -330,13 +330,13 @@ class SimModelTestCase(unittest.TestCase):
 
         # training with mean pooling and inference with mean pooling
         # training data: STS-B + ATEC + BQ + LCQMC + PAWSX
-        # STS-B spearman corr:
-        # ATEC spearman corr:
-        # BQ spearman corr:
-        # LCQMC spearman corr:
-        # PAWSX spearman corr:
-        # avg:
-        # V100 QPS: 1478
+        # STS-B spearman corr: 0.80700
+        # ATEC spearman corr: 0.5126
+        # BQ spearman corr: 0.6872
+        # LCQMC spearman corr: 0.7913
+        # PAWSX spearman corr: 0.3428
+        # avg: 0.6281
+        # V100 QPS: 1526
         pass
 
     def test_ernie3_0_xbase_model(self):
