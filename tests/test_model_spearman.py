@@ -404,6 +404,17 @@ class SimModelTestCase(unittest.TestCase):
         # V100 QPS: 672
         pass
 
+    def test_m3e_base_model(self):
+        # moka-ai/m3e-base
+        # STS-B spearman corr: 0.7696
+        # ATEC spearman corr: 0.4127
+        # BQ spearman corr: 0.6381
+        # LCQMC spearman corr: 0.7487
+        # PAWSX spearman corr: 0.1220
+        # avg: 0.5378
+        # V100 QPS: 1490
+        pass
+
 
 
 if __name__ == '__main__':
