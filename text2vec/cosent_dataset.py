@@ -35,7 +35,7 @@ def load_cosent_train_data(path):
             if not field1 or not field2:
                 continue
 
-            text_a, text_b, score = entry[field1], entry[field2], int(entry["label"])
+            text_a, text_b, score = entry[field1], entry[field2], float(entry["label"])
             data.append((text_a, score))
             data.append((text_b, score))
     else:
@@ -45,7 +45,7 @@ def load_cosent_train_data(path):
                 if len(line) != 3:
                     logger.warning(f'line size not match, pass: {line}')
                     continue
-                score = int(line[2])
+                score = float(line[2])
                 data.append((line[0], score))
                 data.append((line[1], score))
     return data

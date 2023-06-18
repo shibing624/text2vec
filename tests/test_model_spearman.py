@@ -337,6 +337,16 @@ class SimModelTestCase(unittest.TestCase):
         # PAWSX spearman corr: 0.3428
         # avg: 0.6281
         # V100 QPS: 1526
+
+        # training with mean pooling and inference with mean pooling
+        # training data: all nli-zh-all sampled data
+        # STS-B spearman corr: 0.7742
+        # ATEC spearman corr: 0.4394
+        # BQ spearman corr: 0.6436
+        # LCQMC spearman corr: 0.7345
+        # PAWSX spearman corr: 0.3914
+        # avg: 0.5966
+        # V100 QPS: 1603
         pass
 
     def test_ernie3_0_xbase_model(self):
