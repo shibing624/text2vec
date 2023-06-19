@@ -23,6 +23,8 @@
 **text2vec**实现了Word2Vec、RankBM25、BERT、Sentence-BERT、CoSENT等多种文本表征、文本相似度计算模型，并在文本语义匹配（相似度计算）任务上比较了各模型的效果。
 
 ### News
+[2023/06/19] v1.2.1版本: 更新了中文匹配模型`shibing624/text2vec-base-chinese-nli`为新版[shibing624/text2vec-base-chinese-sentence](https://huggingface.co/shibing624/text2vec-base-chinese-sentence)，针对CoSENT的loss计算对排序敏感特点，人工挑选[shibing624/nli-zh-all](https://huggingface.co/datasets/shibing624/nli-zh-all)并整理出高质量的有相关性排序的STS数据集[shibing624/nli-zh-all/text2vec-base-chinese-sentence-dataset](https://huggingface.co/datasets/shibing624/nli-zh-all/tree/main/text2vec-base-chinese-sentence-dataset)，在各评估集表现相对之前有提升，详见[Release-v1.2.1](https://github.com/shibing624/text2vec/releases/tag/1.2.1)；发布了适用于s2p的中文匹配模型[shibing624/text2vec-base-chinese-paraphrase](https://huggingface.co/shibing624/text2vec-base-chinese-paraphrase)
+
 [2023/06/15] v1.2.0版本: 发布了中文匹配模型[shibing624/text2vec-base-chinese-nli](https://huggingface.co/shibing624/text2vec-base-chinese-nli)，基于`nghuyong/ernie-3.0-base-zh`模型，使用了中文NLI数据集[shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh)全部语料训练的CoSENT文本匹配模型，在各评估集表现提升明显，详见[Release-v1.2.0](https://github.com/shibing624/text2vec/releases/tag/1.2.0)
 
 [2022/03/12] v1.1.4版本: 发布了中文匹配模型[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，基于中文STS训练集训练的CoSENT匹配模型。详见[Release-v1.1.4](https://github.com/shibing624/text2vec/releases/tag/1.1.4)
@@ -46,9 +48,9 @@
 详细文本向量表示方法见wiki: [文本向量表示方法](https://github.com/shibing624/text2vec/wiki/%E6%96%87%E6%9C%AC%E5%90%91%E9%87%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95)
 # Evaluation
 
-### 文本匹配
+文本匹配
 
-- 英文匹配数据集的评测结果：
+#### 英文匹配数据集的评测结果：
 
 | Arch | Backbone | Model  | English-STS-B | 
 | :-- | :--- | :--- | :-: |
@@ -62,39 +64,48 @@
 | CoSENT | bert-base-uncased | CoSENT-base-first_last_avg | 69.93 |
 | CoSENT | sentence-transformers/bert-base-nli-mean-tokens | CoSENT-base-nli-first_last_avg | 79.68 |
 
-- 中文匹配数据集的评测结果：
+#### 中文匹配数据集的评测结果：
 
-| Arch | Backbone | Model  | ATEC | BQ | LCQMC | PAWSX | STS-B | Avg | QPS |
-| :-- | :--- | :--- | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| CoSENT | hfl/chinese-macbert-base | CoSENT-macbert-base | 50.39 | **72.93** | **79.17** | **60.86** | **80.51** | **68.77**  | 3008 |
-| CoSENT | Langboat/mengzi-bert-base | CoSENT-mengzi-base | **50.52** | 72.27 | 78.69 | 12.89 | 80.15 | 58.90 | 2502 |
-| CoSENT | bert-base-chinese | CoSENT-bert-base | 49.74 | 72.38 | 78.69 | 60.00 | 80.14 | 68.19 | 2653 |
-| SBERT | bert-base-chinese | SBERT-bert-base | 46.36 | 70.36 | 78.72 | 46.86 | 66.41 | 61.74 | 3365 |
-| SBERT | hfl/chinese-macbert-base | SBERT-macbert-base | 47.28 | 68.63 | **79.42** | 55.59 | 64.82 | 63.15 | 2948 |
-| CoSENT | hfl/chinese-roberta-wwm-ext | CoSENT-roberta-ext | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** | - |
-| SBERT | hfl/chinese-roberta-wwm-ext | SBERT-roberta-ext | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 | - |
+| Arch | Backbone | Model  |   ATEC    |    BQ     |   LCQMC   |   PAWSX   |   STS-B   |    Avg    | QPS  |
+| :-- | :--- | :--- |:---------:|:---------:|:---------:|:---------:|:---------:|:---------:|:----:|
+| CoSENT | hfl/chinese-macbert-base | CoSENT-macbert-base |   50.39   | **72.93** | **79.17** | **60.86** | **80.51** | **68.77** | 3008 |
+| CoSENT | Langboat/mengzi-bert-base | CoSENT-mengzi-base | **50.52** |   72.27   |   78.69   |   12.89   |   80.15   |   58.90   | 2502 |
+| CoSENT | bert-base-chinese | CoSENT-bert-base |   49.74   |   72.38   |   78.69   |   60.00   |   80.14   |   68.19   | 2653 |
+| SBERT | bert-base-chinese | SBERT-bert-base |   46.36   |   70.36   |   78.72   |   46.86   |   66.41   |   61.74   | 3365 |
+| SBERT | hfl/chinese-macbert-base | SBERT-macbert-base |   47.28   |   68.63   | **79.42** |   55.59   |   64.82   |   63.15   | 2948 |
+| CoSENT | hfl/chinese-roberta-wwm-ext | CoSENT-roberta-ext | **50.81** | **71.45** | **79.31** | **61.56** | **81.13** | **68.85** |  -   |
+| SBERT | hfl/chinese-roberta-wwm-ext | SBERT-roberta-ext |   48.29   |   69.99   |   79.22   |   44.10   |   72.42   |   62.80   |  -   |
 
+说明：
+- 结果评测指标：spearman系数
+- 为评测模型能力，结果均只用该数据集的train训练，在test上评估得到的表现，没用外部数据
+
+
+### Release Models
 - 本项目release模型的中文匹配评测结果：
 
-| Arch | BaseModel                    | Model                                                                                                                                             | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |    Avg    |  QPS  |
-| :-- |:-----------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:---------:|:-----:|
-| Word2Vec | word2vec                     | [w2v-light-tencent-chinese](https://ai.tencent.com/ailab/nlp/en/download.html)                                                                    | 20.00 | 31.49 | 59.46 | 2.57  | 55.78 |   33.86   | 23769 |
-| SBERT | xlm-roberta-base             | [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2) | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 |   41.99   | 3138  |
-| CoSENT | hfl/chinese-macbert-base     | [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)                                                       | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 | 48.25 | 3008  |
-| CoSENT | hfl/chinese-lert-large       | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese)                                                   | 32.61 | 44.59 | 69.30 | 14.51 | 79.44 |   48.08   | 2092  |
-| CoSENT | nghuyong/ernie-3.0-base-zh   | [shibing624/text2vec-base-chinese-nli](https://huggingface.co/shibing624/text2vec-base-chinese-nli)                                               | 51.26 | 68.72 | 79.13 | 34.28 | 80.70 |   **62.81**   | 3066  |
+| Arch       | BaseModel                         | Model                                                                                                                                             | ATEC  |  BQ   | LCQMC | PAWSX | STS-B | SOHU-dd | SOHU-dc |    Avg    |  QPS  |
+|:-----------|:----------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-------:|:-------:|:---------:|:-----:|
+| Word2Vec   | word2vec                          | [w2v-light-tencent-chinese](https://ai.tencent.com/ailab/nlp/en/download.html)                                                                    | 20.00 | 31.49 | 59.46 | 2.57  | 55.78 |  55.04  |  20.70  |   35.03   | 23769 |
+| SBERT      | xlm-roberta-base                  | [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2) | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 |  63.01  |  52.28  |   46.46   | 3138  |
+| Instructor | hfl/chinese-roberta-wwm-ext       | [moka-ai/m3e-base](https://huggingface.co/moka-ai/m3e-base)                                                                                       | 41.27 | 63.81 | 74.87 | 12.20 | 76.96 |  75.83  |  60.55  |   57.93   | 2980  |
+| CoSENT     | hfl/chinese-macbert-base          | [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)                                                       | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 |  70.27  |  50.42  |   51.61   | 3008  |
+| CoSENT     | hfl/chinese-lert-large            | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese)                                                   | 32.61 | 44.59 | 69.30 | 14.51 | 79.44 |  73.01  |  59.04  |   53.12   | 2092  |
+| CoSENT     | nghuyong/ernie-3.0-base-zh        | [shibing624/text2vec-base-chinese-sentence](https://huggingface.co/shibing624/text2vec-base-chinese-sentence)                                     | 51.26 | 68.72 | 79.13 | 34.28 | 80.70 |  70.34  |  54.91  |   60.09   | 3066  |
+| CoSENT     | nghuyong/ernie-3.0-base-zh        | [shibing624/text2vec-base-chinese-paraphrase](https://huggingface.co/shibing624/text2vec-base-chinese-paraphrase)                                 | 44.89 | 63.58 | 74.24 | 40.90 | 78.93 |  76.70  |  63.30  | **63.08** | 3066  |
 
 
 说明：
-- 结果值是spearman系数
-- 结果均只用该数据集的train训练，在test上评估得到的表现，没用外部数据
+- 结果评测指标：spearman系数
 - `shibing624/text2vec-base-chinese`模型，是用CoSENT方法训练，基于`hfl/chinese-macbert-base`在中文STS-B数据训练得到，并在中文STS-B测试集评估达到较好效果，运行[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)代码可训练模型，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，中文通用语义匹配任务推荐使用
-- `shibing624/text2vec-base-chinese-nli`模型，是用CoSENT方法训练，基于`nghuyong/ernie-3.0-base-zh`用中文NLI数据集[shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh)全部语料训练得到，并在中文各NLI测试集评估达到SOTA，运行[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)代码可训练模型，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese-nli](https://huggingface.co/shibing624/text2vec-base-chinese-nli)，中文s2s(句子vs句子)语义匹配任务推荐使用
+- `shibing624/text2vec-base-chinese-sentence`模型，是用CoSENT方法训练，基于`nghuyong/ernie-3.0-base-zh`用人工挑选后的中文STS数据集[shibing624/nli-zh-all/text2vec-base-chinese-sentence-dataset](https://huggingface.co/datasets/shibing624/nli-zh-all/tree/main/text2vec-base-chinese-sentence-dataset)训练得到，并在中文各NLI测试集评估达到较好效果，运行[examples/training_sup_text_matching_model_jsonl_data.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model_jsonl_data.py)代码可训练模型，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese-sentence](https://huggingface.co/shibing624/text2vec-base-chinese-sentence)，中文s2s(句子vs句子)语义匹配任务推荐使用
+- `shibing624/text2vec-base-chinese-paraphrase`模型，是用CoSENT方法训练，基于`nghuyong/ernie-3.0-base-zh`用人工挑选后的中文STS数据集[shibing624/nli-zh-all/text2vec-base-chinese-paraphrase-dataset](https://huggingface.co/datasets/shibing624/nli-zh-all/tree/main/text2vec-base-chinese-paraphrase-dataset)，数据集相对于[shibing624/nli-zh-all/text2vec-base-chinese-sentence-dataset](https://huggingface.co/datasets/shibing624/nli-zh-all/tree/main/text2vec-base-chinese-sentence-dataset)加入了s2p(sentence to paraphrase)数据，强化了其长文本的表征能力，并在中文各NLI测试集评估达到SOTA，运行[examples/training_sup_text_matching_model_jsonl_data.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model_jsonl_data.py)代码可训练模型，模型文件已经上传到huggingface的模型库[shibing624/text2vec-base-chinese-sentence](https://huggingface.co/shibing624/text2vec-base-chinese-sentence)，中文s2p(句子vs段落)语义匹配任务推荐使用
 - `SBERT-macbert-base`模型，是用SBERT方法训练，运行[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)代码可训练模型
 - `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`模型是用SBERT训练，是`paraphrase-MiniLM-L12-v2`模型的多语言版本，支持中文、英文等
 - `w2v-light-tencent-chinese`是腾讯词向量的Word2Vec模型，CPU加载使用，适用于中文字面匹配任务和缺少数据的冷启动情况
 - 各预训练模型均可以通过transformers调用，如MacBERT模型：`--model_name hfl/chinese-macbert-base` 或者roberta模型：`--model_name uer/roberta-medium-wwm-chinese-cluecorpussmall`
-- 中文匹配数据集下载[链接见下方](#数据集)
+- 为达到开箱即用的实用效果，使用的中文匹配数据集，中文匹配数据集下载[链接见下方](#数据集)
+- 为测评模型的鲁棒性，加入了未训练过的SOHU测试集，用于测试模型的泛化能力，SOHU数据集[链接见下方](#数据集)
 - 中文匹配任务实验表明，pooling最优是`EncoderType.FIRST_LAST_AVG`和`EncoderType.MEAN`，两者预测效果差异很小
 - 中文匹配评测结果复现，可以下载中文匹配数据集到`examples/data`，运行[tests/test_model_spearman.py](https://github.com/shibing624/text2vec/blob/master/tests/test_model_spearman.py)代码复现评测结果
 - QPS的GPU测试环境是Tesla V100，显存32GB
@@ -647,16 +658,17 @@ curl -X 'GET' \
 
 - 本项目release的数据集：
 
-| Dataset               | Introduce                                                           | Download Link                                                                                                                                                                                                                                                                                         |
-|:----------------------|:--------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| shibing624/nli-zh-all | 中文语义匹配数据合集，整合了文本推理，相似，摘要，问答，指令微调等任务的820万高质量数据，并转化为匹配格式数据集           | [https://huggingface.co/datasets/shibing624/nli-zh-all](https://huggingface.co/datasets/shibing624/nli-zh-all)                                                                                                                                                                                        |
-| shibing624/snli-zh    | 中文SNLI和MultiNLI数据集，翻译自英文SNLI和MultiNLI                                       | [https://huggingface.co/datasets/shibing624/snli-zh](https://huggingface.co/datasets/shibing624/snli-zh)                                                                                                                                                                                              |
-| shibing624/nli_zh     | 中文语义匹配数据集，整合了中文ATEC、BQ、LCQMC、PAWSX、STS-B共5个任务的数据集                   | [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh) </br> or </br> [百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ) </br> or </br> [github](https://github.com/shibing624/text2vec/releases/download/1.1.2/senteval_cn.zip) </br> |
-| ATEC                  | 中文ATEC数据集，蚂蚁金服Q-Qpair数据集                                            | [ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)                                                                                                                                                                                                                                 |
-| BQ                    | 中文BQ(Bank Question)数据集，银行Q-Qpair数据集                                 | [BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)                                                                                                                                                                                                                                                     |
-| LCQMC                 | 中文LCQMC(large-scale Chinese question matching corpus)数据集，Q-Qpair数据集 | [LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)                                                                                                                                                                                                                                               |
-| PAWSX                 | 中文PAWS(Paraphrase Adversaries from Word Scrambling)数据集，Q-Qpair数据集   | [PAWSX](https://arxiv.org/abs/1908.11828)                                                                                                                                                                                                                                                             |
-| STS-B                 | 中文STS-B数据集，中文自然语言推理数据集，从英文STS-B翻译为中文的数据集                            | [STS-B](https://github.com/pluto-junzeng/CNSD)                                                                                                                                                                                                                                                        |
+| Dataset                    | Introduce                                                                | Download Link                                                                                                                                                                                                                                                                                         |
+|:---------------------------|:-------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| shibing624/nli-zh-all      | 中文语义匹配数据合集，整合了文本推理，相似，摘要，问答，指令微调等任务的820万高质量数据，并转化为匹配格式数据集                | [https://huggingface.co/datasets/shibing624/nli-zh-all](https://huggingface.co/datasets/shibing624/nli-zh-all)                                                                                                                                                                                        |
+| shibing624/snli-zh         | 中文SNLI和MultiNLI数据集，翻译自英文SNLI和MultiNLI                                    | [https://huggingface.co/datasets/shibing624/snli-zh](https://huggingface.co/datasets/shibing624/snli-zh)                                                                                                                                                                                              |
+| shibing624/nli_zh          | 中文语义匹配数据集，整合了中文ATEC、BQ、LCQMC、PAWSX、STS-B共5个任务的数据集                        | [https://huggingface.co/datasets/shibing624/nli_zh](https://huggingface.co/datasets/shibing624/nli_zh) </br> or </br> [百度网盘(提取码:qkt6)](https://pan.baidu.com/s/1d6jSiU1wHQAEMWJi7JJWCQ) </br> or </br> [github](https://github.com/shibing624/text2vec/releases/download/1.1.2/senteval_cn.zip) </br> |
+| shibing624/sts-sohu2021    | 中文语义匹配数据集，2021搜狐校园文本匹配算法大赛数据集                                            | [https://huggingface.co/datasets/shibing624/sts-sohu2021](https://huggingface.co/datasets/shibing624/sts-sohu2021)                                                                                                                                                                                    |
+| ATEC                       | 中文ATEC数据集，蚂蚁金服Q-Qpair数据集                                                 | [ATEC](https://github.com/IceFlameWorm/NLP_Datasets/tree/master/ATEC)                                                                                                                                                                                                                                 |
+| BQ                         | 中文BQ(Bank Question)数据集，银行Q-Qpair数据集                                      | [BQ](http://icrc.hitsz.edu.cn/info/1037/1162.htm)                                                                                                                                                                                                                                                     |
+| LCQMC                      | 中文LCQMC(large-scale Chinese question matching corpus)数据集，Q-Qpair数据集      | [LCQMC](http://icrc.hitsz.edu.cn/Article/show/171.html)                                                                                                                                                                                                                                               |
+| PAWSX                      | 中文PAWS(Paraphrase Adversaries from Word Scrambling)数据集，Q-Qpair数据集        | [PAWSX](https://arxiv.org/abs/1908.11828)                                                                                                                                                                                                                                                             |
+| STS-B                      | 中文STS-B数据集，中文自然语言推理数据集，从英文STS-B翻译为中文的数据集                                 | [STS-B](https://github.com/pluto-junzeng/CNSD)                                                                                                                                                                                                                                                        |
 
 
 常用英文匹配数据集：
@@ -758,3 +770,4 @@ BibTeX:
 - [CoSENT：比Sentence-BERT更有效的句向量方案](https://kexue.fm/archives/8847)
 - [谈谈文本匹配和多轮检索](https://zhuanlan.zhihu.com/p/111769969)
 - [Sentence-transformers](https://www.sbert.net/examples/applications/computing-embeddings/README.html)
+- [One Embedder, Any Task: Instruction-Finetuned Text Embeddings](https://arxiv.org/abs/2212.09741)
