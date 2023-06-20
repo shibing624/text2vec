@@ -35,17 +35,11 @@ _计算句向量时移除Top-K高频词后的性能变化_
 
 句子表征学习是一个很经典的任务，分为以下三类方法：
 
-1. 有监督的句子表征学习方法
+1. 有监督的句子表征学习方法：早期的工作[5]发现自然语言推理（Natural Language Inference，NLI）任务对语义匹配任务有较大的帮助，训练过程常常融合了两个NLI的数据集SNLI和MNLI，文本表征使用BiLSTM编码器。InferSent模型用了siamese结构，两个句子共用一个encoder，分别得到u和v的文本向量表达，然后用3种计算方式，向量拼接\([u,v]\)，相乘\(u * v\)，相减\(|u-v|\)(为了保证对称性取绝对值），来帮助后面的全连接层提取向量间的交互信息，最后跟一个3分类的分类器。Sentence-BERT[1]借鉴了InferSent的框架，只是encoder部分替换成了BERT模型。
+2. 自监督的Sentence-level预训练：有监督数据标注成本高，研究者们开始寻找无监督的训练方式。BERT提出了NSP的任务，可以算作是一种自监督的句子级预训练目标。尽管之后的工作指出NSP相比于MLM其实没有太大帮助。Cross-Thought[7]、CMLM[8]是两种思想类似的预训练目标，他们把一段文章切成多个短句，然后通过相邻句子的编码去恢复当前句子中被Mask的Token。相比于MLM，额外添加了上下文其他句子的编码对Token恢复的帮助，因此更适合句子级别的训练。SLM[9]通过将原本连贯的若干个短句打乱顺序（通过改变Position Id实现），然后通过预测正确的句子顺序进行自监督预训练。
+3. 无监督的句子表示迁移：预训练模型现已被普遍使用，然而BERT的NSP任务得到的表示表现更不好，大多数同学也没有资源去进行自监督预训练，因此将预训练模型的表示迁移到任务才是更有效的方式。BERT-flow[2]：CMU&amp;字节AI Lab的工作，通过在BERT之上学习一个可逆的Flow变换，可以将BERT表示空间映射到规范化的标准高斯空间，然后在高斯空间进行相似度匹配。BERT-whitening[10]：苏剑林提出对BERT表征进行白化操作（均值变为0，协方差变为单位矩阵）就能在STS上达到媲美BERT-flow的效果。SimCSE[11]：陈丹琦组在2021年4月份公开的工作，他们同样使用基于对比学习的训练框架，使用Dropout的数据增强方法，在维基百科语料上Fine-tune BERT。
 
-早期的工作[5]发现自然语言推理（Natural Language Inference，NLI）任务对语义匹配任务有较大的帮助，训练过程常常融合了两个NLI的数据集SNLI和MNLI，文本表征使用BiLSTM编码器。InferSent模型用了siamese结构，两个句子共用一个encoder，分别得到u和v的文本向量表达，然后用3种计算方式，向量拼接\([u,v]\)，相乘\(u * v\)，相减\(|u-v|\)(为了保证对称性取绝对值），来帮助后面的全连接层提取向量间的交互信息，最后跟一个3分类的分类器。Sentence-BERT[1]借鉴了InferSent的框架，只是encoder部分替换成了BERT模型。
-2. 自监督的Sentence-level预训练
-
-有监督数据标注成本高，研究者们开始寻找无监督的训练方式。BERT提出了NSP的任务，可以算作是一种自监督的句子级预训练目标。尽管之后的工作指出NSP相比于MLM其实没有太大帮助。Cross-Thought[7]、CMLM[8]是两种思想类似的预训练目标，他们把一段文章切成多个短句，然后通过相邻句子的编码去恢复当前句子中被Mask的Token。相比于MLM，额外添加了上下文其他句子的编码对Token恢复的帮助，因此更适合句子级别的训练。SLM[9]通过将原本连贯的若干个短句打乱顺序（通过改变Position Id实现），然后通过预测正确的句子顺序进行自监督预训练。
-3. 无监督的句子表示迁移
-
-预训练模型现已被普遍使用，然而BERT的NSP任务得到的表示表现更不好，大多数同学也没有资源去进行自监督预训练，因此将预训练模型的表示迁移到任务才是更有效的方式。BERT-flow[2]：CMU&amp;字节AI Lab的工作，通过在BERT之上学习一个可逆的Flow变换，可以将BERT表示空间映射到规范化的标准高斯空间，然后在高斯空间进行相似度匹配。BERT-whitening[10]：苏剑林提出对BERT表征进行白化操作（均值变为0，协方差变为单位矩阵）就能在STS上达到媲美BERT-flow的效果。SimCSE[11]：陈丹琦组在2021年4月份公开的工作，他们同样使用基于对比学习的训练框架，使用Dropout的数据增强方法，在维基百科语料上Fine-tune BERT。
-
-### Sentence-BERT模型
+### 2.2 Sentence-BERT模型
 当前有监督的句子表征模型Sentence-BERT，表现出在句向量表示和文本匹配任务上SOTA的效果，证明了其有效性。Sentence-BERT的训练过程是把（u, v, |u - v|）拼接起来后接分类层，而预测过程，是跟普通的句向量模型一样，先计算mean pooling后的句向量，然后拿向量算cos得到相似度值。
 
 Sentence-BERT的训练：
@@ -67,7 +61,7 @@ BERT-flow和BERT-whitening这类BERT后处理模型，就是用无监督方法�
 2. u, v拼接的作用，从BERT-flow的工作可以知道，BERT句向量具备具备丰富的语义信息，但是句向量所在空间受到词频的影响，具备**非平滑，各向异性**的特点，这种特点导致未经过微调的“BERT+CLS”句向量模型直接应用在语义相似计算任务上的效果甚至不如简单的GloVe句向量，
 而|u - v|只是向量的相对差距，无法明显改善这种各向异性。而在u, v拼接之后接全连接层，利用了全连接层的类别向量是随机初始化的，相当于给了u，v一个随机的优化方向，迫使他们各自“散开”，远离当前的各向异性状态。
 
-## 3. 模型介绍
+## 3. CoSENT模型介绍
 
 ### 3.1 基本思路
 
@@ -112,7 +106,7 @@ _训练与预测同模型结构_
 ### 3.3 融合监督和无监督信号
 
 除了有监督训练以外，我们还可以进一步融合监督信号的策略：
-先做有监督再无监督（sup-unsup）：先使用有监督损失训练模型，再使用SimCSE的无监督的方法进行表示迁移也是可以的，具体效果此处不表，大家可以自行实验，可以在领域迁移学习快速应用。
+先做有监督再无监督（sup-unsup）：先使用有监督损失训练模型，再使用SimCSE的无监督的方法进行表示迁移也是可以的，具体效果下面有分析，大家可以自行实验，可以在领域迁移学习快速应用。
 
 
 ## 4. 实验分析
@@ -295,18 +289,28 @@ _不同Batch size下的性能_
 
 我们基于以上实验结果，按最优参数训练了文本表征的CoSENT模型，在中文匹配评测集上取得了SOTA效果，并具备s2s(sentence to sentence)和s2p(sentence to paraphrase)的文本相似度计算、相似文本检索能力。
 
+**训练参数**
+
+- arch: CoSENT 
+- backbone: nghuyong/ernie-3.0-base-zh 
+- pooling: MEAN 
+- temperature: 0.05 
+- batch_size: 64 
+- max_seq_length: 256
+
+
 评测结果：
 
 
-| Arch       | BaseModel                         | Model                                                                                                                                             | ATEC  |  BQ   | LCQMC | PAWSX | STS-B | SOHU-dd | SOHU-dc |    Avg    |  QPS  |
-|:-----------|:----------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-------:|:-------:|:---------:|:-----:|
-| Word2Vec   | word2vec                          | [w2v-light-tencent-chinese](https://ai.tencent.com/ailab/nlp/en/download.html)                                                                    | 20.00 | 31.49 | 59.46 | 2.57  | 55.78 |  55.04  |  20.70  |   35.03   | 23769 |
-| SBERT      | xlm-roberta-base                  | [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2) | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 |  63.01  |  52.28  |   46.46   | 3138  |
-| Instructor | hfl/chinese-roberta-wwm-ext       | [moka-ai/m3e-base](https://huggingface.co/moka-ai/m3e-base)                                                                                       | 41.27 | 63.81 | 74.87 | 12.20 | 76.96 |  75.83  |  60.55  |   57.93   | 2980  |
-| CoSENT     | hfl/chinese-macbert-base          | [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)                                                       | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 |  70.27  |  50.42  |   51.61   | 3008  |
-| CoSENT     | hfl/chinese-lert-large            | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese)                                                   | 32.61 | 44.59 | 69.30 | 14.51 | 79.44 |  73.01  |  59.04  |   53.12   | 2092  |
-| CoSENT     | nghuyong/ernie-3.0-base-zh        | [shibing624/text2vec-base-chinese-sentence](https://huggingface.co/shibing624/text2vec-base-chinese-sentence)                                     | 43.37 | 61.43 | 73.48 | 38.90 | 78.25 |  70.60  |  53.08  |   59.87   | 3089  |
-| CoSENT     | nghuyong/ernie-3.0-base-zh        | [shibing624/text2vec-base-chinese-paraphrase](https://huggingface.co/shibing624/text2vec-base-chinese-paraphrase)                                 | 44.89 | 63.58 | 74.24 | 40.90 | 78.93 |  76.70  |  63.30  | **63.08** | 3066  |
+| Arch       | BackBone                    | Model                                                                                                                                             | ATEC  |  BQ   | LCQMC | PAWSX | STS-B | SOHU-dd | SOHU-dc |    Avg    |  QPS  |
+|:-----------|:----------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-------:|:-------:|:---------:|:-----:|
+| Word2Vec   | word2vec                    | [w2v-light-tencent-chinese](https://ai.tencent.com/ailab/nlp/en/download.html)                                                                    | 20.00 | 31.49 | 59.46 | 2.57  | 55.78 |  55.04  |  20.70  |   35.03   | 23769 |
+| SBERT      | xlm-roberta-base            | [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2) | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 |  63.01  |  52.28  |   46.46   | 3138  |
+| Instructor | hfl/chinese-roberta-wwm-ext | [moka-ai/m3e-base](https://huggingface.co/moka-ai/m3e-base)                                                                                       | 41.27 | 63.81 | 74.87 | 12.20 | 76.96 |  75.83  |  60.55  |   57.93   | 2980  |
+| CoSENT     | hfl/chinese-macbert-base    | [shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)                                                       | 31.93 | 42.67 | 70.16 | 17.21 | 79.30 |  70.27  |  50.42  |   51.61   | 3008  |
+| CoSENT     | hfl/chinese-lert-large      | [GanymedeNil/text2vec-large-chinese](https://huggingface.co/GanymedeNil/text2vec-large-chinese)                                                   | 32.61 | 44.59 | 69.30 | 14.51 | 79.44 |  73.01  |  59.04  |   53.12   | 2092  |
+| CoSENT     | nghuyong/ernie-3.0-base-zh  | [shibing624/text2vec-base-chinese-sentence](https://huggingface.co/shibing624/text2vec-base-chinese-sentence)                                     | 43.37 | 61.43 | 73.48 | 38.90 | 78.25 |  70.60  |  53.08  |   59.87   | 3089  |
+| CoSENT     | nghuyong/ernie-3.0-base-zh  | [shibing624/text2vec-base-chinese-paraphrase](https://huggingface.co/shibing624/text2vec-base-chinese-paraphrase)                                 | 44.89 | 63.58 | 74.24 | 40.90 | 78.93 |  76.70  |  63.30  | **63.08** | 3066  |
 
 - `shibing624/text2vec-base-chinese`模型，是用CoSENT方法训练，基于`hfl/chinese-macbert-base`在中文STS-B数据训练得到，并在中文STS-B测试集评估达到较好效果，模型文件已经上传HF model hub，中文通用语义匹配任务推荐使用
 - `shibing624/text2vec-base-chinese-sentence`模型，是用CoSENT方法训练，基于`nghuyong/ernie-3.0-base-zh`用人工挑选后的中文STS数据集训练得到，并在中文各NLI测试集评估达到较好效果，模型文件已经上传HF model hub，中文s2s语义匹配任务推荐使用
@@ -318,7 +322,7 @@ _不同Batch size下的性能_
 
 在此工作中，我们分析了BERT句向量表示空间坍缩的原因，并分析了基于排序loss的句子表示CoSENT模型的优势。CoSENT在有监督训练的实验中表现出了优秀的性能，在中英文数据集上都超越了基线模型，表现出模型对句子表征的有效性。
 
-目前，相关代码已经放Github[shibing624/text2vec](https://github.com/shibing624/text2vec)，欢迎大家使用。
+目前，相关代码已经放Github上：[shibing624/text2vec](https://github.com/shibing624/text2vec)，欢迎大家使用。
 
 ## 参考文献
 
