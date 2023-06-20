@@ -252,9 +252,9 @@ class SimModelTestCase(unittest.TestCase):
         # LCQMC spearman corr: 0.7913
         # PAWSX spearman corr: 0.3428
         # avg: 0.6281
-        # sohu-dd spearman corr: 0.6970
-        # sohu-dc spearman corr: 0.5984
-        # add sohu-dd and sohu-dc avg: 0.6331
+        # sohu-dd spearman corr: 0.6939
+        # sohu-dc spearman corr: 0.5544
+        # add sohu-dd and sohu-dc avg: 0.6270
         # V100 QPS: 1526
 
         # training with mean pooling and inference with mean pooling

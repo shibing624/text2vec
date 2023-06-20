@@ -67,14 +67,14 @@
 #### 中文匹配数据集的评测结果：
 
 
-| Arch   | Backbone                    | Model Name          | ATEC  |  BQ   | LCQMC  | PAWSX | STS-B |  Avg  | 
-|:-------|:----------------------------|:--------------------|:-----:|:-----:|:------:|:-----:|:-----:|:-----:|
-| SBERT  | bert-base-chinese           | SBERT-bert-base     | 46.36 | 70.36 | 78.72  | 46.86 | 66.41 | 61.74 |
+| Arch   | Backbone                    | Model Name          | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |  Avg  | 
+|:-------|:----------------------------|:--------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| SBERT  | bert-base-chinese           | SBERT-bert-base     | 46.36 | 70.36 | 78.72 | 46.86 | 66.41 | 61.74 |
 | SBERT  | hfl/chinese-macbert-base    | SBERT-macbert-base  | 47.28 | 68.63 | 79.42 | 55.59 | 64.82 | 63.15 |
-| SBERT  | hfl/chinese-roberta-wwm-ext | SBERT-roberta-ext   | 48.29 | 69.99 | 79.22  | 44.10 | 72.42 | 62.80 |
-| CoSENT | bert-base-chinese           | CoSENT-bert-base    | 49.74 | 72.38 | 78.69  | 60.00 | 80.14 | 68.19 |
-| CoSENT | hfl/chinese-macbert-base    | CoSENT-macbert-base | 50.39 | 72.93 | 79.17  | 60.86 | 80.51 | 68.77 |
-| CoSENT | hfl/chinese-roberta-wwm-ext | CoSENT-roberta-ext  | 50.81 | 71.45 | 79.31  | 61.56 | 81.13 | 68.85 |
+| SBERT  | hfl/chinese-roberta-wwm-ext | SBERT-roberta-ext   | 48.29 | 69.99 | 79.22 | 44.10 | 72.42 | 62.80 |
+| CoSENT | bert-base-chinese           | CoSENT-bert-base    | 49.74 | 72.38 | 78.69 | 60.00 | 79.27 | 68.01 |
+| CoSENT | hfl/chinese-macbert-base    | CoSENT-macbert-base | 50.39 | 72.93 | 79.17 | 60.86 | 79.30 | 68.53 |
+| CoSENT | hfl/chinese-roberta-wwm-ext | CoSENT-roberta-ext  | 50.81 | 71.45 | 79.31 | 61.56 | 79.96 | 68.61 |
 
 说明：
 - 结果评测指标：spearman系数

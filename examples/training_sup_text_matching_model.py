@@ -52,7 +52,7 @@ def main():
     parser.add_argument('--num_epochs', default=10, type=int, help='Number of training epochs')
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='Learning rate')
-    parser.add_argument('--encoder_type', default='FIRST_LAST_AVG', type=lambda t: EncoderType[t],
+    parser.add_argument('--encoder_type', default='MEAN', type=lambda t: EncoderType[t],
                         choices=list(EncoderType), help='Encoder type, string name of EncoderType')
     args = parser.parse_args()
     logger.info(args)
