@@ -108,6 +108,7 @@ class SimModelTestCase(unittest.TestCase):
             embedding_type=EmbeddingType.BERT,
             encoder_type="MEAN"
         )
+        print(m)
         test_path = os.path.join(pwd_path, '../examples/data/STS-B/STS-B.test.data')
         c1 = get_corr(m, test_path)
 

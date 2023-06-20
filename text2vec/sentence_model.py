@@ -45,7 +45,7 @@ class SentenceModel:
             self,
             model_name_or_path: str = "shibing624/text2vec-base-chinese",
             encoder_type: Union[str, EncoderType] = "MEAN",
-            max_seq_length: int = 128,
+            max_seq_length: int = 256,
             device: Optional[str] = None,
     ):
         """
