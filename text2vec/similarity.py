@@ -37,15 +37,16 @@ class Similarity:
             model_name_or_path="shibing624/text2vec-base-chinese",
             similarity_type=SimilarityType.COSINE,
             embedding_type=EmbeddingType.BERT,
-            encoder_type=EncoderType.MEAN
+            encoder_type=EncoderType.MEAN,
+            max_seq_length=256,
     ):
         """
         Cal text similarity
         :param model_name_or_path: str, model path or name, default is None,
-            auto load paraphrase-multilingual-MiniLM-L12-v2
         :param similarity_type: SimilarityType, similarity type, default is COSINE
         :param embedding_type: EmbeddingType, embedding type, default is BERT
         :param encoder_type: EncoderType, encoder type, adjust with model_name_or_path
+        :param max_seq_length: int, max sequence length, default is 256
         """
         if embedding_type not in [EmbeddingType.BERT, EmbeddingType.WORD2VEC]:
             logger.warning('embedding_type set error, use default bert')
@@ -70,7 +71,11 @@ class Similarity:
                 raise ValueError(e)
         elif self.embedding_type == EmbeddingType.BERT:
             try:
-                self.model = SentenceModel(model_name_or_path, encoder_type=self.encoder_type)
+                self.model = SentenceModel(
+                    model_name_or_path,
+                    encoder_type=self.encoder_type,
+                    max_seq_length=max_seq_length,
+                )
             except ValueError as e:
                 logger.error(f"{model_name_or_path} is not Bert model")
                 raise ValueError(e)
