@@ -53,7 +53,7 @@
 #### 英文匹配数据集的评测结果：
 
 
-| Arch   | Backbone                                        | Model Name                           | English-STS-B | 
+| Arch   | BaseModel                                        | Model                            | English-STS-B | 
 |:-------|:------------------------------------------------|:-------------------------------------|:-------------:|
 | GloVe  | glove                                           | Avg_word_embeddings_glove_6B_300d    |     61.77     |
 | BERT   | bert-base-uncased                               | BERT-base-cls                        |     20.29     |
@@ -67,7 +67,7 @@
 #### 中文匹配数据集的评测结果：
 
 
-| Arch   | Backbone                    | Model Name          | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |  Avg  | 
+| Arch   | BaseModel                    | Model           | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |  Avg  | 
 |:-------|:----------------------------|:--------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | SBERT  | bert-base-chinese           | SBERT-bert-base     | 46.36 | 70.36 | 78.72 | 46.86 | 66.41 | 61.74 |
 | SBERT  | hfl/chinese-macbert-base    | SBERT-macbert-base  | 47.28 | 68.63 | 79.42 | 55.59 | 64.82 | 63.15 |

@@ -105,7 +105,7 @@ _训练与预测同模型结构_
 
 ### 3.3 融合监督和无监督信号
 
-除了有监督训练以外，我们还可以进一步融合监督信号的策略：
+除了有监督训练以外，我们还可以进一步融合监督信号的策略。
 先做有监督再无监督（sup-unsup）：先使用有监督损失训练模型，再使用SimCSE的无监督的方法进行表示迁移也是可以的，具体效果下面有分析，大家可以自行实验，可以在领域迁移学习快速应用。
 
 
@@ -135,7 +135,7 @@ _训练与预测同模型结构_
 
 ### 4.1 英文匹配数据集
 
-| Arch   | Backbone                                        | Model Name                           | English-STS-B | 
+| Arch   | BaseModel                                        | Model                           | English-STS-B | 
 |:-------|:------------------------------------------------|:-------------------------------------|:-------------:|
 | GloVe  | glove                                           | Avg_word_embeddings_glove_6B_300d    |     61.77     |
 | BERT   | bert-base-uncased                               | BERT-base-cls                        |     20.29     |
@@ -149,14 +149,14 @@ _训练与预测同模型结构_
 **英文数据集的实验结果**
 
 在英文匹配任务实验中，我们基于预训练的BERT在STS数据上进行Fine-tune。
-在有监督实验中，我们没有使用额外的SNLI和MNLI训练数据，仅使用了STSb的训练数据，CoSENT在backbone为bert-base-uncased和bert-base-nli-mean-tokens下，实现结果得分均超过了基线。
+在有监督实验中，我们没有使用额外的SNLI和MNLI训练数据，仅使用了STSb的训练数据，CoSENT在BaseModel为bert-base-uncased和bert-base-nli-mean-tokens下，实现结果得分均超过了基线。
 
 结果显示，CoSENT方法在完全一致的设置下超过Sentence-BERT，达到了2%的相对性能提升。
 
 ### 4.2 中文匹配数据集
 
 
-| Arch   | Backbone                    | Model Name          | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |  Avg  | 
+| Arch   | BaseModel                    | Model          | ATEC  |  BQ   | LCQMC | PAWSX | STS-B |  Avg  | 
 |:-------|:----------------------------|:--------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 | SBERT  | bert-base-chinese           | SBERT-bert-base     | 46.36 | 70.36 | 78.72 | 46.86 | 66.41 | 61.74 |
 | SBERT  | hfl/chinese-macbert-base    | SBERT-macbert-base  | 47.28 | 68.63 | 79.42 | 55.59 | 64.82 | 63.15 |
@@ -171,12 +171,12 @@ _训练与预测同模型结构_
 在中文匹配任务实验中，我们在五个数据集中做了实验，包括：ATEC、BQ、LCQMC、PAWSX、STS-B，并且报告了五个数据集的平均结果，结果显示，
 CoSENT方法在在相同的MacBERT预训练模型下Fine-tune，其得分超过Sentence-BERT，达到了5%的相对性能提升。
 
-### 4.3 BackBone选择的实验分析
+### 4.3 BaseModel选择的实验分析
 
-我们对比了CoSENT在不同的BackBone下的中文STS-B的实验结果，包括`bert-base-chinese`、`hfl/chinese-macbert-base`、`nghuyong/ernie-3.0-base-zh`等多种中文预训练模型。
+我们对比了CoSENT在不同的BaseModel下的中文STS-B的实验结果，包括`bert-base-chinese`、`hfl/chinese-macbert-base`、`nghuyong/ernie-3.0-base-zh`等多种中文预训练模型。
 
 
-|         backbone         | Chinese-STS-B (spearman, test) |
+|         BaseModel         | Chinese-STS-B (spearman, test) |
 |:------------------------:|:------------------------------:|
 |    bert-base-chinese     |               0.7927                |
 |   hfl/chinese-bert-wwm-ext   |             0.7635             |
@@ -189,13 +189,13 @@ CoSENT方法在在相同的MacBERT预训练模型下Fine-tune，其得分超过S
 
 
 
-在中文STS-B的实验中，我们发现CoSENT在不同的BackBone下的实验结果相差不大，这说明CoSENT方法对于不同的BackBone都有很好的适应性，
-该实验显示同等参数量模型size下，Backbone最佳是`nghuyong/ernie-3.0-base-zh`。
+在中文STS-B的实验中，我们发现CoSENT在不同的BaseModel下的实验结果相差不大，这说明CoSENT方法对于不同的BaseModel都有很好的适应性，
+该实验显示同等参数量模型size下，BaseModel最佳是`nghuyong/ernie-3.0-base-zh`。
 
 ### 4.4 Pooling策略的实验分析
 
 我们对比了CoSENT使用不同pooling策略的实验结果，包括`MEAN`、`CLS`、`FIRST_LAST_AVG`等多种pooling策略，其他实验设置是一样的：
-Backbone为`nghuyong/ernie-3.0-base-zh`，训练集为Chinese-STS-B，batch size为64，t为0.05。
+BaseModel为`nghuyong/ernie-3.0-base-zh`，训练集为Chinese-STS-B，batch size为64，t为0.05。
 
 
 |    pooling     | Chinese-STS-B (spearman, test) |
@@ -252,32 +252,29 @@ _不同Batch size下的性能_
 
 实验结果，可以看到batch size和spearman得分两者基本是成正比的，但提升很有限。该实验显示最佳batch size是64。
 
-
-
-
 ### 4.7 融合无监督信号的实验分析
 
 无监督句子表征的模型有较大突破，为了提升模型的表征效果，我们希望能在有监督模型之后融合无监督信号，下面对比实验了Whitening、SimCSE等无监督方法。
 
 
-|       arch       |      backbone      |                 model                 | Chinese-STS-B (spearman) |
-|:----------------:|:------------------:|:-------------------------------------:|:------------------------:|
-|      SBERT       | bert-base-chinese  | SBERT-bert-chinese-finetune-ChineseSTS|         0.7723          |
-|  RoFormer-Sim    | RoFormer-base-chinese| chinese_roformer-sim-char-ft_L-12_H-768_A-12| 0.7827|
-|     SimBERT      | bert-base-chinese  |        chinese_simbert_L-12_H-768_A-12       |         0.7098          |
-|     SimBERT      | chinese_simbert_L-12_H-768_A-12 | SimBERT-base-chinese-SimCSE-cls-unsup | 0.7562 |
-|     SimBERT      | chinese_simbert_L-12_H-768_A-12 | SimBERT-base-chinese-SimCSE-first-last-avg-unsup | 0.7264 |
-|       BERT       | bert-base-chinese  |        BERT-base-chinese-SimCSE-cls-unsup     |         0.6699          |
-|       BERT       | bert-base-chinese  |        BERT-base-chinese-SimCSE-cls-sup       |         0.7613          |
-|       BERT       | bert-base-chinese  |        BERT-base-chinese-mean_pooling         |         0.5473          |
-|       BERT       | bert-base-chinese  |        BERT-base-chinese-first_last_avg       |         0.5446          |
-|       BERT       | bert-base-chinese  |        BERT-base-chinese-first_last_avg-whiten(768)| 0.6808|
-|       BERT       | bert-base-chinese  |        BERT-base-chinese-sup-finetune-ChineseSTS | 0.7755  |
-|      CoSENT      | bert-base-chinese  |        CoSENT-bert-base-chinese-first_last_avg  | 0.7942  |
-|      CoSENT      | hfl/chinese-macbert-base | CoSENT-macbert-base-chinese-first_last_avg | 0.8051 |
-|      CoSENT      | hfl/chinese-macbert-base | CoSENT-macbert-base-chinese-first_last_avg-whiten(768)| 0.7642|
-|      CoSENT      | hfl/chinese-macbert-base | CoSENT-macbert-base-chinese-first_last_avg-whiten(384)| 0.7708|
-|      CoSENT      | hfl/chinese-macbert-base | CoSENT-macbert-base-chinese-first_last_avg-simcse | 0.8133|
+|       arch       |      BaseModel      |                         Model                          | Chinese-STS-B (spearman) |
+|:----------------:|:------------------:|:------------------------------------------------------:|:------------------------:|
+|      SBERT       | bert-base-chinese  |         SBERT-bert-chinese-finetune-ChineseSTS         |         0.7723          |
+|  RoFormer-Sim    | RoFormer-base-chinese|      chinese_roformer-sim-char-ft_L-12_H-768_A-12      | 0.7827|
+|     SimBERT      | bert-base-chinese  |            chinese_simbert_L-12_H-768_A-12             |         0.7098          |
+|     SimBERT      | chinese_simbert_L-12_H-768_A-12 |         SimBERT-base-chinese-SimCSE-cls-unsup          | 0.7562 |
+|     SimBERT      | chinese_simbert_L-12_H-768_A-12 |    SimBERT-base-chinese-SimCSE-first-last-avg-unsup    | 0.7264 |
+|       BERT       | bert-base-chinese  |           BERT-base-chinese-SimCSE-cls-unsup           |         0.6699          |
+|       BERT       | bert-base-chinese  |            BERT-base-chinese-SimCSE-cls-sup            |         0.7613          |
+|       BERT       | bert-base-chinese  |             BERT-base-chinese-mean_pooling             |         0.5473          |
+|       BERT       | bert-base-chinese  |            BERT-base-chinese-first_last_avg            |         0.5446          |
+|       BERT       | bert-base-chinese  |      BERT-base-chinese-first_last_avg-whiten(768)      | 0.6808|
+|       BERT       | bert-base-chinese  |       BERT-base-chinese-sup-finetune-ChineseSTS        | 0.7755  |
+|      CoSENT      | bert-base-chinese  |        CoSENT-bert-base-chinese-first_last_avg         | 0.7942  |
+|      CoSENT      | hfl/chinese-macbert-base |       CoSENT-macbert-base-chinese-first_last_avg       | 0.8051 |
+|      CoSENT      | hfl/chinese-macbert-base | CoSENT-macbert-base-chinese-first_last_avg-whiten(768) | 0.7642|
+|      CoSENT      | hfl/chinese-macbert-base | CoSENT-macbert-base-chinese-first_last_avg-whiten(384) | 0.7708|
+|      CoSENT      | hfl/chinese-macbert-base |   CoSENT-macbert-base-chinese-first_last_avg-simcse    | 0.8133|
 
 
 
@@ -292,7 +289,7 @@ _不同Batch size下的性能_
 **训练参数**
 
 - arch: CoSENT 
-- backbone: nghuyong/ernie-3.0-base-zh 
+- BaseModel: nghuyong/ernie-3.0-base-zh 
 - pooling: MEAN 
 - temperature: 0.05 
 - batch_size: 64 
@@ -302,7 +299,7 @@ _不同Batch size下的性能_
 评测结果：
 
 
-| Arch       | BackBone                    | Model                                                                                                                                             | ATEC  |  BQ   | LCQMC | PAWSX | STS-B | SOHU-dd | SOHU-dc |    Avg    |  QPS  |
+| Arch       | BaseModel                    | Model                                                                                                                                             | ATEC  |  BQ   | LCQMC | PAWSX | STS-B | SOHU-dd | SOHU-dc |    Avg    |  QPS  |
 |:-----------|:----------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------|:-----:|:-----:|:-----:|:-----:|:-----:|:-------:|:-------:|:---------:|:-----:|
 | Word2Vec   | word2vec                    | [w2v-light-tencent-chinese](https://ai.tencent.com/ailab/nlp/en/download.html)                                                                    | 20.00 | 31.49 | 59.46 | 2.57  | 55.78 |  55.04  |  20.70  |   35.03   | 23769 |
 | SBERT      | xlm-roberta-base            | [sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2](https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2) | 18.42 | 38.52 | 63.96 | 10.14 | 78.90 |  63.01  |  52.28  |   46.46   | 3138  |
