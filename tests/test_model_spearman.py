@@ -145,7 +145,7 @@ class SimModelTestCase(unittest.TestCase):
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
-        print('SOHU-dd spearman corr:', corr)
+        print(f'{test_path} spearman corr:', corr)
         print('spend time:', spend_time, ' seconds count:', len(sents1) * 2, 'qps:', len(sents1) * 2 / spend_time)
         c6 = corr
 
@@ -166,7 +166,7 @@ class SimModelTestCase(unittest.TestCase):
         corr = compute_spearmanr(sims, labels)
         print('scores:', sims[:10])
         print('labels:', labels[:10])
-        print('SOHU-dc spearman corr:', corr)
+        print(f'{test_path} spearman corr:', corr)
         print('spend time:', spend_time, ' seconds count:', len(sents1) * 2, 'qps:', len(sents1) * 2 / spend_time)
         c7 = corr
         print('average spearman corr:', (c1 + c2 + c3 + c4 + c5 + c6 + c7) / 7)

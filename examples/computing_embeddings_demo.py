@@ -21,7 +21,8 @@ def compute_emb(model):
         '花呗更改绑定银行卡',
         'This framework generates embeddings for each input sentence',
         'Sentences are passed as a list of string.',
-        'The quick brown fox jumps over the lazy dog.'
+        'The quick brown fox jumps over the lazy dog.',
+        '敏捷的棕色狐狸跳过了懒狗',
     ]
     sentence_embeddings = model.encode(sentences, show_progress_bar=True)
     print(type(sentence_embeddings), sentence_embeddings.shape)
@@ -40,8 +41,8 @@ if __name__ == "__main__":
     print(t2v_model)
     compute_emb(t2v_model)
 
-    # 支持多语言的句向量模型（Sentence-BERT），英文语义匹配任务推荐，支持fine-tune继续训练
-    sbert_model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+    # 支持多语言的句向量模型（CoSENT），多语言（包括中英文）语义匹配任务推荐，支持fine-tune继续训练
+    sbert_model = SentenceModel("shibing624/text2vec-base-multilingual")
     compute_emb(sbert_model)
 
     # 中文词向量模型(word2vec)，中文字面匹配任务和冷启动适用
