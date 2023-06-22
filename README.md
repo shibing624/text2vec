@@ -55,17 +55,17 @@
 #### 英文匹配数据集的评测结果：
 
 
-| Arch   | BaseModel                                        | Model                                | English-STS-B | 
-|:-------|:------------------------------------------------|:-------------------------------------|:-------------:|
-| GloVe  | glove                                           | Avg_word_embeddings_glove_6B_300d    |     61.77     |
-| BERT   | bert-base-uncased                               | BERT-base-cls                        |     20.29     |
-| BERT   | bert-base-uncased                               | BERT-base-first_last_avg             |     59.04     |
-| BERT   | bert-base-uncased                               | BERT-base-first_last_avg-whiten(NLI) |     63.65     |
-| SBERT  | sentence-transformers/bert-base-nli-mean-tokens | SBERT-base-nli-cls                   |     73.65     |
-| SBERT  | sentence-transformers/bert-base-nli-mean-tokens | SBERT-base-nli-first_last_avg        |     77.96     |
-| CoSENT | bert-base-uncased                               | CoSENT-base-first_last_avg           |     69.93     |
-| CoSENT | sentence-transformers/bert-base-nli-mean-tokens | CoSENT-base-nli-first_last_avg       |     79.68     |
-| CoSENT | sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 | CoSENT-base-sts-mean                 |     80.12     |
+| Arch   | BaseModel                                        | Model                                                                                                                | English-STS-B | 
+|:-------|:------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------|:-------------:|
+| GloVe  | glove                                           | Avg_word_embeddings_glove_6B_300d                                                                                    |     61.77     |
+| BERT   | bert-base-uncased                               | BERT-base-cls                                                                                                        |     20.29     |
+| BERT   | bert-base-uncased                               | BERT-base-first_last_avg                                                                                             |     59.04     |
+| BERT   | bert-base-uncased                               | BERT-base-first_last_avg-whiten(NLI)                                                                                 |     63.65     |
+| SBERT  | sentence-transformers/bert-base-nli-mean-tokens | SBERT-base-nli-cls                                                                                                   |     73.65     |
+| SBERT  | sentence-transformers/bert-base-nli-mean-tokens | SBERT-base-nli-first_last_avg                                                                                        |     77.96     |
+| CoSENT | bert-base-uncased                               | CoSENT-base-first_last_avg                                                                                           |     69.93     |
+| CoSENT | sentence-transformers/bert-base-nli-mean-tokens | CoSENT-base-nli-first_last_avg                                                                                       |     79.68     |
+| CoSENT | sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 | [shibing624/text2vec-base-multilingual](https://huggingface.co/shibing624/text2vec-base-multilingual)                |     80.12     |
 
 #### 中文匹配数据集的评测结果：
 
@@ -195,8 +195,8 @@ if __name__ == "__main__":
     t2v_model = SentenceModel("shibing624/text2vec-base-chinese")
     compute_emb(t2v_model)
 
-    # 支持多语言的句向量模型（Sentence-BERT），英文语义匹配任务推荐，支持fine-tune继续训练
-    sbert_model = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+    # 支持多语言的句向量模型（CoSENT），多语言（包括中英文）语义匹配任务推荐，支持fine-tune继续训练
+    sbert_model = SentenceModel("shibing624/text2vec-base-multilingual")
     compute_emb(sbert_model)
 
     # 中文词向量模型(word2vec)，中文字面匹配任务和冷启动适用
@@ -221,8 +221,6 @@ Embedding shape: (768,)
 模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，
 是`text2vec.SentenceModel`指定的默认模型，可以通过上面示例调用，或者如下所示用[transformers库](https://github.com/huggingface/transformers)调用，
 模型自动下载到本机路径：`~/.cache/huggingface/transformers`
-- `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`模型是Sentence-BERT的多语言句向量模型，
-适用于释义（paraphrase）识别，文本匹配，通过`text2vec.SentenceModel`和[sentence-transformers库]((https://github.com/UKPLab/sentence-transformers))都可以调用该模型
 - `w2v-light-tencent-chinese`是通过gensim加载的Word2Vec模型，使用腾讯词向量`Tencent_AILab_ChineseEmbedding.tar.gz`计算各字词的词向量，句子向量通过单词词
 向量取平均值得到，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
 
