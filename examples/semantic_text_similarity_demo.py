@@ -9,19 +9,25 @@ sys.path.append('..')
 from text2vec import SentenceModel, cos_sim, Similarity, SimilarityType, EmbeddingType
 
 # Two lists of sentences
-sentences1 = ['如何更换花呗绑定银行卡',
-              'The cat sits outside',
-              'A man is playing guitar',
-              'The new movie is awesome']
+sentences1 = [
+    '如何更换花呗绑定银行卡',
+    'The cat sits outside',
+    'A man is playing guitar',
+    'The new movie is awesome',
+    '敏捷的棕色狐狸跳过了懒狗',
+]
 
-sentences2 = ['花呗更改绑定银行卡',
-              'The dog plays in the garden',
-              'A woman watches TV',
-              'The new movie is so great']
+sentences2 = [
+    '花呗更改绑定银行卡',
+    'The dog plays in the garden',
+    'A woman watches TV',
+    'The new movie is so great',
+    'The quick brown fox jumps over the lazy dog.',
+]
 
-sim_model = Similarity("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+sim_model = Similarity("shibing624/text2vec-base-multilingual")
 # 纯中文建议使用模型"shibing624/text2vec-base-chinese"，
-# 多语言建议使用模型"sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+# 多语言建议使用模型"shibing624/text2vec-base-multilingual"
 scores = sim_model.get_scores(sentences1, sentences2)
 print('1:use Similarity compute cos scores\n')
 for i in range(len(sentences1)):

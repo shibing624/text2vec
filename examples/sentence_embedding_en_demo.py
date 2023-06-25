@@ -12,8 +12,7 @@ sys.path.append('..')
 from text2vec import SentenceModel, cos_sim, semantic_search, Similarity, EncoderType
 
 if __name__ == '__main__':
-    m = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-                      encoder_type="MEAN")
+    m = SentenceModel("shibing624/text2vec-base-multilingual")
     # Corpus with example sentences
     corpus = [
         '花呗更改绑定银行卡',
@@ -27,6 +26,7 @@ if __name__ == '__main__':
         'A man is riding a white horse on an enclosed ground.',
         'A monkey is playing drums.',
         'A cheetah is running behind its prey.'
+        'The quick brown fox jumps over the lazy dog.',
     ]
     # 1. Compute text embedding
     corpus_embeddings = m.encode(corpus)
@@ -39,8 +39,7 @@ if __name__ == '__main__':
         print()
 
     # 2. Compute cosine-similarities for sentence1 and sentence2
-    sim_model = Similarity("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-                           encoder_type=EncoderType.MEAN)
+    sim_model = Similarity("shibing624/text2vec-base-multilingual")
     cosine_scores = sim_model.get_score(corpus[0], corpus[1])
     print('{} vs {} cos score: {:.4f}'.format(corpus[0], corpus[1], cosine_scores))
     # 以上相似度计算的实质是对embedding结果求cos值，等同于：
@@ -54,7 +53,8 @@ if __name__ == '__main__':
         '如何更换花呗绑定银行卡',
         'A man is eating pasta.',
         'Someone in a gorilla costume is playing a set of drums.',
-        'A cheetah chases prey on across a field.'
+        'A cheetah chases prey on across a field.',
+        '敏捷的棕色狐狸跳过了懒狗',
     ]
     for query in queries:
         query_embedding = m.encode(query)

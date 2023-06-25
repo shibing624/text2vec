@@ -16,7 +16,7 @@ sys.path.append('..')
 from text2vec import SentenceModel, cos_sim, semantic_search, BM25
 import torch
 
-embedder = SentenceModel("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+embedder = SentenceModel("shibing624/text2vec-base-multilingual")
 
 # Corpus with example sentences
 corpus = [
@@ -30,7 +30,8 @@ corpus = [
     'Two men pushed carts through the woods.',
     'A man is riding a white horse on an enclosed ground.',
     'A monkey is playing drums.',
-    'A cheetah is running behind its prey.'
+    'A cheetah is running behind its prey.',
+    'The quick brown fox jumps over the lazy dog.',
 ]
 corpus_embeddings = embedder.encode(corpus)
 
@@ -39,7 +40,9 @@ queries = [
     '如何更换花呗绑定银行卡',
     'A man is eating pasta.',
     'Someone in a gorilla costume is playing a set of drums.',
-    'A cheetah chases prey on across a field.']
+    'A cheetah chases prey on across a field.',
+    '敏捷的棕色狐狸跳过了懒狗',
+]
 
 # Find the closest 5 sentences of the corpus for each query sentence based on cosine similarity
 print('\nuse cos sim calc each query and corpus:')

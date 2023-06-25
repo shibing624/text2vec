@@ -12,7 +12,7 @@ sys.path.append('..')
 from text2vec import SentenceModel, cos_sim, semantic_search, Similarity, EncoderType
 
 if __name__ == '__main__':
-    m = SentenceModel("shibing624/text2vec-base-chinese", encoder_type="FIRST_LAST_AVG")
+    m = SentenceModel("shibing624/text2vec-base-chinese")
     # Corpus with example sentences
     corpus = [
         '花呗更改绑定银行卡',
@@ -33,7 +33,7 @@ if __name__ == '__main__':
         print()
 
     # 2. Compute cosine-similarities for sentence1 and sentence2
-    sim_model = Similarity("shibing624/text2vec-base-chinese", encoder_type=EncoderType.FIRST_LAST_AVG)
+    sim_model = Similarity("shibing624/text2vec-base-chinese")
     cosine_scores = sim_model.get_score(corpus[0], corpus[1])
     print('{} vs {} cos score: {:.4f}'.format(corpus[0], corpus[1], cosine_scores))
     # 以上相似度计算的实质是对embedding结果求cos值，等同于：
