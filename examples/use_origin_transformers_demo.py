@@ -19,8 +19,8 @@ def mean_pooling(model_output, attention_mask):
 
 
 # Load model from HuggingFace Hub
-tokenizer = AutoTokenizer.from_pretrained('shibing624/text2vec-base-chinese')
-model = AutoModel.from_pretrained('shibing624/text2vec-base-chinese')
+tokenizer = AutoTokenizer.from_pretrained('shibing624/text2vec-base-chinese-paragraph')
+model = AutoModel.from_pretrained('shibing624/text2vec-base-chinese-paragraph')
 sentences = ['如何更换花呗绑定银行卡', '花呗更改绑定银行卡']
 # Tokenize sentences
 encoded_input = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
@@ -32,3 +32,7 @@ with torch.no_grad():
 sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
 print("Sentence embeddings:")
 print(sentence_embeddings)
+
+model_dir = './shibing624/text2vec-base-chinese-paragraph'
+model.save_pretrained(model_dir)
+tokenizer.save_pretrained(model_dir)
