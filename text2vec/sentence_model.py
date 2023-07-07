@@ -93,7 +93,7 @@ class SentenceModel:
         # Use getattr to safely access the out_features attribute of the pooler's dense layer
         return getattr(self.bert.pooler.dense, "out_features", None)
 
-    def get_sentence_embeddings(self, input_ids, attention_mask, token_type_ids):
+    def get_sentence_embeddings(self, input_ids, attention_mask, token_type_ids=None):
         """
         Returns the model output by encoder_type as embeddings.
 
