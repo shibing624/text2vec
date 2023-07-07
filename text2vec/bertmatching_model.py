@@ -267,7 +267,9 @@ class BertMatchModel:
                 # inputs        [batch, 1, seq_len] -> [batch, seq_len]
                 input_ids = inputs.get('input_ids').squeeze(1).to(device)
                 attention_mask = inputs.get('attention_mask').squeeze(1).to(device)
-                token_type_ids = inputs.get('token_type_ids').squeeze(1).to(device)
+                token_type_ids = inputs.get('token_type_ids', None)
+                if token_type_ids is not None:
+                    token_type_ids = token_type_ids.squeeze(1).to(self.device)
                 loss, logits, probs = self.model(input_ids, attention_mask, token_type_ids, labels)
                 current_loss = loss.item()
 

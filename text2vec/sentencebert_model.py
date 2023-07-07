@@ -254,11 +254,15 @@ class SentenceBertModel(SentenceModel):
                 # source        [batch, 1, seq_len] -> [batch, seq_len]
                 source_input_ids = source.get('input_ids').squeeze(1).to(self.device)
                 source_attention_mask = source.get('attention_mask').squeeze(1).to(self.device)
-                source_token_type_ids = source.get('token_type_ids').squeeze(1).to(self.device)
+                source_token_type_ids = source.get('token_type_ids', None)
+                if source_token_type_ids is not None:
+                    source_token_type_ids = source_token_type_ids.squeeze(1).to(self.device)
                 # target        [batch, 1, seq_len] -> [batch, seq_len]
                 target_input_ids = target.get('input_ids').squeeze(1).to(self.device)
                 target_attention_mask = target.get('attention_mask').squeeze(1).to(self.device)
-                target_token_type_ids = target.get('token_type_ids').squeeze(1).to(self.device)
+                target_token_type_ids = target.get('token_type_ids', None)
+                if target_token_type_ids is not None:
+                    target_token_type_ids = target_token_type_ids.squeeze(1).to(self.device)
                 labels = labels.to(self.device)
 
                 # get sentence embeddings of BERT encoder

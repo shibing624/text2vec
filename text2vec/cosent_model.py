@@ -245,7 +245,9 @@ class CosentModel(SentenceModel):
                 # inputs        [batch, 1, seq_len] -> [batch, seq_len]
                 input_ids = inputs.get('input_ids').squeeze(1).to(self.device)
                 attention_mask = inputs.get('attention_mask').squeeze(1).to(self.device)
-                token_type_ids = inputs.get('token_type_ids').squeeze(1).to(self.device)
+                token_type_ids = inputs.get('token_type_ids', None)
+                if token_type_ids is not None:
+                    token_type_ids = token_type_ids.squeeze(1).to(self.device)
                 output_embeddings = self.get_sentence_embeddings(input_ids, attention_mask, token_type_ids)
                 loss = self.calc_loss(labels, output_embeddings)
                 current_loss = loss.item()
