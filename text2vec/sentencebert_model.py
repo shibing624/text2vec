@@ -72,6 +72,8 @@ class SentenceBertModel(SentenceModel):
             use_hf_dataset: bool = False,
             hf_dataset_name: str = "STS-B",
             save_model_every_epoch: bool = True,
+            bf16: bool = False,
+            data_parallel: bool = False,
     ):
         """
         Trains the model on 'train_file'
@@ -94,6 +96,8 @@ class SentenceBertModel(SentenceModel):
             use_hf_dataset (optional): Whether to use the HuggingFace datasets for training.
             hf_dataset_name (optional): Name of the dataset to use for the HuggingFace datasets.
             save_model_every_epoch (optional): Save model checkpoint every epoch.
+            bf16 (optional): Use bfloat16 amp training.
+            data_parallel: Use multi-gpu data parallel training.
         Returns:
             global_step: Number of global steps trained
             training_details: Full training progress scores
@@ -129,6 +133,8 @@ class SentenceBertModel(SentenceModel):
             max_grad_norm=max_grad_norm,
             max_steps=max_steps,
             save_model_every_epoch=save_model_every_epoch,
+            bf16=bf16,
+            data_parallel=data_parallel,
         )
         logger.info(f" Training model done. Saved to {output_dir}.")
 
@@ -173,6 +179,8 @@ class SentenceBertModel(SentenceModel):
             max_grad_norm: float = 1.0,
             max_steps: int = -1,
             save_model_every_epoch: bool = True,
+            bf16=bf16,
+            data_parallel=data_parallel,
     ):
         """
         Trains the model on train_dataset.
@@ -183,6 +191,9 @@ class SentenceBertModel(SentenceModel):
         logger.debug("Use pytorch device: {}".format(self.device))
         self.bert.to(self.device)
         set_seed(seed)
+
+        if data_parallel:
+            self.bert = nn.DataParallel(self.bert)
 
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size)  # keep the order of the data, not shuffle
         total_steps = len(train_dataloader) * num_epochs
@@ -266,12 +277,22 @@ class SentenceBertModel(SentenceModel):
                 labels = labels.to(self.device)
 
                 # get sentence embeddings of BERT encoder
-                source_embeddings = self.get_sentence_embeddings(source_input_ids, source_attention_mask,
-                                                                 source_token_type_ids)
-                target_embeddings = self.get_sentence_embeddings(target_input_ids, target_attention_mask,
-                                                                 target_token_type_ids)
-                logits = self.concat_embeddings(source_embeddings, target_embeddings)
-                loss = self.calc_loss(labels, logits)
+                if bf16:
+                    with torch.autocast('cuda', dtype=torch.bfloat16):
+                        source_embeddings = self.get_sentence_embeddings(source_input_ids, source_attention_mask,
+                                                                         source_token_type_ids)
+                        target_embeddings = self.get_sentence_embeddings(target_input_ids, target_attention_mask,
+                                                                         target_token_type_ids)
+                        logits = self.concat_embeddings(source_embeddings, target_embeddings)
+                        loss = self.calc_loss(labels, logits)
+                else:
+                    source_embeddings = self.get_sentence_embeddings(source_input_ids, source_attention_mask,
+                                                                     source_token_type_ids)
+                    target_embeddings = self.get_sentence_embeddings(target_input_ids, target_attention_mask,
+                                                                     target_token_type_ids)
+                    logits = self.concat_embeddings(source_embeddings, target_embeddings)
+                    loss = self.calc_loss(labels, logits)
+                    
                 current_loss = loss.item()
                 if verbose:
                     batch_iterator.set_description(
