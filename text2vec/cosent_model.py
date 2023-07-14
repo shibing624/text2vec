@@ -63,6 +63,8 @@ class CosentModel(SentenceModel):
             use_hf_dataset: bool = False,
             hf_dataset_name: str = "STS-B",
             save_model_every_epoch: bool = True,
+            bf16: bool = False,
+            data_parallel: bool = False,
     ):
         """
         Trains the model on 'train_file'
@@ -85,6 +87,8 @@ class CosentModel(SentenceModel):
             use_hf_dataset (optional): Whether to use the HF dataset.
             hf_dataset_name (optional): Name of the dataset to use for the HuggingFace datasets.
             save_model_every_epoch (optional): Save model checkpoint every epoch.
+            bf16 (optional): Use bfloat16 amp training.
+            data_parallel: Use multi-gpu data parallel training.
         Returns:
             global_step: Number of global steps trained
             training_details: full training progress scores
@@ -119,6 +123,8 @@ class CosentModel(SentenceModel):
             max_grad_norm=max_grad_norm,
             max_steps=max_steps,
             save_model_every_epoch=save_model_every_epoch,
+            bf16=bf16,
+            data_parallel=data_parallel,
         )
         logger.info(f" Training model done. Saved to {output_dir}.")
 
@@ -163,6 +169,8 @@ class CosentModel(SentenceModel):
             max_grad_norm: float = 1.0,
             max_steps: int = -1,
             save_model_every_epoch: bool = True,
+            bf16: bool = False,
+            data_parallel: bool = False,
     ):
         """
         Trains the model on train_dataset.
@@ -173,6 +181,9 @@ class CosentModel(SentenceModel):
         logger.debug("Use device: {}".format(self.device))
         self.bert.to(self.device)
         set_seed(seed)
+
+        if data_parallel:
+            self.bert = nn.DataParallel(self.bert)
 
         train_dataloader = DataLoader(train_dataset, batch_size=batch_size)  # keep the order of the data, not shuffle
         total_steps = len(train_dataloader) * num_epochs
@@ -248,8 +259,15 @@ class CosentModel(SentenceModel):
                 token_type_ids = inputs.get('token_type_ids', None)
                 if token_type_ids is not None:
                     token_type_ids = token_type_ids.squeeze(1).to(self.device)
-                output_embeddings = self.get_sentence_embeddings(input_ids, attention_mask, token_type_ids)
-                loss = self.calc_loss(labels, output_embeddings)
+
+                if bf16:
+                    with torch.autocast('cuda', dtype=torch.bfloat16):
+                        output_embeddings = self.get_sentence_embeddings(input_ids, attention_mask, token_type_ids)
+                        loss = self.calc_loss(labels, output_embeddings)
+                else:
+                    output_embeddings = self.get_sentence_embeddings(input_ids, attention_mask, token_type_ids)
+                    loss = self.calc_loss(labels, output_embeddings)
+                    
                 current_loss = loss.item()
                 if verbose:
                     batch_iterator.set_description(
