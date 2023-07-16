@@ -12,7 +12,7 @@ import torch
 from loguru import logger
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
-from tqdm.auto import tqdm, trange
+from tqdm import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
 from text2vec.sentence_model import SentenceModel

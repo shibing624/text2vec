@@ -12,7 +12,7 @@ import torch
 from loguru import logger
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
-from tqdm.auto import tqdm, trange
+from tqdm import tqdm, trange
 from transformers import BertForSequenceClassification, BertTokenizer
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
@@ -131,7 +131,7 @@ class BertMatchModel:
             hf_dataset_name (optional): Name of the dataset to use for the HuggingFace datasets.
             save_model_every_epoch (optional): Save model checkpoint every epoch.
             bf16 (optional): Use bfloat16 amp training.
-            data_parallel: Use multi-gpu data parallel training.
+            data_parallel (optional): Use multi-gpu data parallel training.
         Returns:
             global_step: Number of global steps trained
             training_details: Full training progress scores

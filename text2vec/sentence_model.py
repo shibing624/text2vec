@@ -12,7 +12,7 @@ import numpy as np
 import torch
 from loguru import logger
 from torch.utils.data import DataLoader, Dataset
-from tqdm.auto import tqdm, trange
+from tqdm import tqdm, trange
 from tqdm.autonotebook import trange
 from transformers import AutoTokenizer, AutoModel
 
