@@ -4,9 +4,9 @@
 @description: Create Sentence-BERT model for text matching task
 """
 
+import math
 import os
 
-import math
 import pandas as pd
 import torch
 from loguru import logger
@@ -179,8 +179,8 @@ class SentenceBertModel(SentenceModel):
             max_grad_norm: float = 1.0,
             max_steps: int = -1,
             save_model_every_epoch: bool = True,
-            bf16=bf16,
-            data_parallel=data_parallel,
+            bf16: bool = False,
+            data_parallel: bool = False,
     ):
         """
         Trains the model on train_dataset.
@@ -292,7 +292,7 @@ class SentenceBertModel(SentenceModel):
                                                                      target_token_type_ids)
                     logits = self.concat_embeddings(source_embeddings, target_embeddings)
                     loss = self.calc_loss(labels, logits)
-                    
+
                 current_loss = loss.item()
                 if verbose:
                     batch_iterator.set_description(
