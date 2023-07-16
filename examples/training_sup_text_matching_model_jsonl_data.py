@@ -55,6 +55,8 @@ def main():
     parser.add_argument('--save_model_every_epoch', action="store_true", help="Whether to save model after each epoch")
     parser.add_argument('--encoder_type', default='MEAN', type=lambda t: EncoderType[t],
                         choices=list(EncoderType), help='Encoder type, string name of EncoderType')
+    parser.add_argument("--bf16", action="store_true", help="Whether to use bfloat16 amp training.")
+    parser.add_argument("--data_parallel", action="store_true", help="Whether to use multi-gpu data parallel.")
     args = parser.parse_args()
     logger.info(args)
 
@@ -85,6 +87,8 @@ def main():
             batch_size=args.batch_size,
             lr=args.learning_rate,
             save_model_every_epoch=args.save_model_every_epoch,
+            bf16=args.bf16,
+            data_parallel=args.data_parallel,
         )
         logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:

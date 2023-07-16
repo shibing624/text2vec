@@ -97,7 +97,7 @@ class SentenceBertModel(SentenceModel):
             hf_dataset_name (optional): Name of the dataset to use for the HuggingFace datasets.
             save_model_every_epoch (optional): Save model checkpoint every epoch.
             bf16 (optional): Use bfloat16 amp training.
-            data_parallel: Use multi-gpu data parallel training.
+            data_parallel (optional): Use multi-gpu data parallel training.
         Returns:
             global_step: Number of global steps trained
             training_details: Full training progress scores

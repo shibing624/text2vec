@@ -87,7 +87,7 @@ def main():
             batch_size=args.batch_size,
             lr=args.learning_rate,
             bf16=args.bf16,
-            data_parallel=args.data_parallel
+            data_parallel=args.data_parallel,
         )
         logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:
