@@ -33,22 +33,22 @@
 
 
 **Guide**
-- [Feature](#Feature)
+- [Features](#Features)
 - [Evaluation](#Evaluation)
 - [Install](#install)
 - [Usage](#usage)
 - [Contact](#Contact)
-- [Reference](#reference)
+- [References](#references)
 
 
-# Feature
+## Features
 ### 文本向量表示模型
 - [Word2Vec](https://github.com/shibing624/text2vec/blob/master/text2vec/word2vec.py)：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe）实现词向量检索，本项目实现了句子（词向量求平均）的word2vec向量表示
 - [SBERT(Sentence-BERT)](https://github.com/shibing624/text2vec/blob/master/text2vec/sentencebert_model.py)：权衡性能和效率的句向量表示模型，训练时通过有监督训练上层分类函数，文本匹配预测时直接句子向量做余弦，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
 - [CoSENT(Cosine Sentence)](https://github.com/shibing624/text2vec/blob/master/text2vec/cosent_model.py)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
 
 详细文本向量表示方法见wiki: [文本向量表示方法](https://github.com/shibing624/text2vec/wiki/%E6%96%87%E6%9C%AC%E5%90%91%E9%87%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95)
-# Evaluation
+## Evaluation
 
 文本匹配
 
@@ -114,7 +114,7 @@
 - QPS的GPU测试环境是Tesla V100，显存32GB
 
 模型训练实验报告：[实验报告](https://github.com/shibing624/text2vec/blob/master/docs/model_report.md)
-# Demo
+## Demo
 
 Official Demo: https://www.mulanai.com/product/short_text_sim/
 
@@ -127,7 +127,7 @@ run example: [examples/gradio_demo.py](https://github.com/shibing624/text2vec/bl
 python examples/gradio_demo.py
 ```
 
-# Install
+## Install
 ```shell
 pip install torch # conda install pytorch
 pip install -U text2vec
@@ -144,9 +144,9 @@ cd text2vec
 pip install --no-deps .
 ```
 
-# Usage
+## Usage
 
-## 文本向量表征
+### 文本向量表征
 
 基于`pretrained model`计算文本向量：
 
@@ -445,9 +445,9 @@ r = m.similarity('如何更换花呗绑定银行卡', '花呗更改绑定银行�
 print(f"similarity score: {float(r)}")  # similarity score: 0.855146050453186
 ```
 
-# Models
+## Models
 
-## CoSENT model
+### CoSENT model
 
 CoSENT（Cosine Sentence）文本匹配模型，在Sentence-BERT上改进了CosineRankLoss的句向量方案
 
@@ -486,8 +486,14 @@ python training_sup_text_matching_model.py --task_name ATEC --model_arch cosent 
 
 example: [examples/training_sup_text_matching_model_mydata.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model_mydata.py)
 
+单卡训练：
 ```shell
-python training_sup_text_matching_model_mydata.py --do_train --do_predict
+CUDA_VISIBLE_DEVICES=0 python training_sup_text_matching_model_mydata.py --do_train --do_predict
+```
+
+多卡训练：
+```shell
+CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node 2  training_sup_text_matching_model_mydata.py --do_train --do_predict --output_dir outputs/STS-B-text2vec-macbert-v1 --batch_size 64 --fp16 --data_parallel 
 ```
 
 训练集格式参考[examples/data/STS-B/STS-B.valid.data](https://github.com/shibing624/text2vec/blob/master/examples/data/STS-B/STS-B.valid.data)
@@ -522,7 +528,7 @@ python training_unsup_text_matching_model_en.py --model_arch cosent --do_train -
 ```
 
 
-## Sentence-BERT model
+### Sentence-BERT model
 
 Sentence-BERT文本匹配模型，表征式句向量表示方案
 
@@ -565,7 +571,7 @@ cd examples
 python training_unsup_text_matching_model_en.py --model_arch sentencebert --do_train --do_predict --num_epochs 10 --model_name bert-base-uncased --output_dir ./outputs/STS-B-en-unsup-sbert
 ```
 
-## BERT-Match model
+### BERT-Match model
 BERT文本匹配模型，原生BERT匹配网络结构，交互式句向量匹配模型
 
 Network structure:
@@ -577,18 +583,18 @@ Training and inference:
 训练脚本同上[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)。
 
 
-## 模型蒸馏（Model Distillation）
+### 模型蒸馏（Model Distillation）
 
 由于text2vec训练的模型可以使用[sentence-transformers](https://github.com/UKPLab/sentence-transformers)库加载，此处复用其模型蒸馏方法[distillation](https://github.com/UKPLab/sentence-transformers/tree/master/examples/training/distillation)。
 
 1. 模型降维，参考[dimensionality_reduction.py](https://github.com/UKPLab/sentence-transformers/blob/master/examples/training/distillation/dimensionality_reduction.py)使用PCA对模型输出embedding降维，可减少milvus等向量检索数据库的存储压力，还能轻微提升模型效果。
 2. 模型蒸馏，参考[model_distillation.py](https://github.com/UKPLab/sentence-transformers/blob/master/examples/training/distillation/model_distillation.py)使用蒸馏方法，将Teacher大模型蒸馏到更少layers层数的student模型中，在权衡效果的情况下，可大幅提升模型预测速度。
 
-## 模型部署
+### 模型部署
 
 提供两种部署模型，搭建服务的方法： 1）基于Jina搭建gRPC服务【推荐】；2）基于FastAPI搭建原生Http服务。
 
-### Jina服务
+#### Jina服务
 采用C/S模式搭建高性能服务，支持docker云原生，gRPC/HTTP/WebSocket，支持多个模型同时预测，GPU多卡处理。
 
 - 安装：
@@ -635,7 +641,7 @@ print(r.embeddings)
 批量调用方法见example: [examples/jina_client_demo.py](https://github.com/shibing624/text2vec/blob/master/examples/jina_client_demo.py)
 
 
-### FastAPI服务
+#### FastAPI服务
 
 - 安装：
 ```pip install fastapi uvicorn```
@@ -656,7 +662,7 @@ curl -X 'GET' \
 ```
 
 
-## 数据集
+## Dataset
 
 - 本项目release的数据集：
 
@@ -675,8 +681,8 @@ curl -X 'GET' \
 
 常用英文匹配数据集：
 
-- 大名鼎鼎的multi_nli和snli: https://huggingface.co/datasets/multi_nli
-- 大名鼎鼎的multi_nli和snli: https://huggingface.co/datasets/snli
+- 英文匹配数据集：multi_nli: https://huggingface.co/datasets/multi_nli
+- 英文匹配数据集：snli: https://huggingface.co/datasets/snli
 - https://huggingface.co/datasets/metaeval/cnli
 - https://huggingface.co/datasets/mteb/stsbenchmark-sts
 - https://huggingface.co/datasets/JeremiahZ/simcse_sup_nli
@@ -719,7 +725,7 @@ DatasetDict({
 
 
 
-# Contact
+## Contact
 
 - Issue(建议)：[![GitHub issues](https://img.shields.io/github/issues/shibing624/text2vec.svg)](https://github.com/shibing624/text2vec/issues)
 - 邮件我：xuming: xuming624@qq.com
@@ -728,7 +734,7 @@ DatasetDict({
 <img src="docs/wechat.jpeg" width="200" />
 
 
-# Citation
+## Citation
 
 如果你在研究中使用了text2vec，请按如下格式引用：
 
@@ -749,13 +755,13 @@ BibTeX:
 }
 ```
 
-# License
+## License
 
 
 授权协议为 [The Apache License 2.0](LICENSE)，可免费用做商业用途。请在产品说明中附加text2vec的链接和授权协议。
 
 
-# Contribute
+## Contribute
 项目代码还很粗糙，如果大家对代码有所改进，欢迎提交回本项目，在提交之前，注意以下两点：
 
  - 在`tests`添加相应的单元测试
@@ -763,7 +769,7 @@ BibTeX:
 
 之后即可提交PR。
 
-# Reference
+## References
 - [将句子表示为向量（上）：无监督句子表示学习（sentence embedding）](https://www.cnblogs.com/llhthinker/p/10335164.html)
 - [将句子表示为向量（下）：无监督句子表示学习（sentence embedding）](https://www.cnblogs.com/llhthinker/p/10341841.html)
 - [A Simple but Tough-to-Beat Baseline for Sentence Embeddings[Sanjeev Arora and Yingyu Liang and Tengyu Ma, 2017]](https://openreview.net/forum?id=SyK00v5xx)
