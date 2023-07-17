@@ -28,6 +28,7 @@ def cosine_distance(v1, v2):
     down = np.linalg.norm(v1) * np.linalg.norm(v2)
     return try_divide(up, down)
 
+
 def hamming_distance(v1, v2):
     n = int(v1, 2) ^ int(v2, 2)
     return bin(n & 0xffffffff).count('1')
@@ -45,8 +46,13 @@ def chebyshev_distance(v1, v2):  # 切比雪夫距离
     return np.max(np.abs(v1 - v2))
 
 
-def minkowski_distance(v1, v2):  # 闵可夫斯基距离
-    return np.sqrt(np.sum(np.square(v1 - v2)))
+def minkowski_distance(v1, v2, p=2):
+    """
+    闵可夫斯基距离
+        p=1 曼哈顿距离
+        p=2 欧氏距离
+    """
+    return np.power(np.sum(np.power(np.abs(v1 - v2), p)), 1 / p)
 
 
 def euclidean_distance_standardized(v1, v2):  # 标准化欧氏距离
@@ -208,7 +214,6 @@ def z_score(x, axis=0):
     xr -= np.mean(x, axis=axis)
     xr /= np.std(x, axis=axis)
     return x
-
 
 
 if __name__ == '__main__':
