@@ -493,7 +493,7 @@ CUDA_VISIBLE_DEVICES=0 python training_sup_text_matching_model_mydata.py --do_tr
 
 多卡训练：
 ```shell
-CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node 2  training_sup_text_matching_model_mydata.py --do_train --do_predict --output_dir outputs/STS-B-text2vec-macbert-v1 --batch_size 64 --fp16 --data_parallel 
+CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node 2  training_sup_text_matching_model_mydata.py --do_train --do_predict --output_dir outputs/STS-B-text2vec-macbert-v1 --batch_size 64 --bf16 --data_parallel 
 ```
 
 训练集格式参考[examples/data/STS-B/STS-B.valid.data](https://github.com/shibing624/text2vec/blob/master/examples/data/STS-B/STS-B.valid.data)
