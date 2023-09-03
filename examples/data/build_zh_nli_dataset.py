@@ -3,7 +3,7 @@
 @author:XuMing(xuming624@qq.com)
 @description: build zh nli dataset
 
-part of this code is adapted from https://github.com/wangyuxinwhy/uniem/blob/main/scripts/process_zh_datasets.py
+part of this code modified from https://github.com/wangyuxinwhy/uniem/blob/main/scripts/process_zh_datasets.py
 """
 import string
 from dataclasses import dataclass

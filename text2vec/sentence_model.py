@@ -146,6 +146,7 @@ class SentenceModel:
             convert_to_numpy: bool = True,
             convert_to_tensor: bool = False,
             device: str = None,
+            normalize_embeddings: bool = False,
     ):
         """
         Returns the embeddings for a batch of sentences.
@@ -156,6 +157,7 @@ class SentenceModel:
         :param convert_to_numpy: If true, the output is a list of numpy vectors. Else, it is a list of pytorch tensors.
         :param convert_to_tensor: If true, you get one large tensor as return. Overwrites any setting from convert_to_numpy
         :param device: Which device to use for the computation
+        :param normalize_embeddings: If true, returned vectors will have length 1. In that case, the faster dot-product (util.dot_score) instead of cosine similarity can be used.
         """
         self.bert.eval()
         if device is None:
@@ -179,6 +181,9 @@ class SentenceModel:
                                      padding=True, truncation=True, return_tensors='pt').to(device)
                 )
             embeddings = embeddings.detach()
+            if normalize_embeddings:
+                embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+
             if convert_to_numpy:
                 embeddings = embeddings.cpu()
             all_embeddings.extend(embeddings)
