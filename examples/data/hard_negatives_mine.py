@@ -14,7 +14,7 @@ import sys
 import faiss
 from tqdm import tqdm
 
-sys.path.append('..')
+sys.path.append('../..')
 from text2vec import SentenceModel
 
 
