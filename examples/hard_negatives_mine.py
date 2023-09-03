@@ -20,14 +20,14 @@ from text2vec import SentenceModel
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name_or_path', default="BAAI/bge-base-en", type=str)
+    parser.add_argument('--model_name_or_path', default="BAAI/bge-large-zh-noinstruct", type=str)
     parser.add_argument('--input_file', default=None, type=str)
     parser.add_argument('--candidate_pool', default=None, type=str)
     parser.add_argument('--output_file', default=None, type=str)
-    parser.add_argument('--range_for_sampling', default=None, type=str, help="range to sample negatives")
+    parser.add_argument('--batch_size', default=128, type=int)
+    parser.add_argument('--range_for_sampling', default='2-200', type=str, help="range to sample negatives")
     parser.add_argument('--use_gpu_for_searching', action='store_true', help='use faiss-gpu')
     parser.add_argument('--negative_number', default=15, help='use faiss-gpu')
-
     return parser.parse_args()
 
 
@@ -49,7 +49,7 @@ def batch_search(
         batch_size: int = 64
 ):
     all_scores, all_inxs = [], []
-    for start_index in tqdm(range(0, len(query), batch_size), desc="Batches", disable=len(query) < 256):
+    for start_index in tqdm(range(0, len(query), batch_size), desc="Batches", disable=len(query) < batch_size):
         batch_query = query[start_index:start_index + batch_size]
         batch_scores, batch_inxs = index.search(batch_query, k=topk)
         all_scores.extend(batch_scores.tolist())
@@ -65,11 +65,20 @@ def get_corpus(candidate_pool):
     return corpus
 
 
-def find_knn_neg(model, input_file, candidate_pool, output_file, sample_range, negative_number, use_gpu):
+def find_knn_neg(
+        model,
+        input_file,
+        candidate_pool,
+        output_file,
+        sample_range,
+        negative_number,
+        use_gpu,
+        batch_size
+):
     corpus = []
     queries = []
     train_data = []
-    for line in open(input_file):
+    for line in open(input_file, 'r', encoding='utf-8'):
         line = json.loads(line.strip())
         train_data.append(line)
         corpus.extend(line['neg'])
@@ -79,14 +88,14 @@ def find_knn_neg(model, input_file, candidate_pool, output_file, sample_range, n
         corpus = get_corpus(candidate_pool)
     corpus = list(set(corpus))
 
-    print(f'inferencing embedding for corpus (number={len(corpus)})--------------')
-    p_vecs = model.encode(corpus, batch_size=256, normalize_embeddings=True)
-    print(f'inferencing embedding for queries (number={len(queries)})--------------')
-    q_vecs = model.encode(queries, batch_size=256, normalize_embeddings=True)
+    print(f'inference embedding for corpus (number={len(corpus)})--------------')
+    p_vecs = model.encode(corpus, batch_size=batch_size, normalize_embeddings=True)
+    print(f'inference embedding for queries (number={len(queries)})--------------')
+    q_vecs = model.encode(queries, batch_size=batch_size, normalize_embeddings=True)
 
-    print('creat index and search------------------')
+    print('create index and search------------------')
     index = create_index(p_vecs, use_gpu=use_gpu)
-    _, all_inxs = batch_search(index, q_vecs, topk=sample_range[-1])
+    _, all_inxs = batch_search(index, q_vecs, topk=sample_range[-1], batch_size=batch_size)
     assert len(all_inxs) == len(train_data)
 
     for i, data in enumerate(train_data):
@@ -94,7 +103,8 @@ def find_knn_neg(model, input_file, candidate_pool, output_file, sample_range, n
         inxs = all_inxs[i][sample_range[0]:sample_range[1]]
         filtered_inx = []
         for inx in inxs:
-            if inx == -1: break
+            if inx == -1:
+                break
             if corpus[inx] not in data['pos'] and corpus[inx] != query:
                 filtered_inx.append(inx)
 
@@ -102,7 +112,7 @@ def find_knn_neg(model, input_file, candidate_pool, output_file, sample_range, n
             filtered_inx = random.sample(filtered_inx, negative_number)
         data['neg'] = [corpus[inx] for inx in filtered_inx]
 
-    with open(output_file, 'w') as f:
+    with open(output_file, 'w', encoding='utf-8') as f:
         for data in train_data:
             if len(data['neg']) < negative_number:
                 data['neg'].extend(random.sample(corpus, negative_number - len(data['neg'])))
@@ -124,5 +134,6 @@ if __name__ == '__main__':
         output_file=args.output_file,
         sample_range=sample_range,
         negative_number=args.negative_number,
-        use_gpu=args.use_gpu_for_searching
+        use_gpu=args.use_gpu_for_searching,
+        batch_size=args.batch_size
     )

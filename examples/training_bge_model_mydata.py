@@ -50,7 +50,7 @@ def main():
     parser.add_argument('--output_dir', default='./outputs/bge-model', type=str, help='Model output directory')
     parser.add_argument('--query_max_len', default=128, type=int, help='Max sequence length for query')
     parser.add_argument('--passage_max_len', default=128, type=int, help='Max sequence length for passage')
-    parser.add_argument('--num_epochs', default=10, type=int, help='Number of training epochs')
+    parser.add_argument('--num_epochs', default=3, type=int, help='Number of training epochs')
     parser.add_argument('--batch_size', default=64, type=int, help='Batch size')
     parser.add_argument('--learning_rate', default=2e-5, type=float, help='Learning rate')
     parser.add_argument('--train_group_size', default=4, type=int, help='Train group size')
