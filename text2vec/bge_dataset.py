@@ -61,7 +61,7 @@ class BgeTrainDataset(Dataset):
     def __len__(self):
         return len(self.dataset)
 
-    def text_2_id(self, text: str, max_len: int):
+    def text_2_id(self, text, max_len: int):
         return self.tokenizer(
             text,
             max_length=max_len,
@@ -82,11 +82,6 @@ class BgeTrainDataset(Dataset):
         else:
             negs = random.sample(self.dataset[index]['neg'], self.train_group_size - 1)
         passage.extend(negs)
+        return query, passage
 
-        if isinstance(query, list):
-            query = sum(query, [])
-        if isinstance(passage, list):
-            passage = sum(passage, [])
-        query_tokens = self.text_2_id(query, self.query_max_len)
-        passage_tokens = self.text_2_id(passage, self.passage_max_len)
-        return query_tokens, passage_tokens
+

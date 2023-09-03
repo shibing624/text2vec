@@ -88,7 +88,6 @@ def main():
         model = SentenceModel(
             model_name_or_path=args.output_dir,
             encoder_type=args.encoder_type,
-            max_seq_length=args.max_seq_length
         )
         test_data = load_text_matching_test_data(args.test_file)
 
