@@ -23,6 +23,8 @@
 **text2vec**实现了Word2Vec、RankBM25、BERT、Sentence-BERT、CoSENT等多种文本表征、文本相似度计算模型，并在文本语义匹配（相似度计算）任务上比较了各模型的效果。
 
 ### News
+[2023/09/03] v1.2.4版本: 支持FlagEmbedding模型训练，发布了中文匹配模型[shibing624/text2vec-bge-large-chinese](https://huggingface.co/shibing624/text2vec-bge-large-chinese)，用BGE方法训练，基于`BAAI/bge-large-zh-noinstruct`用中文STS数据集训练得到，并在中文测试集评估相对于原模型效果有提升，详见[Release-v1.2.4](https://github.com/shibing624/text2vec/releases/tag/1.2.4)
+
 [2023/07/17] v1.2.2版本: 支持多卡训练，发布了多语言匹配模型[shibing624/text2vec-base-multilingual](https://huggingface.co/shibing624/text2vec-base-multilingual)，用CoSENT方法训练，基于`sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`用人工挑选后的多语言STS数据集[shibing624/nli-zh-all/text2vec-base-multilingual-dataset](https://huggingface.co/datasets/shibing624/nli-zh-all/tree/main/text2vec-base-multilingual-dataset)训练得到，并在中英文测试集评估相对于原模型效果有提升，详见[Release-v1.2.2](https://github.com/shibing624/text2vec/releases/tag/1.2.2)
 
 [2023/06/19] v1.2.1版本: 更新了中文匹配模型`shibing624/text2vec-base-chinese-nli`为新版[shibing624/text2vec-base-chinese-sentence](https://huggingface.co/shibing624/text2vec-base-chinese-sentence)，针对CoSENT的loss计算对排序敏感特点，人工挑选并整理出高质量的有相关性排序的STS数据集[shibing624/nli-zh-all/text2vec-base-chinese-sentence-dataset](https://huggingface.co/datasets/shibing624/nli-zh-all/tree/main/text2vec-base-chinese-sentence-dataset)，在各评估集表现相对之前有提升；发布了适用于s2p的中文匹配模型[shibing624/text2vec-base-chinese-paraphrase](https://huggingface.co/shibing624/text2vec-base-chinese-paraphrase)，详见[Release-v1.2.1](https://github.com/shibing624/text2vec/releases/tag/1.2.1)
@@ -46,6 +48,8 @@
 - [Word2Vec](https://github.com/shibing624/text2vec/blob/master/text2vec/word2vec.py)：通过腾讯AI Lab开源的大规模高质量中文[词向量数据（800万中文词轻量版）](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) (文件名：light_Tencent_AILab_ChineseEmbedding.bin 密码: tawe）实现词向量检索，本项目实现了句子（词向量求平均）的word2vec向量表示
 - [SBERT(Sentence-BERT)](https://github.com/shibing624/text2vec/blob/master/text2vec/sentencebert_model.py)：权衡性能和效率的句向量表示模型，训练时通过有监督训练BERT和softmax分类函数，文本匹配预测时直接取句子向量做余弦，句子表征方法，本项目基于PyTorch复现了Sentence-BERT模型的训练和预测
 - [CoSENT(Cosine Sentence)](https://github.com/shibing624/text2vec/blob/master/text2vec/cosent_model.py)：CoSENT模型提出了一种排序的损失函数，使训练过程更贴近预测，模型收敛速度和效果比Sentence-BERT更好，本项目基于PyTorch实现了CoSENT模型的训练和预测
+- [BGE(BAAI general embedding)](https://github.com/shibing624/text2vec/blob/master/text2vec/bge_model.py)：BGE模型按照[retromae](https://github.com/staoxiao/RetroMAE)方法进行预训练，[参考论文](https://aclanthology.org/2022.emnlp-main.35.pdf)，再使用对比学习finetune微调训练模型，本项目基于PyTorch实现了BGE模型的微调训练和预测
+
 
 详细文本向量表示方法见wiki: [文本向量表示方法](https://github.com/shibing624/text2vec/wiki/%E6%96%87%E6%9C%AC%E5%90%91%E9%87%8F%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95)
 ## Evaluation
@@ -581,6 +585,35 @@ Training and inference:
 <img src="docs/bert-fc-train.png" width="300" />
 
 训练脚本同上[examples/training_sup_text_matching_model.py](https://github.com/shibing624/text2vec/blob/master/examples/training_sup_text_matching_model.py)。
+
+
+
+### BGE model
+
+#### BGE 监督模型
+- 在中文STS-B数据集训练和评估`BGE`模型
+
+example: [examples/training_bge_model_mydata.py](https://github.com/shibing624/text2vec/blob/master/examples/training_bge_model_mydata.py)
+
+```shell
+cd examples
+python training_bge_model_mydata.py --model_arch bge --do_train --do_predict --num_epochs 4 --output_dir ./outputs/STS-B-bge --batch_size 4
+```
+
+- 自建BGE训练集
+
+BGE模型微调训练，使用对比学习训练模型，输入数据的格式是一个三元组' (query, positive, negative) '
+
+```shell
+cd examples/data
+python build_zh_bge_dataset.py
+python hard_negatives_mine.py
+```
+1. `build_zh_bge_dataset.py` 基于中文STS-B生成三元组训练集，格式如下：
+```json lines
+{"query":"一个男人正在往锅里倒油。","pos":["一个男人正在往锅里倒油。"],"neg":["亲俄军队进入克里米亚乌克兰海军基地","配有木制家具的优雅餐厅。","马雅瓦蒂要求总统统治查谟和克什米尔","非典还夺去了多伦多地区44人的生命，其中包括两名护士和一名医生。","在一次采访中，身为犯罪学家的希利说，这里和全国各地的许多议员都对死刑抱有戒心。","豚鼠吃胡萝卜。","狗嘴里叼着一根棍子在水中游泳。","拉里·佩奇说Android很重要，不是关键","法国、比利时、德国、瑞典、意大利和英国为印度计划向缅甸出售的先进轻型直升机提供零部件和技术。","巴林赛马会在动乱中进行"]}
+```
+2. `hard_negatives_mine.py` 使用faiss相似匹配，挖掘难负例。
 
 
 ### 模型蒸馏（Model Distillation）

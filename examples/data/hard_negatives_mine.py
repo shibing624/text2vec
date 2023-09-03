@@ -21,9 +21,9 @@ from text2vec import SentenceModel
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_name_or_path', default="BAAI/bge-large-zh-noinstruct", type=str)
-    parser.add_argument('--input_file', default=None, type=str)
-    parser.add_argument('--candidate_pool', default=None, type=str)
-    parser.add_argument('--output_file', default=None, type=str)
+    parser.add_argument('--input_file', default='nli-zh-bge/nli_zh-train.jsonl', type=str)
+    parser.add_argument('--candidate_pool', default='STS-B/STS-B.train.data', type=str)
+    parser.add_argument('--output_file', default='bge_finetune_data.jsonl', type=str)
     parser.add_argument('--batch_size', default=128, type=int)
     parser.add_argument('--range_for_sampling', default='2-200', type=str, help="range to sample negatives")
     parser.add_argument('--use_gpu_for_searching', action='store_true', help='use faiss-gpu')
@@ -59,9 +59,12 @@ def batch_search(
 
 def get_corpus(candidate_pool):
     corpus = []
-    for line in open(candidate_pool):
-        line = json.loads(line.strip())
-        corpus.append(line['text'])
+    for line in open(candidate_pool, 'r', encoding='utf-8'):
+        parts = line.strip().split('\t')
+        txt1 = parts[0].strip()
+        txt2 = parts[1].strip()
+        corpus.append(txt1)
+        corpus.append(txt2)
     return corpus
 
 

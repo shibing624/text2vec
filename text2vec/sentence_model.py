@@ -138,6 +138,7 @@ class SentenceModel:
                 input_mask_expanded.sum(1), min=1e-9)
             return final_encoding  # [batch, hid_size]
 
+    @torch.inference_mode()
     def encode(
             self,
             sentences: Union[str, List[str]],
@@ -175,11 +176,10 @@ class SentenceModel:
         for start_index in trange(0, len(sentences), batch_size, desc="Batches", disable=not show_progress_bar):
             sentences_batch = sentences_sorted[start_index: start_index + batch_size]
             # Compute sentences embeddings
-            with torch.no_grad():
-                embeddings = self.get_sentence_embeddings(
-                    **self.tokenizer(sentences_batch, max_length=self.max_seq_length,
-                                     padding=True, truncation=True, return_tensors='pt').to(device)
-                )
+            embeddings = self.get_sentence_embeddings(
+                **self.tokenizer(sentences_batch, max_length=self.max_seq_length,
+                                 padding=True, truncation=True, return_tensors='pt').to(device)
+            )
             embeddings = embeddings.detach()
             if normalize_embeddings:
                 embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
@@ -211,6 +211,7 @@ class SentenceModel:
 
         return result
 
+    @torch.inference_mode()
     def evaluate(self, eval_dataset, output_dir: str = None, batch_size: int = 16):
         """
         Evaluates the model on eval_dataset.
@@ -243,12 +244,11 @@ class SentenceModel:
             if target_token_type_ids is not None:
                 target_token_type_ids = target_token_type_ids.squeeze(1).to(self.device)
 
-            with torch.no_grad():
-                source_embeddings = self.get_sentence_embeddings(source_input_ids, source_attention_mask,
-                                                                 source_token_type_ids)
-                target_embeddings = self.get_sentence_embeddings(target_input_ids, target_attention_mask,
-                                                                 target_token_type_ids)
-                preds = torch.cosine_similarity(source_embeddings, target_embeddings)
+            source_embeddings = self.get_sentence_embeddings(source_input_ids, source_attention_mask,
+                                                             source_token_type_ids)
+            target_embeddings = self.get_sentence_embeddings(target_input_ids, target_attention_mask,
+                                                             target_token_type_ids)
+            preds = torch.cosine_similarity(source_embeddings, target_embeddings)
             batch_preds.extend(preds.cpu().numpy())
 
         spearman = compute_spearmanr(batch_labels, batch_preds)
