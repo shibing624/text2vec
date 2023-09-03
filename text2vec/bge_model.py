@@ -19,7 +19,7 @@ from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
 from text2vec.bge_dataset import BgeTrainDataset
 from text2vec.sentence_model import SentenceModel
-from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr
+from text2vec.text_matching_dataset import TextMatchingTestDataset, load_text_matching_test_data
 from text2vec.utils.stats_util import set_seed
 
 
@@ -116,8 +116,8 @@ class BgeModel(SentenceModel):
             logger.info(f"Load train_file: {train_file}")
             train_dataset = BgeTrainDataset(self.tokenizer, train_file, self.query_max_len, self.passage_max_len,
                                             train_group_size)
-            eval_dataset = BgeTrainDataset(self.tokenizer, eval_file, self.query_max_len, self.passage_max_len,
-                                           train_group_size)
+            eval_dataset = TextMatchingTestDataset(self.tokenizer, load_text_matching_test_data(eval_file),
+                                                   self.max_seq_length)
         else:
             raise ValueError("Error, train_file|use_hf_dataset must be specified")
 
@@ -151,6 +151,14 @@ class BgeModel(SentenceModel):
         """
         loss = nn.CrossEntropyLoss(reduction='mean')(y_pred, y_true)
         return loss
+
+    def calc_similarity(self, q_embs, p_embs):
+        """
+        Calc similarity with two sentence embeddings
+        """
+        if len(p_embs.size()) == 2:
+            return torch.matmul(q_embs, p_embs.transpose(0, 1))
+        return torch.matmul(q_embs, p_embs.transpose(-2, -1))
 
     @staticmethod
     def flat_list(l):
@@ -282,7 +290,7 @@ class BgeModel(SentenceModel):
                 with torch.autocast(str(self.device), dtype=torch_type):
                     q_embeddings = self.get_sentence_embeddings(**query)
                     p_embeddings = self.get_sentence_embeddings(**passage)
-                    scores = torch.cosine_similarity(q_embeddings, p_embeddings)
+                    scores = self.calc_similarity(q_embeddings, p_embeddings)
                     scores = scores / temperature
                     scores = scores.view(q_embeddings.size(0), -1)
 
@@ -326,73 +334,3 @@ class BgeModel(SentenceModel):
                 return global_step, training_progress_scores
 
         return global_step, training_progress_scores
-
-    def eval_model(self, eval_dataset: Dataset, output_dir: str = None, verbose: bool = True, batch_size: int = 16):
-        """
-        Evaluates the model on eval_df. Saves results to args.output_dir
-            result: Dictionary containing evaluation results.
-        """
-        result = self.evaluate(eval_dataset, output_dir, batch_size=batch_size)
-        self.results.update(result)
-
-        if verbose:
-            logger.info(self.results)
-
-        return result
-
-    def evaluate(self, eval_dataset, output_dir: str = None, batch_size: int = 16):
-        """
-        Evaluates the model on eval_dataset.
-
-        Utility function to be used by the eval_model() method. Not intended to be used directly.
-        """
-        results = {}
-
-        eval_dataloader = DataLoader(eval_dataset, batch_size=batch_size)
-        self.bert.to(self.device)
-        self.bert.eval()
-
-        batch_labels = []
-        batch_preds = []
-        for batch in tqdm(eval_dataloader, disable=False, desc="Running Evaluation"):
-            query, passage = batch
-            query = self.flat_list(query)
-            passage = self.flat_list(passage)
-            query = self.tokenizer(
-                query,
-                max_length=self.query_max_len,
-                truncation=True,
-                padding=True,
-                return_tensors='pt'
-            )
-            passage = self.tokenizer(
-                passage,
-                max_length=self.passage_max_len,
-                truncation=True,
-                padding=True,
-                return_tensors='pt'
-            )
-            query = query.to(self.device)
-            passage = passage.to(self.device)
-
-            with torch.no_grad():
-                q_embeddings = self.get_sentence_embeddings(**query)
-                p_embeddings = self.get_sentence_embeddings(**passage)
-                preds = torch.cosine_similarity(q_embeddings, p_embeddings)
-            batch_preds.extend(preds.cpu().numpy())
-
-        spearman = compute_spearmanr(batch_labels, batch_preds)
-        pearson = compute_pearsonr(batch_labels, batch_preds)
-        logger.debug(f"labels: {batch_labels[:10]}")
-        logger.debug(f"preds:  {batch_preds[:10]}")
-        logger.debug(f"pearson: {pearson}, spearman: {spearman}")
-
-        results["eval_spearman"] = spearman
-        results["eval_pearson"] = pearson
-        if output_dir:
-            os.makedirs(output_dir, exist_ok=True)
-            with open(os.path.join(output_dir, "eval_results.txt"), "w") as writer:
-                for key in sorted(results.keys()):
-                    writer.write("{} = {}\n".format(key, str(results[key])))
-
-        return results

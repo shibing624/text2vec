@@ -43,7 +43,7 @@ def main():
     parser.add_argument('--model_name', default='BAAI/bge-large-zh-noinstruct', type=str,
                         help='Transformers model model or path')
     parser.add_argument('--train_file', default='data/bge_finetune_data.jsonl', type=str, help='Train data path')
-    parser.add_argument('--valid_file', default='data/bge_finetune_data.jsonl', type=str, help='Train data path')
+    parser.add_argument('--valid_file', default='data/snli_zh_50.jsonl', type=str, help='Train data path')
     parser.add_argument('--test_file', default='data/snli_zh_50.jsonl', type=str, help='Test data path')
     parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
     parser.add_argument("--do_predict", action="store_true", help="Whether to run predict.")
