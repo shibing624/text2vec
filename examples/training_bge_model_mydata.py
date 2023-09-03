@@ -67,7 +67,7 @@ def main():
         model = BgeModel(
             model_name_or_path=args.model_name,
             encoder_type=args.encoder_type,
-            query_max_len=args.query_max_len,
+            max_seq_length=args.query_max_len,
             passage_max_len=args.passage_max_len,
         )
         model.train_model(

@@ -27,7 +27,7 @@ class BgeModel(SentenceModel):
             self,
             model_name_or_path: str = "BAAI/bge-large-zh-noinstruct",
             encoder_type: str = "MEAN",
-            query_max_len: int = 64,
+            max_seq_length: int = 128,
             passage_max_len: int = 128,
             num_classes: int = 1,
             device: str = None,
@@ -38,12 +38,13 @@ class BgeModel(SentenceModel):
         Args:
             model_name_or_path: Default Transformer model name or path to a directory containing Transformer model file (pytorch_nodel.bin).
             encoder_type: encoder type, set by model name
-            query_max_len: The maximum total input sequence length after tokenization.
+            max_seq_length: The maximum total input sequence length after tokenization.
+            passage_max_len: The maximum total input sequence length after tokenization.
             num_classes: Number of classes for classification.
             device: CPU or GPU
         """
-        super().__init__(model_name_or_path, encoder_type, query_max_len, device)
-        self.query_max_len = query_max_len
+        super().__init__(model_name_or_path, encoder_type, max_seq_length, device)
+        self.query_max_len = max_seq_length
         self.passage_max_len = passage_max_len
         self.classifier = nn.Linear(self.bert.config.hidden_size * 3, num_classes).to(self.device)
 

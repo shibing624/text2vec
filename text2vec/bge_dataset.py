@@ -42,7 +42,7 @@ def load_bge_train_data(train_file):
 
 
 class BgeTrainDataset(Dataset):
-    """Bge文本匹配训练数据集, 重写__getindex__和__len__方法"""
+    """Bge文本匹配训练数据集, 重写__getitem__和__len__方法"""
 
     def __init__(
             self,
@@ -70,7 +70,7 @@ class BgeTrainDataset(Dataset):
             return_tensors='pt'
         )
 
-    def __getindex__(self, index: int):
+    def __getitem__(self, index: int):
         query = self.dataset[index]['query']
         passage = []
         pos = random.choice(self.dataset[index]['pos'])
