@@ -11,7 +11,7 @@ import pandas as pd
 import torch
 from loguru import logger
 from torch import nn
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, DistributedSampler
 from tqdm import tqdm, trange
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 
@@ -185,8 +185,12 @@ class CosentModel(SentenceModel):
 
         if data_parallel:
             self.bert = nn.DataParallel(self.bert)
-
-        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)  # keep the order of the data, not shuffle
+            world_size = torch.cuda.device_count()
+            local_rank = int(os.environ["LOCAL_RANK"])
+            sampler = DistributedSampler(train_dataset, num_replicas=world_size, rank=local_rank)
+            train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=sampler, shuffle=False)
+        else:
+            train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False)  # not shuffle
         total_steps = len(train_dataloader) * num_epochs
         param_optimizer = list(self.bert.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
