@@ -12,7 +12,10 @@ from time import time
 sys.path.append('..')
 from text2vec import Similarity, SimilarityType, EmbeddingType, compute_spearmanr
 from text2vec import load_jsonl
+
 pwd_path = os.path.abspath(os.path.dirname(__file__))
+
+is_debug = True
 
 
 def load_test_data(path):
@@ -27,9 +30,10 @@ def load_test_data(path):
             sents1.append(line[0])
             sents2.append(line[1])
             labels.append(int(line[2]))
-            if len(sents1) > 10:
+            if is_debug and len(sents1) > 10:
                 break
     return sents1, sents2, labels
+
 
 def get_corr(model, test_path):
     sents1, sents2, labels = load_test_data(test_path)
@@ -45,6 +49,7 @@ def get_corr(model, test_path):
     print(f'{test_path} spearman corr:', corr)
     print('spend time:', spend_time, ' seconds count:', len(sents1) * 2, 'qps:', len(sents1) * 2 / spend_time)
     return corr
+
 
 class SimModelTestCase(unittest.TestCase):
     def test_w2v_sim_batch(self):
@@ -387,6 +392,33 @@ class SimModelTestCase(unittest.TestCase):
         # add sohu avg: 0.5793
         pass
 
+    def test_bge_large_zh_noinstruct_model(self):
+        # BAAI/bge-large-zh-noinstruct
+        # STS-B spearman corr: 0.9211
+        # ATEC spearman corr: 0.5
+        # BQ spearman corr: 0.8366
+        # LCQMC spearman corr: 0.69282
+        # PAWSX spearman corr: 0.51961
+        # avg: 0.5378
+        # V100 QPS: 1490
+        # sohu-dd spearman corr: 0.53381
+        # sohu-dc spearman corr: 0.19863
+        # add sohu avg: 0.60038
+        pass
+
+    def test_bge_large_zh_noinstruct_cosent_model(self):
+        # BAAI/bge-large-zh-noinstruct with cosent finetuned
+        # STS-B spearman corr: 0.86535
+        # ATEC spearman corr: 0.3000
+        # BQ spearman corr: 0.5976
+        # LCQMC spearman corr: 0.8660
+        # PAWSX spearman corr: 0.11547
+        # avg: 0.5378
+        # V100 QPS: 1490
+        # sohu-dd spearman corr: 0.7248
+        # sohu-dc spearman corr: 0.5839
+        # add sohu avg: 0.57904
+        pass
 
 
 if __name__ == '__main__':
