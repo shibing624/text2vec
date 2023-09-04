@@ -4,12 +4,14 @@
 @description: Evaluate MTEB benchmark
 
 pip install mteb
+
+code modified from https://github.com/FlagOpen/FlagEmbedding
 """
 import argparse
 
 from mteb import MTEB
-from flag_dres_model import FlagDRESModel
 
+from flag_dres_model import FlagDRESModel
 
 query_instruction_for_retrieval_dict = {
     "BAAI/bge-large-en": "Represent this sentence for searching relevant passages: ",
@@ -21,7 +23,8 @@ query_instruction_for_retrieval_dict = {
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_name_or_path', default="shibing624/text2vec-base-multilingual", type=str)
-    parser.add_argument('--task_type', default=None, type=str, help="task type. Default is None, which means using all task types")
+    parser.add_argument('--task_type', default=None, type=str,
+                        help="task type. Default is None, which means using all task types")
     return parser.parse_args()
 
 
@@ -29,7 +32,8 @@ if __name__ == '__main__':
     args = get_args()
 
     model = FlagDRESModel(model_name_or_path=args.model_name_or_path,
-                          normalize_embeddings=False,  # normlize embedding will harm the performance of classification task
+                          normalize_embeddings=False,
+                          # normlize embedding will harm the performance of classification task
                           query_instruction_for_retrieval="Represent this sentence for searching relevant passages: ")
 
     task_names = [t.description["name"] for t in MTEB(task_types=args.task_type,
@@ -54,8 +58,5 @@ if __name__ == '__main__':
 
         model.query_instruction_for_retrieval = instruction
 
-        evaluation = MTEB(tasks=[task], task_langs=['en'], eval_splits = ["test" if task not in ['MSMARCO'] else 'dev'])
+        evaluation = MTEB(tasks=[task], task_langs=['en'], eval_splits=["test" if task not in ['MSMARCO'] else 'dev'])
         evaluation.run(model, output_folder=f"en_results/{args.model_name_or_path.split('/')[-1]}")
-
-
-

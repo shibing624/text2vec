@@ -4,6 +4,8 @@
 @description: Evaluate C-MTEB benchmark
 
 pip install mteb
+
+code modified from https://github.com/FlagOpen/FlagEmbedding
 """
 import argparse
 

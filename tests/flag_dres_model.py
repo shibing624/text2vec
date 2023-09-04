@@ -4,12 +4,15 @@
 @description: Evaluate MTEB benchmark
 
 pip install mteb
+
+code modified from https://github.com/FlagOpen/FlagEmbedding
 """
-import numpy as np
 from typing import cast, List, Dict, Union
+
+import numpy as np
 import torch
-from tqdm import tqdm
 from mteb import DRESModel
+from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer
 
 
@@ -20,7 +23,7 @@ class FlagDRESModel(DRESModel):
             pooling_method: str = 'cls',
             normalize_embeddings: bool = True,
             query_instruction_for_retrieval: str = None,
-            batch_size: int = 256,
+            batch_size: int = 64,
             **kwargs
     ) -> None:
 
@@ -39,7 +42,6 @@ class FlagDRESModel(DRESModel):
             self.model = torch.nn.DataParallel(self.model)
             self.batch_size = self.batch_size * num_gpus
 
-
     def encode_queries(self, queries: List[str], **kwargs) -> np.ndarray:
         '''
         This function will be used for retrieval task
@@ -50,7 +52,6 @@ class FlagDRESModel(DRESModel):
         else:
             input_texts = queries
         return self.encode(input_texts)
-
 
     def encode_corpus(self, corpus: List[Union[Dict[str, str], str]], **kwargs) -> np.ndarray:
         '''
@@ -63,13 +64,13 @@ class FlagDRESModel(DRESModel):
             input_texts = corpus
         return self.encode(input_texts)
 
-
     @torch.no_grad()
     def encode(self, sentences: List[str], **kwargs) -> np.ndarray:
         self.model.eval()
 
         all_embeddings = []
-        for start_index in tqdm(range(0, len(sentences), self.batch_size), desc="Batches", disable=len(sentences)<256):
+        for start_index in tqdm(range(0, len(sentences), self.batch_size), desc="Batches",
+                                disable=len(sentences) < 256):
             sentences_batch = sentences[start_index:start_index + self.batch_size]
             inputs = self.tokenizer(
                 sentences_batch,
@@ -86,10 +87,3 @@ class FlagDRESModel(DRESModel):
             all_embeddings.append(embeddings.cpu().numpy())
 
         return np.concatenate(all_embeddings, axis=0)
-
-
-
-
-
-
-
