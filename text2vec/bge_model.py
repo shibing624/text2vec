@@ -30,7 +30,6 @@ class BgeModel(SentenceModel):
             encoder_type: str = "MEAN",
             max_seq_length: int = 32,
             passage_max_len: int = 128,
-            num_classes: int = 1,
             device: str = None,
     ):
         """
@@ -47,7 +46,6 @@ class BgeModel(SentenceModel):
         super().__init__(model_name_or_path, encoder_type, max_seq_length, device)
         self.query_max_len = max_seq_length
         self.passage_max_len = passage_max_len
-        self.classifier = nn.Linear(self.bert.config.hidden_size * 3, num_classes).to(self.device)
 
     def __str__(self):
         return f"<BgeModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
@@ -61,7 +59,7 @@ class BgeModel(SentenceModel):
             verbose: bool = True,
             batch_size: int = 32,
             num_epochs: int = 1,
-            weight_decay: float = 0.01,
+            weight_decay: float = 0.0,
             seed: int = 42,
             warmup_ratio: float = 0.05,
             lr: float = 1e-5,
@@ -72,7 +70,7 @@ class BgeModel(SentenceModel):
             use_hf_dataset: bool = False,
             hf_dataset_name: str = "",
             save_model_every_epoch: bool = True,
-            bf16: bool = True,
+            bf16: bool = False,
             data_parallel: bool = False,
             train_group_size: int = 8,
             temperature: float = 1.0,
@@ -175,7 +173,7 @@ class BgeModel(SentenceModel):
             verbose: bool = True,
             batch_size: int = 8,
             num_epochs: int = 1,
-            weight_decay: float = 0.01,
+            weight_decay: float = 0.0,
             seed: int = 42,
             warmup_ratio: float = 0.05,
             lr: float = 1e-5,
@@ -184,7 +182,7 @@ class BgeModel(SentenceModel):
             max_grad_norm: float = 1.0,
             max_steps: int = -1,
             save_model_every_epoch: bool = True,
-            bf16: bool = True,
+            bf16: bool = False,
             data_parallel: bool = False,
             temperature: float = 1.0,
             normalize_embeddings: bool = False,

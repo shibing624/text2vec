@@ -48,7 +48,7 @@ class BgeTrainDataset(Dataset):
             self,
             tokenizer: PreTrainedTokenizer,
             data_file_or_name: str,
-            query_max_len: int = 64,
+            query_max_len: int = 32,
             passage_max_len: int = 128,
             train_group_size: int = 8
     ):

@@ -60,6 +60,8 @@ def main():
                         choices=list(EncoderType), help='Encoder type, string name of EncoderType')
     parser.add_argument("--bf16", action="store_true", help="Whether to use bfloat16 amp training.")
     parser.add_argument("--data_parallel", action="store_true", help="Whether to use multi-gpu data parallel.")
+    parser.add_argument("--normalize_embeddings", action="store_true",
+                        help="Whether to normalize embeddings. set True if temperature < 1.0")
     args = parser.parse_args()
     logger.info(args)
 
@@ -82,6 +84,7 @@ def main():
             data_parallel=args.data_parallel,
             train_group_size=args.train_group_size,
             temperature=args.temperature,
+            normalize_embeddings=args.normalize_embeddings,
         )
         logger.info(f"Model saved to {args.output_dir}")
     if args.do_predict:

@@ -27,7 +27,7 @@ class FlagDRESModel(DRESModel):
             pooling_method: str = 'cls',
             normalize_embeddings: bool = True,
             query_instruction_for_retrieval: str = None,
-            batch_size: int = 64,
+            batch_size: int = 128,
             **kwargs
     ) -> None:
 

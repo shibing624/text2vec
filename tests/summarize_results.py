@@ -3,7 +3,7 @@
 @author:XuMing(xuming624@qq.com)
 @description: Evaluate MTEB benchmark
 
-pip install mteb
+pip install C_MTEB
 
 code modified from https://github.com/FlagOpen/FlagEmbedding
 """
@@ -108,7 +108,6 @@ def output_markdown(tasks_results, model_names, save_file):
                     write_line += f" {round(sum(cqa_res) / len(cqa_res), 2)} |"
                     all_res.append(round(sum(cqa_res) / len(cqa_res), 2))
 
-                # if len(all_res) == len(type_results.keys()):
                 if len(all_res) == task_cnt:
                     write_line += f" {round(sum(all_res) / len(all_res), 2)} |"
                     task_type_res[t_type][model] = all_res
@@ -139,7 +138,7 @@ def output_markdown(tasks_results, model_names, save_file):
                 write_line += f" {round(sum(all_res) / len(all_res), 2)} |"
 
             f.write(write_line + '  \n')
-
+    print(f"Save results to {save_file}")
 
 def get_args():
     parser = argparse.ArgumentParser()
