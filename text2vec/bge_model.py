@@ -269,21 +269,32 @@ class BgeModel(SentenceModel):
                 query, passage = batch
                 query = self.flat_list(query)
                 passage = self.flat_list(passage)
+                query = self.tokenizer(
+                    query,
+                    max_length=self.query_max_len,
+                    truncation=True,
+                    padding=True,
+                    return_tensors='pt'
+                )
+                passage = self.tokenizer(
+                    passage,
+                    max_length=self.passage_max_len,
+                    truncation=True,
+                    padding=True,
+                    return_tensors='pt'
+                )
+                query = query.to(self.device)
+                passage = passage.to(self.device)
 
                 # get sentence embeddings
                 with torch.autocast(str(self.device), dtype=torch_type):
-                    q_embeddings = self.encode(
-                        query,
-                        normalize_embeddings=True,
-                        convert_to_tensor=True,
-                        max_seq_length=self.query_max_len
-                    )
-                    p_embeddings = self.encode(
-                        passage,
-                        normalize_embeddings=True,
-                        convert_to_tensor=True,
-                        max_seq_length=self.passage_max_len
-                    )
+                    q_embeddings = self.get_sentence_embeddings(**query)
+                    q_embeddings = torch.nn.functional.normalize(q_embeddings, dim=-1)
+                    q_embeddings = q_embeddings.contiguous()
+
+                    p_embeddings = self.get_sentence_embeddings(**passage)
+                    p_embeddings = torch.nn.functional.normalize(p_embeddings, dim=-1)
+                    p_embeddings = p_embeddings.contiguous()
                     scores = self.calc_similarity(q_embeddings, p_embeddings)
                     scores = scores / temperature
                     scores = scores.view(q_embeddings.size(0), -1)
