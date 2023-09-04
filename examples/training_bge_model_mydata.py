@@ -54,7 +54,7 @@ def main():
     parser.add_argument('--batch_size', default=4, type=int, help='Batch size')
     parser.add_argument('--learning_rate', default=1e-5, type=float, help='Learning rate')
     parser.add_argument('--train_group_size', default=4, type=int, help='Train group size')
-    parser.add_argument('--temperature', default=0.02, type=float, help='Temperature for softmax')
+    parser.add_argument('--temperature', default=1.0, type=float, help='Temperature for softmax')
     parser.add_argument('--save_model_every_epoch', action="store_true", help="Whether to save model after each epoch")
     parser.add_argument('--encoder_type', default='MEAN', type=lambda t: EncoderType[t],
                         choices=list(EncoderType), help='Encoder type, string name of EncoderType')

@@ -27,7 +27,7 @@ class BgeModel(SentenceModel):
     def __init__(
             self,
             model_name_or_path: str = "BAAI/bge-large-zh-noinstruct",
-            encoder_type: str = "CLS",
+            encoder_type: str = "MEAN",
             max_seq_length: int = 32,
             passage_max_len: int = 128,
             num_classes: int = 1,
@@ -75,7 +75,8 @@ class BgeModel(SentenceModel):
             bf16: bool = True,
             data_parallel: bool = False,
             train_group_size: int = 8,
-            temperature: float = 0.02,
+            temperature: float = 1.0,
+            normalize_embeddings: bool = False,
     ):
         """
         Trains the model on 'train_file'
@@ -102,6 +103,7 @@ class BgeModel(SentenceModel):
             data_parallel (optional): Use multi-gpu data parallel training.
             train_group_size (optional): Group size for training.
             temperature (optional): Temperature for softmax.
+            normalize_embeddings (optional): Normalize embeddings or not.
         Returns:
             global_step: Number of global steps trained
             training_details: Full training progress scores
@@ -140,6 +142,7 @@ class BgeModel(SentenceModel):
             bf16=bf16,
             data_parallel=data_parallel,
             temperature=temperature,
+            normalize_embeddings=normalize_embeddings,
         )
         logger.info(f" Training model done. Saved to {output_dir}.")
 
@@ -183,7 +186,8 @@ class BgeModel(SentenceModel):
             save_model_every_epoch: bool = True,
             bf16: bool = True,
             data_parallel: bool = False,
-            temperature: float = 0.02,
+            temperature: float = 1.0,
+            normalize_embeddings: bool = False,
     ):
         """
         Trains the model on train_dataset.
@@ -289,12 +293,11 @@ class BgeModel(SentenceModel):
                 # get sentence embeddings
                 with torch.autocast(str(self.device), dtype=torch_type):
                     q_embeddings = self.get_sentence_embeddings(**query)
-                    q_embeddings = torch.nn.functional.normalize(q_embeddings, dim=-1)
-                    q_embeddings = q_embeddings.contiguous()
-
                     p_embeddings = self.get_sentence_embeddings(**passage)
-                    p_embeddings = torch.nn.functional.normalize(p_embeddings, dim=-1)
-                    p_embeddings = p_embeddings.contiguous()
+                    if normalize_embeddings:
+                        q_embeddings = torch.nn.functional.normalize(q_embeddings, dim=-1)
+                        p_embeddings = torch.nn.functional.normalize(p_embeddings, dim=-1)
+
                     scores = self.calc_similarity(q_embeddings, p_embeddings)
                     scores = scores / temperature
                     scores = scores.view(q_embeddings.size(0), -1)

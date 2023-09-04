@@ -597,7 +597,7 @@ example: [examples/training_bge_model_mydata.py](https://github.com/shibing624/t
 
 ```shell
 cd examples
-python training_bge_model_mydata.py --model_arch bge --do_train --do_predict --num_epochs 4 --output_dir ./outputs/STS-B-bge --batch_size 4
+python training_bge_model_mydata.py --model_arch bge --do_train --do_predict --num_epochs 4 --output_dir ./outputs/STS-B-bge-v1 --batch_size 4 --save_model_every_epoch --bf16
 ```
 
 - 自建BGE训练集
