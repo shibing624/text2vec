@@ -27,7 +27,7 @@ class BgeModel(SentenceModel):
     def __init__(
             self,
             model_name_or_path: str = "BAAI/bge-large-zh-noinstruct",
-            encoder_type: str = "MEAN",
+            encoder_type: str = "CLS",
             max_seq_length: int = 32,
             passage_max_len: int = 128,
             num_classes: int = 1,
