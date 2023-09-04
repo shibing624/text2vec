@@ -420,6 +420,20 @@ class SimModelTestCase(unittest.TestCase):
         # add sohu avg: 0.5582
         pass
 
+    def test_bge_large_zh_noinstruct_cosent_passage_model(self):
+        # BAAI/bge-large-zh-noinstruct with sts-b cosent finetuned v2
+        # STS-B spearman corr: 0.7644
+        # ATEC spearman corr: 0.38411
+        # BQ spearman corr: 0.61348
+        # LCQMC spearman corr: 0.717220
+        # PAWSX spearman corr: 0.351538
+        # avg: 0.5661
+        # V100 QPS:427
+        # sohu-dd spearman corr: 0.7181
+        # sohu-dc spearman corr: 0.631528
+        # add sohu avg: 0.5972
+        pass
+
     def test_bge_large_zh_noinstruct_bge_model(self):
         # BAAI/bge-large-zh-noinstruct with bge finetuned v2
         # STS-B spearman corr: 0.8093
