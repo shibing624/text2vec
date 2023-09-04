@@ -30,7 +30,7 @@ def get_args():
 
 if __name__ == '__main__':
     args = get_args()
-
+    print(args)
     model = FlagDRESModel(model_name_or_path=args.model_name_or_path,
                           normalize_embeddings=False,
                           # normlize embedding will harm the performance of classification task
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     task_names = [t.description["name"] for t in MTEB(task_types=args.task_type,
                                                       task_langs=['en']).tasks]
-
+    print(task_names)
     for task in task_names:
         if task in ['MSMARCOv2']:
             print('Skip task: {}, since it has no test split'.format(task))

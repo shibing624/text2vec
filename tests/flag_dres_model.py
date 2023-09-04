@@ -7,6 +7,7 @@ pip install mteb
 
 code modified from https://github.com/FlagOpen/FlagEmbedding
 """
+import os
 from typing import cast, List, Dict, Union
 
 import numpy as np
@@ -14,6 +15,9 @@ import torch
 from mteb import DRESModel
 from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["TOKENIZERS_PARALLELISM"] = "TRUE"
 
 
 class FlagDRESModel(DRESModel):
