@@ -3,14 +3,15 @@
 @author:XuMing(xuming624@qq.com)
 @description: Evaluate C-MTEB benchmark
 
-pip install mteb
+pip install -U C_MTEB
 
 code modified from https://github.com/FlagOpen/FlagEmbedding
 """
 import argparse
 
 from mteb import MTEB
-
+from C_MTEB.tasks import *
+from C_MTEB import ChineseTaskList
 from flag_dres_model import FlagDRESModel
 
 query_instruction_for_retrieval_dict = {
@@ -38,8 +39,8 @@ if __name__ == '__main__':
                                                       task_langs=['zh', 'zh-CN']).tasks]
     print(task_names)
     for task in task_names:
-        # if task not in ChineseTaskList:
-        #     continue
+        if task not in ChineseTaskList:
+            continue
         if task in ['T2Retrieval', 'MMarcoRetrieval', 'DuRetrieval',
                     'CovidRetrieval', 'CmedqaRetrieval',
                     'EcomRetrieval', 'MedicalRetrieval', 'VideoRetrieval',
