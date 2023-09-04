@@ -183,11 +183,13 @@ class CosentModel(SentenceModel):
         self.bert.to(self.device)
         set_seed(seed)
         num_devices = 1
+        torch_type = torch.bfloat16 if bf16 else torch.float32
 
         if data_parallel:
             self.bert = nn.DataParallel(self.bert)
             num_devices = torch.cuda.device_count()
-            sampler = DistributedSampler(train_dataset)
+            local_rank = int(os.environ["LOCAL_RANK"])
+            sampler = DistributedSampler(train_dataset, num_replicas=num_devices, rank=local_rank)
             train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=sampler, shuffle=False)
         else:
             train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False)  # not shuffle
@@ -265,19 +267,14 @@ class CosentModel(SentenceModel):
                 if token_type_ids is not None:
                     token_type_ids = token_type_ids.squeeze(1).to(self.device)
 
-                if bf16:
-                    with torch.autocast('cuda', dtype=torch.bfloat16):
-                        output_embeddings = self.get_sentence_embeddings(input_ids, attention_mask, token_type_ids)
-                        loss = self.calc_loss(labels, output_embeddings)
-                else:
+                with torch.autocast(str(self.device), dtype=torch_type):
                     output_embeddings = self.get_sentence_embeddings(input_ids, attention_mask, token_type_ids)
                     loss = self.calc_loss(labels, output_embeddings)
-
                 current_loss = loss.item()
                 if verbose:
                     batch_iterator.set_description(
                         f"Epoch: {epoch_number + 1}/{num_epochs}, "
-                        f"Batch:{step}/{len(train_dataloader)//num_devices}, Loss: {current_loss:9.4f}")
+                        f"Batch:{step}/{len(train_dataloader) // num_devices}, Loss: {current_loss:9.4f}")
 
                 if gradient_accumulation_steps > 1:
                     loss = loss / gradient_accumulation_steps

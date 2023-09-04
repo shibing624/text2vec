@@ -4,14 +4,14 @@
 @description: Create BERT model for text matching task
 """
 
+import math
 import os
 
-import math
 import pandas as pd
 import torch
 from loguru import logger
 from torch import nn
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, DistributedSampler
 from tqdm import tqdm, trange
 from transformers import BertForSequenceClassification, BertTokenizer
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
@@ -203,12 +203,18 @@ class BertMatchModel:
         logger.debug("Use pytorch device: {}".format(device))
         self.model.bert.to(device)
         set_seed(seed)
+        num_devices = 1
+        torch_type = torch.bfloat16 if bf16 else torch.float32
 
         if data_parallel:
             self.bert = nn.DataParallel(self.bert)
-
-        train_dataloader = DataLoader(train_dataset, batch_size=batch_size)  # keep the order of the data, not shuffle
-        total_steps = len(train_dataloader) * num_epochs
+            num_devices = torch.cuda.device_count()
+            local_rank = int(os.environ["LOCAL_RANK"])
+            sampler = DistributedSampler(train_dataset, num_replicas=num_devices, rank=local_rank)
+            train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=sampler, shuffle=False)
+        else:
+            train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False)  # not shuffle
+        total_steps = len(train_dataloader) * num_epochs // num_devices
         param_optimizer = list(self.model.bert.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
         optimizer_grouped_parameters = [
@@ -282,17 +288,14 @@ class BertMatchModel:
                 if token_type_ids is not None:
                     token_type_ids = token_type_ids.squeeze(1).to(self.device)
 
-                if bf16:
-                    with torch.autocast('cuda', dtype=torch.bfloat16):
-                        loss, logits, probs = self.model(input_ids, attention_mask, token_type_ids, labels)
-                else:
+                with torch.autocast(str(self.device), dtype=torch_type):
                     loss, logits, probs = self.model(input_ids, attention_mask, token_type_ids, labels)
-                    
                 current_loss = loss.item()
 
                 if verbose:
                     batch_iterator.set_description(
-                        f"Epoch: {epoch_number + 1}/{num_epochs}, Batch:{step}/{len(train_dataloader)}, Loss: {current_loss:9.4f}")
+                        f"Epoch: {epoch_number + 1}/{num_epochs}, "
+                        f"Batch:{step}/{len(train_dataloader) // num_devices}, Loss: {current_loss:9.4f}")
 
                 if gradient_accumulation_steps > 1:
                     loss = loss / gradient_accumulation_steps
