@@ -28,7 +28,7 @@ class BgeModel(SentenceModel):
             self,
             model_name_or_path: str = "BAAI/bge-large-zh-noinstruct",
             encoder_type: str = "MEAN",
-            max_seq_length: int = 128,
+            max_seq_length: int = 32,
             passage_max_len: int = 128,
             num_classes: int = 1,
             device: str = None,
@@ -64,7 +64,7 @@ class BgeModel(SentenceModel):
             weight_decay: float = 0.01,
             seed: int = 42,
             warmup_ratio: float = 0.05,
-            lr: float = 2e-5,
+            lr: float = 1e-5,
             eps: float = 1e-6,
             gradient_accumulation_steps: int = 1,
             max_grad_norm: float = 1.0,
@@ -72,10 +72,10 @@ class BgeModel(SentenceModel):
             use_hf_dataset: bool = False,
             hf_dataset_name: str = "",
             save_model_every_epoch: bool = True,
-            bf16: bool = False,
+            bf16: bool = True,
             data_parallel: bool = False,
             train_group_size: int = 8,
-            temperature: float = 1.0,
+            temperature: float = 0.02,
     ):
         """
         Trains the model on 'train_file'
@@ -175,15 +175,15 @@ class BgeModel(SentenceModel):
             weight_decay: float = 0.01,
             seed: int = 42,
             warmup_ratio: float = 0.05,
-            lr: float = 2e-5,
+            lr: float = 1e-5,
             eps: float = 1e-6,
             gradient_accumulation_steps: int = 1,
             max_grad_norm: float = 1.0,
             max_steps: int = -1,
             save_model_every_epoch: bool = True,
-            bf16: bool = False,
+            bf16: bool = True,
             data_parallel: bool = False,
-            temperature: float = 1.0,
+            temperature: float = 0.02,
     ):
         """
         Trains the model on train_dataset.
@@ -269,27 +269,21 @@ class BgeModel(SentenceModel):
                 query, passage = batch
                 query = self.flat_list(query)
                 passage = self.flat_list(passage)
-                query = self.tokenizer(
-                    query,
-                    max_length=self.query_max_len,
-                    truncation=True,
-                    padding=True,
-                    return_tensors='pt'
-                )
-                passage = self.tokenizer(
-                    passage,
-                    max_length=self.passage_max_len,
-                    truncation=True,
-                    padding=True,
-                    return_tensors='pt'
-                )
-                query = query.to(self.device)
-                passage = passage.to(self.device)
 
                 # get sentence embeddings
                 with torch.autocast(str(self.device), dtype=torch_type):
-                    q_embeddings = self.get_sentence_embeddings(**query)
-                    p_embeddings = self.get_sentence_embeddings(**passage)
+                    q_embeddings = self.encode(
+                        query,
+                        normalize_embeddings=True,
+                        convert_to_tensor=True,
+                        max_seq_length=self.query_max_len
+                    )
+                    p_embeddings = self.encode(
+                        passage,
+                        normalize_embeddings=True,
+                        convert_to_tensor=True,
+                        max_seq_length=self.passage_max_len
+                    )
                     scores = self.calc_similarity(q_embeddings, p_embeddings)
                     scores = scores / temperature
                     scores = scores.view(q_embeddings.size(0), -1)

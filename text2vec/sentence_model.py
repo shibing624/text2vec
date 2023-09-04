@@ -148,6 +148,7 @@ class SentenceModel:
             convert_to_tensor: bool = False,
             device: str = None,
             normalize_embeddings: bool = False,
+            max_seq_length: int = None,
     ):
         """
         Returns the embeddings for a batch of sentences.
@@ -159,10 +160,13 @@ class SentenceModel:
         :param convert_to_tensor: If true, you get one large tensor as return. Overwrites any setting from convert_to_numpy
         :param device: Which device to use for the computation
         :param normalize_embeddings: If true, returned vectors will have length 1. In that case, the faster dot-product (util.dot_score) instead of cosine similarity can be used.
+        :param max_seq_length: Override value for max_seq_length
         """
         self.bert.eval()
         if device is None:
             device = self.device
+        if max_seq_length is None:
+            max_seq_length = self.max_seq_length
         if convert_to_tensor:
             convert_to_numpy = False
         input_is_string = False
@@ -177,7 +181,7 @@ class SentenceModel:
             sentences_batch = sentences_sorted[start_index: start_index + batch_size]
             # Compute sentences embeddings
             embeddings = self.get_sentence_embeddings(
-                **self.tokenizer(sentences_batch, max_length=self.max_seq_length,
+                **self.tokenizer(sentences_batch, max_length=max_seq_length,
                                  padding=True, truncation=True, return_tensors='pt').to(device)
             )
             embeddings = embeddings.detach()

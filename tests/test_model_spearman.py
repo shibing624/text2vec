@@ -422,16 +422,16 @@ class SimModelTestCase(unittest.TestCase):
 
     def test_bge_large_zh_noinstruct_bge_model(self):
         # BAAI/bge-large-zh-noinstruct with bge finetuned
-        # STS-B spearman corr: 0.8059
-        # ATEC spearman corr: 0.4234
-        # BQ spearman corr: 0.515842
-        # LCQMC spearman corr: 0.7291
-        # PAWSX spearman corr: 0.1249
-        # avg: 0.5198
+        # STS-B spearman corr: 0.
+        # ATEC spearman corr: 0.
+        # BQ spearman corr: 0.
+        # LCQMC spearman corr: 0.
+        # PAWSX spearman corr: 0.
+        # avg: 0.
         # V100 QPS: 498
-        # sohu-dd spearman corr: 0.7243
-        # sohu-dc spearman corr: 0.58399
-        # add sohu avg: 0.5582
+        # sohu-dd spearman corr: 0.
+        # sohu-dc spearman corr: 0.
+        # add sohu avg: 0.
         pass
 
 
