@@ -12,7 +12,7 @@ import numpy as np
 import torch
 from loguru import logger
 from torch.utils.data import DataLoader, Dataset
-from tqdm import tqdm, trange
+from tqdm import tqdm
 from tqdm.autonotebook import trange
 from transformers import AutoTokenizer, AutoModel
 
@@ -138,7 +138,6 @@ class SentenceModel:
                 input_mask_expanded.sum(1), min=1e-9)
             return final_encoding  # [batch, hid_size]
 
-    @torch.inference_mode()
     def encode(
             self,
             sentences: Union[str, List[str]],
