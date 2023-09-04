@@ -8,11 +8,11 @@ pip install -U C_MTEB
 code modified from https://github.com/FlagOpen/FlagEmbedding
 """
 import argparse
-
-from mteb import MTEB
-from C_MTEB.tasks import *
+from mteb import MTEB  # must import mteb before C_MTEB
 from C_MTEB import ChineseTaskList
+from C_MTEB.tasks import *
 from flag_dres_model import FlagDRESModel
+
 
 query_instruction_for_retrieval_dict = {
     "BAAI/bge-large-zh": "为这个句子生成表示以用于检索相关文章：",
@@ -35,8 +35,7 @@ if __name__ == '__main__':
     model = FlagDRESModel(model_name_or_path=args.model_name_or_path,
                           query_instruction_for_retrieval="为这个句子生成表示以用于检索相关文章：")
 
-    task_names = [t.description["name"] for t in MTEB(task_types=args.task_type,
-                                                      task_langs=['zh', 'zh-CN']).tasks]
+    task_names = [t.description["name"] for t in MTEB(tasks=args.task_type, task_langs=['zh', 'zh-CN']).tasks]
     print(task_names)
     for task in task_names:
         if task not in ChineseTaskList:
@@ -46,7 +45,6 @@ if __name__ == '__main__':
                     'EcomRetrieval', 'MedicalRetrieval', 'VideoRetrieval',
                     'T2Reranking', 'MmarcoReranking', 'CMedQAv1', 'CMedQAv2']:
             if args.model_name_or_path not in query_instruction_for_retrieval_dict:
-                # instruction = "为这个句子生成表示以用于检索相关文章："
                 instruction = None
                 print(f"{args.model_name_or_path} not in query_instruction_for_retrieval_dict, set instruction=None")
             else:
