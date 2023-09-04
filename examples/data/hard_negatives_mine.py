@@ -25,15 +25,16 @@ def get_args():
     parser.add_argument('--candidate_pool', default='STS-B/STS-B.train.data', type=str)
     parser.add_argument('--output_file', default='bge_finetune_data.jsonl', type=str)
     parser.add_argument('--batch_size', default=128, type=int)
-    parser.add_argument('--range_for_sampling', default='2-200', type=str, help="range to sample negatives")
+    parser.add_argument('--range_for_sampling', default='2-20', type=str, help="range to sample negatives")
     parser.add_argument('--use_gpu_for_searching', action='store_true', help='use faiss-gpu')
-    parser.add_argument('--negative_number', default=15, help='use faiss-gpu')
+    parser.add_argument('--negative_number', default=10, help='use faiss-gpu')
     return parser.parse_args()
 
 
 def create_index(embeddings, use_gpu):
     index = faiss.IndexFlatIP(len(embeddings[0]))
     if use_gpu:
+        print('use faiss-gpu')
         co = faiss.GpuMultipleClonerOptions()
         co.shard = True
         co.useFloat16 = True

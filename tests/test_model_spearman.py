@@ -394,30 +394,44 @@ class SimModelTestCase(unittest.TestCase):
 
     def test_bge_large_zh_noinstruct_model(self):
         # BAAI/bge-large-zh-noinstruct
-        # STS-B spearman corr: 0.9211
-        # ATEC spearman corr: 0.5
-        # BQ spearman corr: 0.8366
-        # LCQMC spearman corr: 0.69282
-        # PAWSX spearman corr: 0.51961
-        # avg: 0.5378
-        # V100 QPS: 1490
-        # sohu-dd spearman corr: 0.53381
-        # sohu-dc spearman corr: 0.19863
-        # add sohu avg: 0.60038
+        # STS-B spearman corr: 0.7292
+        # ATEC spearman corr: 0.4466
+        # BQ spearman corr: 0.54995
+        # LCQMC spearman corr: 0.69834
+        # PAWSX spearman corr: 0.15612
+        # avg: 0.51606
+        # V100 QPS: 470
+        # sohu-dd spearman corr: 0.53378
+        # sohu-dc spearman corr: 0.198637
+        # add sohu avg: 0.4732
         pass
 
     def test_bge_large_zh_noinstruct_cosent_model(self):
         # BAAI/bge-large-zh-noinstruct with cosent finetuned
-        # STS-B spearman corr: 0.86535
-        # ATEC spearman corr: 0.3000
-        # BQ spearman corr: 0.5976
-        # LCQMC spearman corr: 0.8660
-        # PAWSX spearman corr: 0.11547
-        # avg: 0.5378
-        # V100 QPS: 1490
-        # sohu-dd spearman corr: 0.7248
-        # sohu-dc spearman corr: 0.5839
-        # add sohu avg: 0.57904
+        # STS-B spearman corr: 0.8059
+        # ATEC spearman corr: 0.4234
+        # BQ spearman corr: 0.515842
+        # LCQMC spearman corr: 0.7291
+        # PAWSX spearman corr: 0.1249
+        # avg: 0.5198
+        # V100 QPS: 498
+        # sohu-dd spearman corr: 0.7243
+        # sohu-dc spearman corr: 0.58399
+        # add sohu avg: 0.5582
+        pass
+
+    def test_bge_large_zh_noinstruct_bge_model(self):
+        # BAAI/bge-large-zh-noinstruct with bge finetuned
+        # STS-B spearman corr: 0.8059
+        # ATEC spearman corr: 0.4234
+        # BQ spearman corr: 0.515842
+        # LCQMC spearman corr: 0.7291
+        # PAWSX spearman corr: 0.1249
+        # avg: 0.5198
+        # V100 QPS: 498
+        # sohu-dd spearman corr: 0.7243
+        # sohu-dc spearman corr: 0.58399
+        # add sohu avg: 0.5582
         pass
 
 
