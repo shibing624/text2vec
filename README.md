@@ -333,7 +333,7 @@ options:
 
 case：
 
-```shell
+```zsh
 pip install text2vec -U
 text2vec --input_file input.txt --output_file out.csv --batch_size 16
 ```
