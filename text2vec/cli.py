@@ -6,7 +6,7 @@
 import argparse
 import sys
 
-import numpy as np
+import pandas as pd
 from loguru import logger
 
 sys.path.append('..')
@@ -14,28 +14,39 @@ from text2vec.sentence_model import SentenceModel
 from text2vec.word2vec import Word2Vec
 
 
+def save_partial_results(df, output_file, is_first_chunk):
+    mode = 'w' if is_first_chunk else 'a'
+    header = is_first_chunk
+
+    with open(output_file, mode, encoding='utf-8') as f:
+        df.to_csv(f, index=False, header=header)
+
+
 def main():
     parser = argparse.ArgumentParser(description='text2vec cli')
     parser.add_argument('--input_file', type=str, help='input file path, text file', required=True)
-    parser.add_argument('--output_file', type=str, default='text_embs.npy', help='output file path')
+    parser.add_argument('--output_file', type=str, default='text_embs.csv', help='output file path')
     parser.add_argument('--model_type', type=str, default='sentencemodel', help='model type: sentencemodel, word2vec')
     parser.add_argument('--model_name', type=str, default='shibing624/text2vec-base-chinese', help='model name or path')
     parser.add_argument('--encoder_type', type=str, default='MEAN',
                         help='encoder type: MEAN, CLS, POOLER, FIRST_LAST_AVG, LAST_AVG')
-    parser.add_argument('--batch_size', type=int, default=64, help='batch size')
+    parser.add_argument('--batch_size', type=int, default=128, help='batch size')
     parser.add_argument('--max_seq_length', type=int, default=256, help='max sequence length')
+    parser.add_argument('--chunk_size', type=int, default=4000, help='chunk size to save partial results')
     parser.add_argument('--device', type=str, default=None, help='device: cpu, cuda')
     parser.add_argument('--show_progress_bar', type=bool, default=True, help='show progress bar')
     parser.add_argument('--normalize_embeddings', type=bool, default=True, help='normalize embeddings')
-
     args = parser.parse_args()
     logger.debug(args)
 
-    sentences = []
+    sentences = set()
     with open(args.input_file, 'r', encoding='utf-8') as f:
         for line in f:
-            sentences.append(line.strip())
-    logger.info(f'load sentences success. sentences num: {len(sentences)}')
+            line = line.strip()
+            if line:
+                sentences.add(line)
+    sentences = list(sentences)
+    logger.info(f'load sentences success. sentences num: {len(sentences)}, top3: {sentences[:3]}')
 
     if args.model_type == 'sentencemodel':
         model = SentenceModel(
@@ -44,37 +55,35 @@ def main():
             max_seq_length=args.max_seq_length,
             device=args.device,
         )
-        logger.info(f'load model success. model: {model}')
-        """model.encode
-        Returns the embeddings for a batch of sentences.
-
-        :param sentences: str/list, Input sentences
-        :param batch_size: int, Batch size
-        :param show_progress_bar: bool, Whether to show a progress bar for the sentences
-        :param convert_to_numpy: If true, the output is a list of numpy vectors. Else, it is a list of pytorch tensors.
-        :param convert_to_tensor: If true, you get one large tensor as return. Overwrites any setting from convert_to_numpy
-        :param device: Which device to use for the computation
-        :param normalize_embeddings: If true, returned vectors will have length 1. In that case, the faster dot-product (util.dot_score) instead of cosine similarity can be used.
-        :param max_seq_length: Override value for max_seq_length
-        """
-        sentence_embeddings = model.encode(
-            sentences,
-            batch_size=args.batch_size,
-            show_progress_bar=args.show_progress_bar,
-            convert_to_numpy=True,
-            convert_to_tensor=False,
-            normalize_embeddings=args.normalize_embeddings,
-        )
     elif args.model_type == 'word2vec':
         model = Word2Vec(args.model_name)
-        logger.info(f'load model success. model: {model}')
-        sentence_embeddings = model.encode(sentences, show_progress_bar=args.show_progress_bar)
     else:
         raise Exception('model_type must be sentencemodel or word2vec')
+    logger.info(f'load model success. model: {model}')
 
-    logger.info(type(sentence_embeddings), sentence_embeddings.shape)
-    # save embeddings to npy file
-    np.save(args.output_file, sentence_embeddings)
+    chunk_size = args.chunk_size
+    for i in range(0, len(sentences), chunk_size):
+        chunk_sentences = sentences[i:i + chunk_size]
+
+        if args.model_type == 'sentencemodel':
+            chunk_embeddings = model.encode(
+                chunk_sentences,
+                batch_size=args.batch_size,
+                show_progress_bar=args.show_progress_bar,
+                convert_to_numpy=True,
+                convert_to_tensor=False,
+                normalize_embeddings=args.normalize_embeddings,
+            )
+        elif args.model_type == 'word2vec':
+            chunk_embeddings = model.encode(chunk_sentences, show_progress_bar=args.show_progress_bar)
+        else:
+            raise Exception('model_type must be sentencemodel or word2vec')
+
+        # Save part embeddings to dataframe
+        chunk_df = pd.DataFrame({'sentence': chunk_sentences, 'sentence_embeddings': chunk_embeddings.tolist()})
+        save_partial_results(chunk_df, args.output_file, i == 0)
+        logger.debug(f'save partial results success. size: {len(chunk_sentences)}, shape: {chunk_embeddings.shape}')
+    logger.info(f"Input file {args.input_file}, saved embeddings to {args.output_file} success.")
 
 
 if __name__ == "__main__":
