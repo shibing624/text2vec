@@ -294,6 +294,51 @@ print(sentence_embeddings)
   - 腾讯词向量-官方全量, 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`，腾讯词向量主页：https://ai.tencent.com/ailab/nlp/zh/index.html 词向量下载地址：https://ai.tencent.com/ailab/nlp/en/download.html  更多查看[腾讯词向量介绍-wiki](https://github.com/shibing624/text2vec/wiki/%E8%85%BE%E8%AE%AF%E8%AF%8D%E5%90%91%E9%87%8F%E4%BB%8B%E7%BB%8D)
 
 
+### 命令行模式（CLI）
+
+支持批量获取文本向量
+
+```
+> text2vec -h                                    
+usage: text2vec [-h] --input_file INPUT_FILE [--output_file OUTPUT_FILE] [--model_type MODEL_TYPE] [--model_name MODEL_NAME] [--encoder_type ENCODER_TYPE]
+                [--batch_size BATCH_SIZE] [--max_seq_length MAX_SEQ_LENGTH] [--chunk_size CHUNK_SIZE] [--device DEVICE]
+                [--show_progress_bar SHOW_PROGRESS_BAR] [--normalize_embeddings NORMALIZE_EMBEDDINGS]
+
+text2vec cli
+
+options:
+  -h, --help            show this help message and exit
+  --input_file INPUT_FILE
+                        input file path, text file
+  --output_file OUTPUT_FILE
+                        output file path
+  --model_type MODEL_TYPE
+                        model type: sentencemodel, word2vec
+  --model_name MODEL_NAME
+                        model name or path
+  --encoder_type ENCODER_TYPE
+                        encoder type: MEAN, CLS, POOLER, FIRST_LAST_AVG, LAST_AVG
+  --batch_size BATCH_SIZE
+                        batch size
+  --max_seq_length MAX_SEQ_LENGTH
+                        max sequence length
+  --chunk_size CHUNK_SIZE
+                        chunk size to save partial results
+  --device DEVICE       device: cpu, cuda
+  --show_progress_bar SHOW_PROGRESS_BAR
+                        show progress bar
+  --normalize_embeddings NORMALIZE_EMBEDDINGS
+                        normalize embeddings
+```
+
+case：
+
+```shell
+pip install text2vec -U
+text2vec --input_file input.txt --output_file out.csv --batch_size 16
+```
+
+> 输入文件（required）：`input.txt`
 
 ## 下游任务
 ### 1. 句子相似度计算
@@ -432,6 +477,7 @@ A man is riding a white horse on an enclosed ground. (Score: 0.1733)
 A man is eating food. (Score: 0.0329)
 ```
 
+ 
 
 ## 下游任务支持库
 **similarities库[推荐]**

@@ -30,9 +30,9 @@ def main():
     parser.add_argument('--model_name', type=str, default='shibing624/text2vec-base-chinese', help='model name or path')
     parser.add_argument('--encoder_type', type=str, default='MEAN',
                         help='encoder type: MEAN, CLS, POOLER, FIRST_LAST_AVG, LAST_AVG')
-    parser.add_argument('--batch_size', type=int, default=128, help='batch size')
+    parser.add_argument('--batch_size', type=int, default=32, help='batch size')
     parser.add_argument('--max_seq_length', type=int, default=256, help='max sequence length')
-    parser.add_argument('--chunk_size', type=int, default=4000, help='chunk size to save partial results')
+    parser.add_argument('--chunk_size', type=int, default=1000, help='chunk size to save partial results')
     parser.add_argument('--device', type=str, default=None, help='device: cpu, cuda')
     parser.add_argument('--show_progress_bar', type=bool, default=True, help='show progress bar')
     parser.add_argument('--normalize_embeddings', type=bool, default=True, help='normalize embeddings')
