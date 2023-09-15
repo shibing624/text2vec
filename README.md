@@ -298,6 +298,8 @@ print(sentence_embeddings)
 
 支持批量获取文本向量
 
+code: [cli.py](https://github.com/shibing624/text2vec/blob/master/text2vec/cli.py)
+
 ```
 > text2vec -h                                    
 usage: text2vec [-h] --input_file INPUT_FILE [--output_file OUTPUT_FILE] [--model_type MODEL_TYPE] [--model_name MODEL_NAME] [--encoder_type ENCODER_TYPE]
@@ -306,32 +308,33 @@ usage: text2vec [-h] --input_file INPUT_FILE [--output_file OUTPUT_FILE] [--mode
 
 text2vec cli
 
-options:
+optional arguments:
   -h, --help            show this help message and exit
   --input_file INPUT_FILE
-                        input file path, text file
+                        input file path, text file, required
   --output_file OUTPUT_FILE
-                        output file path
+                        output file path, output csv file, default text_embs.csv
   --model_type MODEL_TYPE
-                        model type: sentencemodel, word2vec
+                        model type: sentencemodel, word2vec, default sentencemodel
   --model_name MODEL_NAME
-                        model name or path
+                        model name or path, default shibing624/text2vec-base-chinese
   --encoder_type ENCODER_TYPE
-                        encoder type: MEAN, CLS, POOLER, FIRST_LAST_AVG, LAST_AVG
+                        encoder type: MEAN, CLS, POOLER, FIRST_LAST_AVG, LAST_AVG, default MEAN
   --batch_size BATCH_SIZE
-                        batch size
+                        batch size, default 32
   --max_seq_length MAX_SEQ_LENGTH
-                        max sequence length
+                        max sequence length, default 256
   --chunk_size CHUNK_SIZE
-                        chunk size to save partial results
-  --device DEVICE       device: cpu, cuda
+                        chunk size to save partial results, default 1000
+  --device DEVICE       device: cpu, cuda, default None
   --show_progress_bar SHOW_PROGRESS_BAR
-                        show progress bar
+                        show progress bar, default True
   --normalize_embeddings NORMALIZE_EMBEDDINGS
-                        normalize embeddings
+                        normalize embeddings, default True
+
 ```
 
-case：
+run：
 
 ```zsh
 pip install text2vec -U

@@ -24,8 +24,8 @@ def save_partial_results(df, output_file, is_first_chunk):
 
 def main():
     parser = argparse.ArgumentParser(description='text2vec cli')
-    parser.add_argument('--input_file', type=str, help='input file path, text file', required=True)
-    parser.add_argument('--output_file', type=str, default='text_embs.csv', help='output file path')
+    parser.add_argument('--input_file', type=str, help='input file path, text file, required', required=True)
+    parser.add_argument('--output_file', type=str, default='text_embs.csv', help='output file path, output csv file')
     parser.add_argument('--model_type', type=str, default='sentencemodel', help='model type: sentencemodel, word2vec')
     parser.add_argument('--model_name', type=str, default='shibing624/text2vec-base-chinese', help='model name or path')
     parser.add_argument('--encoder_type', type=str, default='MEAN',
@@ -34,8 +34,8 @@ def main():
     parser.add_argument('--max_seq_length', type=int, default=256, help='max sequence length')
     parser.add_argument('--chunk_size', type=int, default=1000, help='chunk size to save partial results')
     parser.add_argument('--device', type=str, default=None, help='device: cpu, cuda')
-    parser.add_argument('--show_progress_bar', type=bool, default=True, help='show progress bar')
-    parser.add_argument('--normalize_embeddings', type=bool, default=True, help='normalize embeddings')
+    parser.add_argument('--show_progress_bar', type=bool, default=True, help='show progress bar, default True')
+    parser.add_argument('--normalize_embeddings', type=bool, default=True, help='normalize embeddings, default True')
     args = parser.parse_args()
     logger.debug(args)
 
@@ -75,7 +75,10 @@ def main():
                 normalize_embeddings=args.normalize_embeddings,
             )
         elif args.model_type == 'word2vec':
-            chunk_embeddings = model.encode(chunk_sentences, show_progress_bar=args.show_progress_bar)
+            chunk_embeddings = model.encode(
+                chunk_sentences,
+                show_progress_bar=args.show_progress_bar
+            )
         else:
             raise Exception('model_type must be sentencemodel or word2vec')
 
