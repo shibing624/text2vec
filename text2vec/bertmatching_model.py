@@ -209,7 +209,7 @@ class BertMatchModel:
         if data_parallel:
             self.bert = nn.DataParallel(self.bert)
             num_devices = torch.cuda.device_count()
-            local_rank = int(os.environ["LOCAL_RANK"])
+            local_rank = int(os.environ.get("LOCAL_RANK", 0))
             sampler = DistributedSampler(train_dataset, num_replicas=num_devices, rank=local_rank)
             train_dataloader = DataLoader(train_dataset, batch_size=batch_size, sampler=sampler, shuffle=False)
         else:
