@@ -44,7 +44,6 @@ setup(
         "datasets",
         "tqdm",
         "scikit-learn",
-        "gensim>=4.0.0",
         "pandas",
     ],
     packages=find_packages(exclude=['tests']),

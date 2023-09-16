@@ -9,7 +9,6 @@ import time
 from typing import List, Union, Dict
 
 import numpy as np
-from gensim.models import KeyedVectors
 from loguru import logger
 from numpy import ndarray
 from tqdm import tqdm
@@ -63,6 +62,8 @@ class Word2Vec:
             stopwords: list, stopwords
             cache_folder: str, save model dir
         """
+        from gensim.models import KeyedVectors  # noqa
+
         self.w2v_kwargs = w2v_kwargs if w2v_kwargs is not None else {}
         if model_name_or_path and os.path.exists(model_name_or_path):
             logger.info('Load pretrained model:{}'.format(model_name_or_path))
