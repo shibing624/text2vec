@@ -2,23 +2,23 @@
 
 
 import argparse
-import uvicorn
-import sys
 import os
-from fastapi import FastAPI, Query
-from starlette.middleware.cors import CORSMiddleware
-import torch
-from loguru import logger
-from typing import List
-from pydantic import BaseModel, Field
-import numpy as np
+import sys
 
+import torch
+import uvicorn
+from fastapi import FastAPI
+from loguru import logger
+from pydantic import BaseModel, Field
+from starlette.middleware.cors import CORSMiddleware
 
 sys.path.append('..')
 from text2vec import SentenceModel
 
+
 class Item(BaseModel):
     input: str = Field(..., max_length=512)
+
 
 pwd_path = os.path.abspath(os.path.dirname(__file__))
 use_cuda = torch.cuda.is_available()
@@ -29,13 +29,6 @@ parser.add_argument("--model_name_or_path", type=str, default="shibing624/text2v
                     help="Model save dir or model name")
 args = parser.parse_args()
 s_model = SentenceModel(args.model_name_or_path)
-
-def _normalize_embedding_2D(vec: np.ndarray) -> np.ndarray:
-  vec = np.ascontiguousarray(vec)
-  norm = np.sqrt(vec.dot(vec))
-  if norm != 0.0:
-    vec /= norm
-  return vec
 
 # define the app
 app = FastAPI()
@@ -55,10 +48,8 @@ async def index():
 @app.post('/emb')
 async def emb(item: Item):
     try:
-        embeddings = s_model.encode(item.input)
-        embeddings = np.array(embeddings)
-        normalized_embeddings = _normalize_embedding_2D(embeddings)
-        result_dict = {'emb': normalized_embeddings.tolist()}
+        embeddings = s_model.encode(item.input, normalize_embeddings=True)
+        result_dict = {'emb': embeddings.tolist()}
         logger.debug(f"Successfully get sentence embeddings, q:{item.input}")
         return result_dict
     except Exception as e:
@@ -68,4 +59,3 @@ async def emb(item: Item):
 
 if __name__ == '__main__':
     uvicorn.run(app=app, host='0.0.0.0', port=8001)
-
