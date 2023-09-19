@@ -228,6 +228,7 @@ Embedding shape: (768,)
 模型自动下载到本机路径：`~/.cache/huggingface/transformers`
 - `w2v-light-tencent-chinese`是通过gensim加载的Word2Vec模型，使用腾讯词向量`Tencent_AILab_ChineseEmbedding.tar.gz`计算各字词的词向量，句子向量通过单词词
 向量取平均值得到，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
+- `text2vec`支持多卡推理(计算文本向量): [examples/computing_embeddings_multi_gpu_demo.py](https://github.com/shibing624/text2vec/blob/master/examples/computing_embeddings_multi_gpu_demo.py)
 
 #### Usage (HuggingFace Transformers)
 Without [text2vec](https://github.com/shibing624/text2vec), you can use the model like this: 
