@@ -333,15 +333,16 @@ optional arguments:
   --show_progress_bar SHOW_PROGRESS_BAR
                         show progress bar, default True
   --normalize_embeddings NORMALIZE_EMBEDDINGS
-                        normalize embeddings, default True
-
+                        normalize embeddings, default False
+  --multi_gpu MULTI_GPU
+                        multi gpu, default False
 ```
 
 run：
 
-```zsh
+```shell
 pip install text2vec -U
-text2vec --input_file input.txt --output_file out.csv --batch_size 16
+text2vec --input_file input.txt --output_file out.csv --batch_size 32 --multi_gpu True
 ```
 
 > 输入文件（required）：`input.txt`
