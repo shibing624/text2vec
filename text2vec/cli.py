@@ -35,7 +35,8 @@ def main():
     parser.add_argument('--chunk_size', type=int, default=1000, help='chunk size to save partial results')
     parser.add_argument('--device', type=str, default=None, help='device: cpu, cuda')
     parser.add_argument('--show_progress_bar', type=bool, default=True, help='show progress bar, default True')
-    parser.add_argument('--normalize_embeddings', type=bool, default=True, help='normalize embeddings, default True')
+    parser.add_argument('--normalize_embeddings', type=bool, default=False, help='normalize embeddings, default False')
+    parser.add_argument('--multi_gpu', type=bool, default=False, help='multi gpu, default False')
     args = parser.parse_args()
     logger.debug(args)
 
@@ -58,34 +59,46 @@ def main():
     elif args.model_type == 'word2vec':
         model = Word2Vec(args.model_name)
     else:
-        raise Exception('model_type must be sentencemodel or word2vec')
+        raise ValueError('model_type must be sentencemodel or word2vec')
     logger.info(f'load model success. model: {model}')
 
-    chunk_size = args.chunk_size
-    for i in range(0, len(sentences), chunk_size):
-        chunk_sentences = sentences[i:i + chunk_size]
+    if args.multi_gpu:
+        if args.model_type == 'word2vec':
+            raise ValueError('word2vec model not support multi gpu')
+        pool = model.start_multi_process_pool()
+        # Compute the embeddings using the multi processes pool
+        embeddings = model.encode_multi_process(sentences, pool)
+        # Optional: Stop the process in the pool
+        model.stop_multi_process_pool(pool)
+        df = pd.DataFrame({'sentence': sentences, 'sentence_embeddings': embeddings.tolist()})
+        save_partial_results(df, args.output_file, True)
+        logger.debug(f'saved results. size: {len(sentences)}, emb shape: {embeddings.shape}')
+    else:
+        chunk_size = args.chunk_size
+        for i in range(0, len(sentences), chunk_size):
+            chunk_sentences = sentences[i:i + chunk_size]
 
-        if args.model_type == 'sentencemodel':
-            chunk_embeddings = model.encode(
-                chunk_sentences,
-                batch_size=args.batch_size,
-                show_progress_bar=args.show_progress_bar,
-                convert_to_numpy=True,
-                convert_to_tensor=False,
-                normalize_embeddings=args.normalize_embeddings,
-            )
-        elif args.model_type == 'word2vec':
-            chunk_embeddings = model.encode(
-                chunk_sentences,
-                show_progress_bar=args.show_progress_bar
-            )
-        else:
-            raise Exception('model_type must be sentencemodel or word2vec')
+            if args.model_type == 'sentencemodel':
+                chunk_embeddings = model.encode(
+                    chunk_sentences,
+                    batch_size=args.batch_size,
+                    show_progress_bar=args.show_progress_bar,
+                    convert_to_numpy=True,
+                    convert_to_tensor=False,
+                    normalize_embeddings=args.normalize_embeddings,
+                )
+            elif args.model_type == 'word2vec':
+                chunk_embeddings = model.encode(
+                    chunk_sentences,
+                    show_progress_bar=args.show_progress_bar
+                )
+            else:
+                raise ValueError('model_type must be sentencemodel or word2vec')
 
-        # Save part embeddings to dataframe
-        chunk_df = pd.DataFrame({'sentence': chunk_sentences, 'sentence_embeddings': chunk_embeddings.tolist()})
-        save_partial_results(chunk_df, args.output_file, i == 0)
-        logger.debug(f'save partial results success. size: {len(chunk_sentences)}, shape: {chunk_embeddings.shape}')
+            # Save part embeddings to dataframe
+            chunk_df = pd.DataFrame({'sentence': chunk_sentences, 'sentence_embeddings': chunk_embeddings.tolist()})
+            save_partial_results(chunk_df, args.output_file, i == 0)
+            logger.debug(f'saved partial results. size: {len(chunk_sentences)}, emb shape: {chunk_embeddings.shape}')
     logger.info(f"Input file {args.input_file}, saved embeddings to {args.output_file} success.")
 
 
