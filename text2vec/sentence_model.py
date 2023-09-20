@@ -178,6 +178,8 @@ class SentenceModel:
         self.bert.eval()
         if device is None:
             device = self.device
+        self.bert.to(device)
+
         if max_seq_length is None:
             max_seq_length = self.max_seq_length
         if convert_to_tensor:
