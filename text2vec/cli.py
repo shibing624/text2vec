@@ -67,7 +67,12 @@ def main():
             raise ValueError('word2vec model not support multi gpu')
         pool = model.start_multi_process_pool()
         # Compute the embeddings using the multi processes pool
-        embeddings = model.encode_multi_process(sentences, pool)
+        embeddings = model.encode_multi_process(
+            sentences,
+            pool,
+            batch_size=args.batch_size,
+            normalize_embeddings=args.normalize_embeddings
+        )
         # Optional: Stop the process in the pool
         model.stop_multi_process_pool(pool)
         df = pd.DataFrame({'sentence': sentences, 'sentence_embeddings': embeddings.tolist()})
