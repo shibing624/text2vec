@@ -23,7 +23,7 @@
 **text2vec**实现了Word2Vec、RankBM25、BERT、Sentence-BERT、CoSENT等多种文本表征、文本相似度计算模型，并在文本语义匹配（相似度计算）任务上比较了各模型的效果。
 
 ### News
-[2023/09/19] v1.2.8版本: 支持多卡推理（多进程实现多GPU和多CPU推理），新增命令行工具（CLI），可以无需代码开发批量获取文本向量，详见[Release-v1.2.8](https://github.com/shibing624/text2vec/releases/tag/1.2.8)
+[2023/09/20] v1.2.9版本: 支持多卡推理（多进程实现多GPU、多CPU推理），新增命令行工具（CLI），可以脚本执行批量文本向量化，详见[Release-v1.2.9](https://github.com/shibing624/text2vec/releases/tag/1.2.9)
 
 [2023/09/03] v1.2.4版本: 支持FlagEmbedding模型训练，发布了中文匹配模型[shibing624/text2vec-bge-large-chinese](https://huggingface.co/shibing624/text2vec-bge-large-chinese)，用CoSENT方法监督训练，基于`BAAI/bge-large-zh-noinstruct`用中文匹配数据集训练得到，并在中文测试集评估相对于原模型效果有提升，短文本区分度上提升明显，详见[Release-v1.2.4](https://github.com/shibing624/text2vec/releases/tag/1.2.4)
 
