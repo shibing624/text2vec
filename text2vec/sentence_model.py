@@ -142,6 +142,16 @@ class SentenceModel:
                 input_mask_expanded.sum(1), min=1e-9)
             return final_encoding  # [batch, hid_size]
 
+    @staticmethod
+    def batch_to_device(batch, device):
+        """
+        send a pytorch batch to a device (CPU/GPU)
+        """
+        for key in batch:
+            if isinstance(batch[key], torch.Tensor):
+                batch[key] = batch[key].to(device)
+        return batch
+
     def encode(
             self,
             sentences: Union[str, List[str]],
@@ -183,17 +193,20 @@ class SentenceModel:
         for start_index in trange(0, len(sentences), batch_size, desc="Batches", disable=not show_progress_bar):
             sentences_batch = sentences_sorted[start_index: start_index + batch_size]
             # Compute sentences embeddings
-            embeddings = self.get_sentence_embeddings(
-                **self.tokenizer(sentences_batch, max_length=max_seq_length,
-                                 padding=True, truncation=True, return_tensors='pt').to(device)
-            )
-            embeddings = embeddings.detach()
-            if normalize_embeddings:
-                embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+            with torch.no_grad():
+                features = self.tokenizer(
+                    sentences_batch, max_length=max_seq_length,
+                    padding=True, truncation=True, return_tensors='pt'
+                )
+                features = self.batch_to_device(features, device)
+                embeddings = self.get_sentence_embeddings(**features)
+                embeddings = embeddings.detach()
+                if normalize_embeddings:
+                    embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
 
-            if convert_to_numpy:
-                embeddings = embeddings.cpu()
-            all_embeddings.extend(embeddings)
+                if convert_to_numpy:
+                    embeddings = embeddings.cpu()
+                all_embeddings.extend(embeddings)
         all_embeddings = [all_embeddings[idx] for idx in np.argsort(length_sorted_idx)]
         if convert_to_tensor:
             all_embeddings = torch.stack(all_embeddings)
