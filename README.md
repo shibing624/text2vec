@@ -342,7 +342,7 @@ run：
 
 ```shell
 pip install text2vec -U
-text2vec --input_file input.txt --output_file out.csv --batch_size 32 --multi_gpu True
+text2vec --input_file input.txt --output_file out.csv --batch_size 128 --multi_gpu True
 ```
 
 > 输入文件（required）：`input.txt`
