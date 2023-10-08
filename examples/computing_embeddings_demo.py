@@ -24,7 +24,7 @@ def compute_emb(model):
         'The quick brown fox jumps over the lazy dog.',
         '敏捷的棕色狐狸跳过了懒狗',
     ]
-    sentence_embeddings = model.encode(sentences, show_progress_bar=True)
+    sentence_embeddings = model.encode(sentences, show_progress_bar=True, normalize_embeddings=True)
     print(type(sentence_embeddings), sentence_embeddings.shape)
 
     # The result is a list of sentence embeddings as numpy arrays
