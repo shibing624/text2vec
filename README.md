@@ -490,16 +490,16 @@ A man is eating food. (Score: 0.0329)
 **similarities库[推荐]**
 
 文本相似度计算和文本匹配搜索任务，推荐使用 [similarities库](https://github.com/shibing624/similarities) ，兼容本项目release的
-Word2vec、SBERT、Cosent类语义匹配模型，还支持字面维度相似度计算、匹配搜索算法，支持文本、图像。
+Word2vec、SBERT、Cosent类语义匹配模型，还支持亿级图文搜索，支持**文本语义去重**，**图片去重**等功能。
 
 安装：
 ```pip install -U similarities```
 
 句子相似度计算：
 ```python
-from similarities import Similarity
+from similarities import BertSimilarity
 
-m = Similarity()
+m = BertSimilarity()
 r = m.similarity('如何更换花呗绑定银行卡', '花呗更改绑定银行卡')
 print(f"similarity score: {float(r)}")  # similarity score: 0.855146050453186
 ```
