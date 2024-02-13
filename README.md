@@ -128,7 +128,7 @@ Official Demo: https://www.mulanai.com/product/short_text_sim/
 
 HuggingFace Demo: https://huggingface.co/spaces/shibing624/text2vec
 
-![](docs/hf.png)
+![](https://github.com/shibing624/text2vec/blob/master/docs/hf.png)
 
 run example: [examples/gradio_demo.py](https://github.com/shibing624/text2vec/blob/master/examples/gradio_demo.py) to see the demo:
 ```shell
