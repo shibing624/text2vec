@@ -345,7 +345,7 @@ pip install text2vec -U
 text2vec --input_file input.txt --output_file out.csv --batch_size 128 --multi_gpu True
 ```
 
-> 输入文件（required）：`input.txt`
+> 输入文件（required）：`input.txt`，format：一句话一行的句子文本。
 
 ## 下游任务
 ### 1. 句子相似度计算
