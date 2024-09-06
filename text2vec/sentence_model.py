@@ -49,7 +49,7 @@ class SentenceModel:
             model_name_or_path: str = "shibing624/text2vec-base-chinese",
             encoder_type: Literal["FIRST_LAST_AVG", "LAST_AVG", "CLS", "POOLER", "MEAN"] = "MEAN",
             max_seq_length: int = 256,
-            device: Optional[Literal["cpu", "gpu", "mps"]] = None,
+            device: Optional[str] = None,
     ):
         """
         Initializes the base sentence model.
@@ -158,7 +158,7 @@ class SentenceModel:
             show_progress_bar: bool = False,
             convert_to_numpy: bool = True,
             convert_to_tensor: bool = False,
-            device: Optional[Literal["cpu", "gpu", "mps"]] = None,
+            device: Optional[str] = None,
             normalize_embeddings: bool = False,
             max_seq_length: int = None,
     ):
