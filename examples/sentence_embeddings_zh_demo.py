@@ -9,7 +9,7 @@ generate sentence embeddings for a given list of sentences.
 import sys
 
 sys.path.append('..')
-from text2vec import SentenceModel, cos_sim, semantic_search, Similarity, EncoderType
+from text2vec import SentenceModel, cos_sim, semantic_search, Similarity
 
 if __name__ == '__main__':
     m = SentenceModel("shibing624/text2vec-base-chinese")

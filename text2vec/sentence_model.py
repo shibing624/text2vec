@@ -8,14 +8,13 @@ import math
 import os
 import queue
 from enum import Enum
-from typing import List, Union, Optional, Dict
+from typing import List, Union, Optional, Dict, Literal
 
 import numpy as np
 import torch
 import torch.multiprocessing as mp
 from loguru import logger
-from torch.utils.data import DataLoader
-from torch.utils.data import Dataset
+from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 from tqdm.autonotebook import trange
 from transformers import AutoTokenizer, AutoModel
@@ -48,9 +47,9 @@ class SentenceModel:
     def __init__(
             self,
             model_name_or_path: str = "shibing624/text2vec-base-chinese",
-            encoder_type: Union[str, EncoderType] = "MEAN",
+            encoder_type: Literal["FIRST_LAST_AVG", "LAST_AVG", "CLS", "POOLER", "MEAN"] = "MEAN",
             max_seq_length: int = 256,
-            device: Optional[str] = None,
+            device: Optional[Literal["cpu", "gpu", "mps"]] = None,
     ):
         """
         Initializes the base sentence model.
@@ -159,7 +158,7 @@ class SentenceModel:
             show_progress_bar: bool = False,
             convert_to_numpy: bool = True,
             convert_to_tensor: bool = False,
-            device: str = None,
+            device: Optional[Literal["cpu", "gpu", "mps"]] = None,
             normalize_embeddings: bool = False,
             max_seq_length: int = None,
     ):

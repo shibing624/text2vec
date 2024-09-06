@@ -27,7 +27,7 @@ data = ['如何更换花呗绑定银行卡',
 print("data:", data)
 num_tokens = sum([len(i) for i in data])
 use_cuda = torch.cuda.is_available()
-repeat = 10 if use_cuda else 1
+repeat = 10 if use_cuda else 4
 
 
 class TransformersEncoder:
