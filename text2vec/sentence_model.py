@@ -58,8 +58,8 @@ class SentenceModel:
         :param encoder_type: The type of encoder to use, See the EncoderType enum for options:
             FIRST_LAST_AVG, LAST_AVG, CLS, POOLER(cls + dense), MEAN(mean of last_hidden_state)
         :param max_seq_length: The maximum sequence length.
-        :param device: Device (like 'cuda' / 'cpu') that should be used for computation. If None, checks if GPU.
-
+        :param device (str, optional): Device (like "cuda", "cpu", "mps", "npu") that should be used for computation.
+            If None, checks if a GPU can be used.
         bert model: https://huggingface.co/transformers/model_doc/bert.html?highlight=bert#transformers.BertModel.forward
         BERT return: <last_hidden_state>, <pooler_output> [hidden_states, attentions]
         Note that: in doc, it says <last_hidden_state> is better semantic summery than <pooler_output>.
