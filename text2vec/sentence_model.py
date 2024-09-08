@@ -74,15 +74,15 @@ class SentenceModel:
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
         self.bert = AutoModel.from_pretrained(model_name_or_path)
         if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
+            device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+            logger.debug("Use pytorch device: {}".format(device))
         self.device = torch.device(device)
-        logger.debug("Use device: {}".format(self.device))
         self.bert.to(self.device)
         self.results = {}  # Save training process evaluation result
 
     def __str__(self):
-        return f"<SentenceModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, " \
-               f"max_seq_length: {self.max_seq_length}, emb_dim: {self.get_sentence_embedding_dimension()}>"
+        return (f"<SentenceModel: {self.model_name_or_path}, encoder_type: {self.encoder_type}, "
+                f"max_seq_length: {self.max_seq_length}, emb_dim: {self.get_sentence_embedding_dimension()}")
 
     def get_sentence_embedding_dimension(self):
         """
