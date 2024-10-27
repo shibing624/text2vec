@@ -8,7 +8,7 @@ import math
 import os
 import queue
 from enum import Enum
-from typing import List, Union, Optional, Dict, Literal
+from typing import List, Union, Optional, Dict
 
 import numpy as np
 import torch
@@ -47,7 +47,7 @@ class SentenceModel:
     def __init__(
             self,
             model_name_or_path: str = "shibing624/text2vec-base-chinese",
-            encoder_type: Literal["FIRST_LAST_AVG", "LAST_AVG", "CLS", "POOLER", "MEAN"] = "MEAN",
+            encoder_type: str = "MEAN",
             max_seq_length: int = 256,
             device: Optional[str] = None,
     ):
