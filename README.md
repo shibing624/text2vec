@@ -228,7 +228,7 @@ Embedding shape: (768,)
 模型库[shibing624/text2vec-base-chinese](https://huggingface.co/shibing624/text2vec-base-chinese)，
 是`text2vec.SentenceModel`指定的默认模型，可以通过上面示例调用，或者如下所示用[transformers库](https://github.com/huggingface/transformers)调用，
 模型自动下载到本机路径：`~/.cache/huggingface/transformers`
-- `w2v-light-tencent-chinese`是通过gensim加载的Word2Vec模型，使用腾讯词向量`Tencent_AILab_ChineseEmbedding.tar.gz`计算各字词的词向量，句子向量通过单词词
+- `w2v-light-tencent-chinese`是通过gensim加载的Word2Vec模型，使用腾讯词向量计算各字词的词向量，句子向量通过单词词
 向量取平均值得到，模型自动下载到本机路径：`~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
 - `text2vec`支持多卡推理(计算文本向量): [examples/computing_embeddings_multi_gpu_demo.py](https://github.com/shibing624/text2vec/blob/master/examples/computing_embeddings_multi_gpu_demo.py)
 
@@ -291,11 +291,9 @@ print(sentence_embeddings)
 
 #### `Word2Vec`词向量
 
-提供两种`Word2Vec`词向量，任选一个：
+提供`Word2Vec`词向量，轻量版腾讯词向量`light_Tencent_AILab_ChineseEmbedding.bin`，二进制文件，111M，是简化后的高频143613个词，每个词向量还是200维（跟原版一样），运行程序，自动下载到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
 
-  - 轻量版腾讯词向量 [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) 或 [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)，二进制文件，111M，是简化后的高频143613个词，每个词向量还是200维（跟原版一样），运行程序，自动下载到 `~/.text2vec/datasets/light_Tencent_AILab_ChineseEmbedding.bin`
-  - 腾讯词向量-官方全量, 6.78G放到： `~/.text2vec/datasets/Tencent_AILab_ChineseEmbedding.txt`，腾讯词向量主页：https://ai.tencent.com/ailab/nlp/zh/index.html 词向量下载地址：https://ai.tencent.com/ailab/nlp/en/download.html  更多查看[腾讯词向量介绍-wiki](https://github.com/shibing624/text2vec/wiki/%E8%85%BE%E8%AE%AF%E8%AF%8D%E5%90%91%E9%87%8F%E4%BB%8B%E7%BB%8D)
-
+模型地址：[Modelscope](https://modelscope.cn/models/lili666/text2vec-word2vec-tencent-chinese/summary) | [百度云盘-密码:tawe](https://pan.baidu.com/s/1La4U4XNFe8s5BJqxPQpeiQ) | [谷歌云盘](https://drive.google.com/u/0/uc?id=1iQo9tBb2NgFOBxx0fA16AZpSgc-bG_Rp&export=download)
 
 ### 命令行模式（CLI）
 
@@ -808,10 +806,6 @@ DatasetDict({
 })
 {'sentence1': '一个女孩在给她的头发做发型。', 'sentence2': '一个女孩在梳头。', 'label': 2}
 ```
-
-
-
-
 
 ## Contact
 

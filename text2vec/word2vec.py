@@ -34,24 +34,27 @@ def load_stopwords(file_path):
 class Word2Vec:
     """Pre-trained word2vec embedding"""
     model_key_map = {
-        # 腾讯词向量, 6.78G
+        # 腾讯词向量, 6.78G, 下载不了
         'w2v-tencent-chinese': {
             'tar_filename': 'Tencent_AILab_ChineseEmbedding.tar.gz',
-            'url': 'https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz',
+            'url': 'https://ai.tencent.com/ailab/nlp/data/Tencent_AILab_ChineseEmbedding.tar.gz',  # dropped
             'binary': False,
             'untar_filename': 'Tencent_AILab_ChineseEmbedding.txt'},
         # 轻量版腾讯词向量，二进制，111MB
         'w2v-light-tencent-chinese': {
             'tar_filename': 'light_Tencent_AILab_ChineseEmbedding.bin',
-            'url': 'https://github.com/shibing624/text2vec/releases/download/1.1.4/light_Tencent_AILab_ChineseEmbedding.bin',
+            'url': 'https://modelscope.cn/models/lili666/text2vec-word2vec-tencent-chinese/resolve/master/light_Tencent_AILab_ChineseEmbedding.bin',
             'binary': True,
             'untar_filename': 'light_Tencent_AILab_ChineseEmbedding.bin'},
     }
 
-    def __init__(self, model_name_or_path: str = 'w2v-light-tencent-chinese',
-                 w2v_kwargs: Dict = None,
-                 stopwords: List[str] = None,
-                 cache_folder: str = USER_DATA_DIR):
+    def __init__(
+            self,
+            model_name_or_path: str = 'w2v-light-tencent-chinese',
+            w2v_kwargs: Dict = None,
+            stopwords: List[str] = None,
+            cache_folder: str = USER_DATA_DIR
+    ):
         """
         Init word2vec model
 
@@ -101,7 +104,7 @@ class Word2Vec:
         return f"<Word2Vec, word count: {len(self.w2v.key_to_index)}, emb size: {self.w2v.vector_size}, " \
                f"stopwords count: {len(self.stopwords)}>"
 
-    def encode(self, sentences: Union[List[str], str], show_progress_bar: bool = False) -> ndarray:
+    def encode(self, sentences: Union[List[str], str], show_progress_bar: bool = False, **kwargs) -> ndarray:
         """
         Encode sentences to vectors
         """
