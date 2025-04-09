@@ -45,6 +45,7 @@ setup(
         "tqdm",
         "scikit-learn",
         "pandas",
+        "gensim",
     ],
     packages=find_packages(exclude=['tests']),
     package_dir={'text2vec': 'text2vec'},
