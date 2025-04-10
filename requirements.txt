@@ -5,3 +5,4 @@ datasets
 tqdm
 scikit-learn
 pandas
+gensim

@@ -11,9 +11,10 @@ import pandas as pd
 import torch
 from loguru import logger
 from torch import nn
+from torch.optim import AdamW
 from torch.utils.data import DataLoader, Dataset, DistributedSampler
 from tqdm import tqdm, trange
-from transformers.optimization import AdamW, get_linear_schedule_with_warmup
+from transformers.optimization import get_linear_schedule_with_warmup
 
 from text2vec.cosent_dataset import CosentTrainDataset, load_cosent_train_data, HFCosentTrainDataset
 from text2vec.sentence_model import SentenceModel
