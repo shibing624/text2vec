@@ -38,7 +38,7 @@ class FlagDRESModel(DRESModel):
         self.pooling_method = pooling_method
         self.batch_size = batch_size
 
-        self.device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+        self.device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
         self.model = self.model.to(self.device)
 
         num_gpus = torch.cuda.device_count()

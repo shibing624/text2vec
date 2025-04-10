@@ -6,3 +6,4 @@ tqdm
 scikit-learn
 pandas
 gensim
+kenlm

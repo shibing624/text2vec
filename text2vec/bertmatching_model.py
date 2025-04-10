@@ -26,7 +26,7 @@ from text2vec.bertmatching_dataset import (
 from text2vec.text_matching_dataset import load_text_matching_train_data, load_text_matching_test_data
 from text2vec.utils.stats_util import compute_spearmanr, compute_pearsonr, set_seed
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 
 class BertMatchModule(nn.Module):

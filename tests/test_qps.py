@@ -16,7 +16,7 @@ sys.path.append('..')
 from text2vec import Word2Vec, SentenceModel
 from sentence_transformers import SentenceTransformer
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 pwd_path = os.path.abspath(os.path.dirname(__file__))

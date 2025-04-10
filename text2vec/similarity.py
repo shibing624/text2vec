@@ -17,7 +17,7 @@ from text2vec.utils.distance import cosine_distance
 from text2vec.utils.tokenizer import JiebaTokenizer
 from text2vec.word2vec import Word2Vec
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 
 class SimilarityType(Enum):
@@ -173,8 +173,8 @@ def semantic_search(query_embeddings: Tensor,
     This function performs a cosine similarity search between a list of query embeddings  and a list of corpus embeddings.
     It can be used for Information Retrieval / Semantic Search for corpora up to about 1 Million entries.
 
-    :param query_embeddings: A 2 dimensional tensor with the query embeddings.
-    :param corpus_embeddings: A 2 dimensional tensor with the corpus embeddings.
+    :param query_embeddings: Two dim tensor with the query embeddings.
+    :param corpus_embeddings: Two dim tensor with the corpus embeddings.
     :param query_chunk_size: Process 100 queries simultaneously. Increasing that value increases the speed, but requires more memory.
     :param corpus_chunk_size: Scans the corpus 100k entries at a time. Increasing that value increases the speed, but requires more memory.
     :param top_k: Retrieve top k matching entries.
@@ -195,7 +195,6 @@ def semantic_search(query_embeddings: Tensor,
     elif isinstance(corpus_embeddings, list):
         corpus_embeddings = torch.stack(corpus_embeddings)
 
-    # Check that corpus and queries are on the same device
     query_embeddings = query_embeddings.to(device)
     corpus_embeddings = corpus_embeddings.to(device)
 
