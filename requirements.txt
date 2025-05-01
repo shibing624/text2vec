@@ -5,5 +5,5 @@ datasets
 tqdm
 scikit-learn
 pandas
-gensim
+#gensim
 kenlm
