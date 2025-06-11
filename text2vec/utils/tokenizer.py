@@ -45,7 +45,7 @@ def segment(sentence, cut_type='word', pos=False):
 class JiebaTokenizer(object):
     def __init__(self, dict_path='', custom_word_freq_dict=None):
         self.model = jieba
-        self.model.default_logger.setLevel(logging.ERROR)
+        self.model.logger.setLevel(logging.ERROR)
         # 初始化大词典
         if os.path.exists(dict_path):
             self.model.set_dictionary(dict_path)
@@ -62,4 +62,4 @@ class JiebaTokenizer(object):
         :param HMM: 是否打开NER识别，默认打开
         :return:  A list of strings.
         """
-        return self.model.lcut(sentence, cut_all=cut_all, HMM=HMM)
+        return list(self.model.cut(sentence, cut_all=cut_all, HMM=HMM))
