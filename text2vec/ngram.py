@@ -31,7 +31,7 @@ class NGram:
         except ImportError:
             raise ImportError('Kenlm not installed, use "pip install kenlm".')
         self.lm = kenlm.Model(language_model_path)
-        logger.debug('Loaded language model: %s.' % language_model_path)
+        # logger.debug('Loaded language model: %s.' % language_model_path)
 
     def ngram_score(self, sentence: str):
         """

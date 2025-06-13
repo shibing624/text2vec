@@ -69,7 +69,8 @@ class Word2Vec:
 
         self.w2v_kwargs = w2v_kwargs if w2v_kwargs is not None else {}
         if model_name_or_path and os.path.exists(model_name_or_path):
-            logger.info('Load pretrained model:{}'.format(model_name_or_path))
+            # logger.debug('Load pretrained model:{}'.format(model_name_or_path))
+            pass
         else:
             model_dict = self.model_key_map.get(model_name_or_path, self.model_key_map['w2v-light-tencent-chinese'])
             tar_filename = model_dict.get('tar_filename')
@@ -81,7 +82,8 @@ class Word2Vec:
             old_model_name = model_name_or_path
             model_name_or_path = os.path.join(cache_folder, untar_filename)
             if old_model_name in self.model_key_map:
-                logger.info('Load pretrained model:{}, path:{}'.format(old_model_name, model_name_or_path))
+                # logger.info('Load pretrained model:{}, path:{}'.format(old_model_name, model_name_or_path))
+                pass
             else:
                 logger.warning(f"{old_model_name} not found, Set default model path: {model_name_or_path}")
             if not os.path.exists(model_name_or_path):
@@ -93,8 +95,7 @@ class Word2Vec:
                          verbose=1)
         t0 = time.time()
         w2v = KeyedVectors.load_word2vec_format(model_name_or_path, **self.w2v_kwargs)
-        # w2v.init_sims(replace=True)
-        logger.debug('Load w2v from {}, spend {:.2f} sec'.format(model_name_or_path, time.time() - t0))
+        # logger.debug('Load w2v from {}, spend {:.2f} sec'.format(model_name_or_path, time.time() - t0))
         self.stopwords = stopwords if stopwords else load_stopwords(default_stopwords_file)
         self.w2v = w2v
         self.jieba_tokenizer = JiebaTokenizer()

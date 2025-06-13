@@ -140,6 +140,17 @@ class Similarity:
                         scores[i][j] = cosine_distance(e1, e2)
         return scores
 
+    def similarity(self, sentences1: List[str], sentences2: List[str], only_aligned: bool = False) -> ndarray:
+        """
+        Alias for get_scores
+        :param sentences1: list, sentence1 list
+        :param sentences2: list, sentence2 list
+        :param only_aligned: bool, default False return all scores, if True only return scores[i][i],
+            effective when EmbeddingType.WORD2VEC
+        :return: return: Matrix with res[i][j]  = cos_sim(a[i], b[j])
+        """
+        return self.get_scores(sentences1, sentences2, only_aligned)
+
 
 def cos_sim(a: Tensor, b: Tensor):
     """

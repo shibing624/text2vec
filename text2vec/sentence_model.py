@@ -47,7 +47,7 @@ class SentenceModel:
     def __init__(
             self,
             model_name_or_path: str = "shibing624/text2vec-base-chinese",
-            encoder_type: str = "MEAN",
+            encoder_type: Optional[Union[str, EncoderType]] = "MEAN",
             max_seq_length: int = 256,
             device: Optional[str] = None,
     ):
@@ -75,7 +75,7 @@ class SentenceModel:
         self.bert = AutoModel.from_pretrained(model_name_or_path)
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-            logger.debug("Use pytorch device: {}".format(device))
+            # logger.debug("Use pytorch device: {}".format(device))
         self.device = torch.device(device)
         self.bert.to(self.device)
         self.results = {}  # Save training process evaluation result
