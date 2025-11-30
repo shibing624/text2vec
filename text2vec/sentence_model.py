@@ -205,14 +205,17 @@ class SentenceModel:
                 if normalize_embeddings:
                     embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
 
+                # Convert to numpy/cpu immediately to free GPU memory
                 if convert_to_numpy:
+                    embeddings = embeddings.cpu().numpy()
+                elif convert_to_tensor:
                     embeddings = embeddings.cpu()
                 all_embeddings.extend(embeddings)
         all_embeddings = [all_embeddings[idx] for idx in np.argsort(length_sorted_idx)]
         if convert_to_tensor:
             all_embeddings = torch.stack(all_embeddings)
         elif convert_to_numpy:
-            all_embeddings = np.asarray([emb.numpy() for emb in all_embeddings])
+            all_embeddings = np.asarray(all_embeddings)
 
         if input_is_string:
             all_embeddings = all_embeddings[0]
